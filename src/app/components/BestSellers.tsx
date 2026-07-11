@@ -1,8 +1,11 @@
 import Link from "next/link";
 import ProductCard from "./ProductCard";
-import { products } from "../data/products";
+import { getProducts } from "../data/products";
 
-export default function BestSellers() {
+export default async function BestSellers() {
+  const products = await getProducts();
+  const featured = products.slice(0, 4);
+
   return (
     <section className="bg-[#0b0b0b] py-20">
       <div className="mx-auto max-w-7xl px-6">
@@ -15,7 +18,6 @@ export default function BestSellers() {
               Избрани оригинални патосници од нашата понуда.
             </p>
           </div>
-
           <Link
             href="/products"
             className="hidden rounded-xl border border-red-600 px-6 py-3 font-semibold text-white transition hover:bg-red-600 lg:block"
@@ -25,7 +27,7 @@ export default function BestSellers() {
         </div>
 
         <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-4">
-          {products.slice(0, 4).map((product) => (
+          {featured.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
