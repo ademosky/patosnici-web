@@ -1,4 +1,4 @@
-import productsData from "./products.json";
+import { supabase } from "@/lib/supabase";
 
 export type Product = {
   id: number;
@@ -14,4 +14,23 @@ export type Product = {
   sku?: string;
 };
 
-export const products: Product[] = productsData as Product[];
+export async function getProducts(): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .order("created_at", { ascending: true });
+
+  if (error) { console.error("getProducts error:", error); return []; }
+  return data as Product[];
+}
+
+export async function getProductBySlug(slug: string): Promise<Product | null> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("slug", slug)
+    .single();
+
+  if (error) return null;
+  return data as Product;
+}
