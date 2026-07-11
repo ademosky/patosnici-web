@@ -90,7 +90,7 @@ export default async function ProductPage({ params }: Props) {
                   {product.price}
                 </span>
                 <span className="mb-1 text-sm text-zinc-500">
-                  со ДДВ · плаќање при подигање
+                  · плаќање при подигање
                 </span>
               </div>
 
