@@ -28,6 +28,31 @@ const EMPTY_FORM = {
   price: "", image: "", description: "", sku: "",
 };
 
+async function compressImage(file: File): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const MAX = 1200;
+      const ratio = Math.min(1, MAX / img.width);
+      const canvas = document.createElement("canvas");
+      canvas.width  = Math.round(img.width  * ratio);
+      canvas.height = Math.round(img.height * ratio);
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return reject(new Error("Canvas error"));
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(
+        (blob) => blob ? resolve(blob) : reject(new Error("Compress failed")),
+        "image/webp",
+        0.82
+      );
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
 export default function AdminPage() {
   const [password, setPassword]   = useState("");
   const [authed, setAuthed]       = useState(false);
@@ -59,26 +84,47 @@ export default function AdminPage() {
     if (pw) { setAuthed(true); fetchProducts(pw); }
   }, [fetchProducts]);
 
+  // ── UPLOAD — компресија во браузер + директно кон Supabase ──
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
     setUploading(true);
+
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        headers: { "x-admin-password": getPw() },
-        body: fd,
-      });
-     if (res.ok) {
-        const { path, originalKB, compressedKB, savedPercent } = await res.json();
-        setForm((prev) => ({ ...prev, image: path }));
-        showToast(`✓ ${originalKB}KB → ${compressedKB}KB (-${savedPercent}%)`);
-  } else {
-        const err = await res.json().catch(() => ({}));
-        showToast(err.error ?? "Грешка при прикачување!", false);
-      }
+      const compressed = await compressImage(file);
+
+      const safeName = file.name
+        .toLowerCase()
+        .replace(/\.[^.]+$/, "")
+        .replace(/[^a-z0-9-]/g, "-")
+        .slice(0, 40) || "slika";
+      const filename = `${safeName}-${Date.now()}.webp`;
+
+      const { createClient } = await import("@supabase/supabase-js");
+      const sb = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+
+      const { error } = await sb.storage
+        .from("products")
+        .upload(filename, compressed, {
+          contentType: "image/webp",
+          upsert: false,
+        });
+
+      if (error) throw error;
+
+      const { data } = sb.storage.from("products").getPublicUrl(filename);
+
+      const originalKB   = Math.round(file.size / 1024);
+      const compressedKB = Math.round(compressed.size / 1024);
+      const saved        = Math.round((1 - compressed.size / file.size) * 100);
+
+      setForm((prev) => ({ ...prev, image: data.publicUrl }));
+      showToast(`✓ ${originalKB}KB → ${compressedKB}KB (-${saved}%)`);
+
     } catch (err) {
       showToast(`Грешка: ${String(err)}`, false);
     } finally {
@@ -106,14 +152,9 @@ export default function AdminPage() {
   const handleEditClick = (p: Product) => {
     setEditId(p.id);
     setForm({
-      title: p.title,
-      brand: p.brand,
-      model: p.model,
-      year: p.year,
-      price: p.price,
-      image: p.image,
-      description: p.description,
-      sku: p.sku ?? "",
+      title: p.title, brand: p.brand, model: p.model,
+      year: p.year, price: p.price, image: p.image,
+      description: p.description, sku: p.sku ?? "",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -247,7 +288,7 @@ export default function AdminPage() {
                 >
                   <div className="relative h-16 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-zinc-900">
                     {p.image ? (
-                      <Image src={p.image} alt={p.title} fill className="object-cover" />
+                      <Image src={p.image} alt={p.title} fill className="object-cover" unoptimized />
                     ) : (
                       <div className="flex h-full items-center justify-center">
                         <ImageIcon size={18} className="text-zinc-600" />
@@ -266,14 +307,12 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <span className="flex-shrink-0 font-bold text-red-500">{p.price}</span>
-                  <button
-                    onClick={() => editId === p.id ? cancelEdit() : handleEditClick(p)}
+                  <button onClick={() => editId === p.id ? cancelEdit() : handleEditClick(p)}
                     className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border transition ${editId === p.id ? "border-red-600 bg-red-600/20 text-red-400" : "border-zinc-700 text-zinc-400 hover:border-blue-500 hover:text-blue-400"}`}
                   >
                     {editId === p.id ? <X size={15} /> : <Pencil size={15} />}
                   </button>
-                  <button
-                    onClick={() => handleDelete(p.id, p.title)}
+                  <button onClick={() => handleDelete(p.id, p.title)}
                     className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-zinc-700 text-zinc-500 transition hover:border-red-600 hover:text-red-500"
                   >
                     <Trash2 size={15} />
@@ -304,7 +343,6 @@ export default function AdminPage() {
             <form onSubmit={handleSubmit}
               className={`space-y-4 rounded-2xl border bg-[#111] p-6 ${editId !== null ? "border-blue-800/50" : "border-zinc-800"}`}
             >
-              {/* Назив */}
               <div>
                 <label className={labelClass}>Назив *</label>
                 <input required value={form.title}
@@ -314,7 +352,6 @@ export default function AdminPage() {
                 />
               </div>
 
-              {/* Бренд */}
               <div>
                 <label className={labelClass}>Бренд *</label>
                 <select required value={form.brand}
@@ -328,7 +365,6 @@ export default function AdminPage() {
                 </select>
               </div>
 
-              {/* Модел */}
               <div>
                 <label className={labelClass}>Модел *</label>
                 <input required value={form.model}
@@ -338,7 +374,6 @@ export default function AdminPage() {
                 />
               </div>
 
-              {/* Години */}
               <div>
                 <label className={labelClass}>Години</label>
                 <input value={form.year}
@@ -348,7 +383,6 @@ export default function AdminPage() {
                 />
               </div>
 
-              {/* Цена */}
               <div>
                 <label className={labelClass}>Цена *</label>
                 <input required value={form.price}
@@ -358,47 +392,48 @@ export default function AdminPage() {
                 />
               </div>
 
-              {/* ✅ SKU */}
               <div>
                 <label className={labelClass}>SKU број</label>
-                <input
-                  value={form.sku}
+                <input value={form.sku}
                   onChange={(e) => update("sku", e.target.value)}
                   placeholder="пр. PAT-BMW-003"
                   className={inputClass}
                 />
-                <p className="mt-1 text-xs text-zinc-600">
-                  Интерен код за идентификација на производот
-                </p>
+                <p className="mt-1 text-xs text-zinc-600">Интерен код за идентификација</p>
               </div>
 
-              {/* Слика */}
+              {/* СЛИКА */}
               <div>
                 <label className={labelClass}>Слика на производот</label>
                 <label className={`group flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl border-2 border-dashed border-zinc-700 bg-[#151515] py-7 text-sm text-zinc-400 transition hover:border-red-600 hover:text-white ${uploading ? "pointer-events-none opacity-60" : ""}`}>
-                  <input type="file" accept=".jpg,.jpeg,.png,.webp"
+                  <input type="file" accept=".jpg,.jpeg,.png,.webp,.heic"
                     onChange={handleFileUpload} disabled={uploading} className="hidden"
                   />
                   {uploading ? (
-                    <><Loader2 size={20} className="animate-spin text-red-500" /><span>Прикачување...</span></>
+                    <><Loader2 size={20} className="animate-spin text-red-500" /><span>Компресирање и прикачување...</span></>
                   ) : (
                     <><Upload size={20} className="text-zinc-500 group-hover:text-red-500 transition" /><span>Кликни за прикачување слика</span></>
                   )}
                 </label>
-                <p className="mt-2 text-center text-xs text-zinc-600">JPG, PNG, WebP · max 5MB</p>
+                <p className="mt-2 text-center text-xs text-zinc-600">
+                  JPG, PNG, WebP · Автоматски се компресира во WebP
+                </p>
+
                 <div className="my-3 flex items-center gap-3">
                   <div className="h-px flex-1 bg-zinc-800" />
                   <span className="text-xs text-zinc-600">или рачно</span>
                   <div className="h-px flex-1 bg-zinc-800" />
                 </div>
+
                 <input value={form.image}
                   onChange={(e) => update("image", e.target.value)}
-                  placeholder="/images/products/naziv.webp"
+                  placeholder="https://... или /products/..."
                   className={inputClass}
                 />
+
                 {form.image ? (
                   <div className="relative mt-3 h-36 overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900">
-                    <Image src={form.image} alt="preview" fill className="object-cover" />
+                    <Image src={form.image} alt="preview" fill className="object-cover" unoptimized />
                     <button type="button" onClick={() => update("image", "")}
                       className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-white transition hover:bg-red-600"
                     >
@@ -415,7 +450,6 @@ export default function AdminPage() {
                 )}
               </div>
 
-              {/* Опис */}
               <div>
                 <label className={labelClass}>Опис</label>
                 <textarea rows={3} value={form.description}
@@ -425,7 +459,6 @@ export default function AdminPage() {
                 />
               </div>
 
-              {/* Submit */}
               <button type="submit" disabled={loading || uploading}
                 className={`flex w-full items-center justify-center gap-2 rounded-xl py-4 text-sm font-bold uppercase tracking-wide text-white transition disabled:opacity-60 ${editId !== null ? "bg-blue-600 hover:bg-blue-700" : "bg-red-600 hover:bg-red-700"}`}
               >
