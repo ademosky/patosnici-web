@@ -71,11 +71,11 @@ export default function AdminPage() {
         headers: { "x-admin-password": getPw() },
         body: fd,
       });
-      if (res.ok) {
-        const { path, sizeKB } = await res.json();
+     if (res.ok) {
+        const { path, originalKB, compressedKB, savedPercent } = await res.json();
         setForm((prev) => ({ ...prev, image: path }));
-        showToast(`Сликата е прикачена (${sizeKB}KB) ✓`);
-      } else {
+        showToast(`✓ ${originalKB}KB → ${compressedKB}KB (-${savedPercent}%)`);
+  } else {
         const err = await res.json().catch(() => ({}));
         showToast(err.error ?? "Грешка при прикачување!", false);
       }
