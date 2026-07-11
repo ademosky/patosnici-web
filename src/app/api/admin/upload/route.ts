@@ -1,81 +1,55 @@
-export const runtime = "nodejs";
-
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join, extname } from "path";
-import { existsSync } from "fs";
-
-const UPLOAD_DIR = join(process.cwd(), "public/images/products");
+import { supabase } from "@/lib/supabase";
+import { extname } from "path";
 
 function checkAuth(req: NextRequest) {
   return req.headers.get("x-admin-password") === process.env.ADMIN_PASSWORD;
 }
 
 export async function POST(req: NextRequest) {
-  try {
-    if (!checkAuth(req))
-      return NextResponse.json({ error: "Неовластен пристап" }, { status: 401 });
+  if (!checkAuth(req))
+    return NextResponse.json({ error: "Неовластен пристап" }, { status: 401 });
 
-    // Создај фолдер
-    if (!existsSync(UPLOAD_DIR)) {
-      await mkdir(UPLOAD_DIR, { recursive: true });
-    }
+  const formData = await req.formData();
+  const file = formData.get("file") as File | null;
 
-    // Парсирај form data
-    let formData: FormData;
-    try {
-      formData = await req.formData();
-    } catch (err) {
-      console.error("FormData parse error:", err);
-      return NextResponse.json({ error: `FormData грешка: ${err}` }, { status: 400 });
-    }
+  if (!file)
+    return NextResponse.json({ error: "Нема фајл" }, { status: 400 });
 
-    const file = formData.get("file") as File | null;
-    console.log("File:", file?.name, "Type:", file?.type, "Size:", file?.size);
+  const ext = extname(file.name).toLowerCase();
+  const allowed = [".jpg", ".jpeg", ".png", ".webp"];
+  if (!allowed.includes(ext))
+    return NextResponse.json({ error: "Само JPG, PNG или WebP!" }, { status: 400 });
 
-    if (!file)
-      return NextResponse.json({ error: "Нема фајл во барањето" }, { status: 400 });
+  if (file.size > 5 * 1024 * 1024)
+    return NextResponse.json({ error: "Максимум 5MB!" }, { status: 400 });
 
-    // Провери наставка
-    const ext = extname(file.name).toLowerCase();
-    console.log("Extension:", ext);
+  const safeName = file.name
+    .toLowerCase()
+    .replace(extname(file.name), "")
+    .replace(/[^a-z0-9-]/g, "-")
+    .slice(0, 40) || "slika";
+  const filename = `${safeName}-${Date.now()}${ext}`;
 
-    const allowedExt = [".jpg", ".jpeg", ".png", ".webp"];
-    if (!allowedExt.includes(ext))
-      return NextResponse.json({ error: `Неподдржан формат: ${ext}` }, { status: 400 });
+  const bytes = await file.arrayBuffer();
 
-    // Провери големина
-    if (file.size > 5 * 1024 * 1024)
-      return NextResponse.json({ error: `Преголем фајл: ${Math.round(file.size/1024)}KB` }, { status: 400 });
-
-    // Генерирај ime
-    const nameWithoutExt = (file.name
-      .toLowerCase()
-      .replace(extname(file.name), "")
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "")
-      .slice(0, 40)) || "slika";
-
-    const filename = `${nameWithoutExt}-${Date.now()}${ext}`;
-    const fullPath = join(UPLOAD_DIR, filename);
-    console.log("Saving to:", fullPath);
-
-    // Зачувај
-    const bytes = await file.arrayBuffer();
-    await writeFile(fullPath, Buffer.from(bytes));
-    console.log("Saved successfully!");
-
-    return NextResponse.json({
-      path: `/images/products/${filename}`,
-      filename,
-      sizeKB: Math.round(file.size / 1024),
+  const { error } = await supabase.storage
+    .from("products")
+    .upload(filename, bytes, {
+      contentType: file.type || "image/webp",
+      upsert: false,
     });
 
-  } catch (err: any) {
-    console.error("Upload error:", err);
-    return NextResponse.json(
-      { error: `Серверска грешка: ${err?.message ?? err}` },
-      { status: 500 }
-    );
-  }
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 500 });
+
+  const { data } = supabase.storage
+    .from("products")
+    .getPublicUrl(filename);
+
+  return NextResponse.json({
+    path: data.publicUrl,
+    filename,
+    sizeKB: Math.round(file.size / 1024),
+  });
 }
