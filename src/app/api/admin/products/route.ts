@@ -38,6 +38,7 @@ const slug = `${baseSlug}-${Date.now()}`;
       title: body.title,
       brand: body.brand,
       model: body.model,
+      car_model: body.car_model || "",
       year: body.year || "",
       price: body.price,
       image: body.image || "/products/golf5.jpg",

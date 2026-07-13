@@ -16,6 +16,7 @@ type Product = {
   title: string;
   brand: string;
   model: string;
+  car_model: string;
   year: string;
   price: string;
   image: string;
@@ -24,7 +25,7 @@ type Product = {
 };
 
 const EMPTY_FORM = {
-  title: "", brand: "", model: "", year: "",
+  title: "", brand: "", car_model: "", model: "", year: "",
   price: "", image: "", description: "", sku: "",
 };
 
@@ -152,7 +153,7 @@ export default function AdminPage() {
   const handleEditClick = (p: Product) => {
     setEditId(p.id);
     setForm({
-      title: p.title, brand: p.brand, model: p.model,
+      title: p.title, brand: p.brand, model: p.model,car_model: p.car_model ?? "",
       year: p.year, price: p.price, image: p.image,
       description: p.description, sku: p.sku ?? "",
     });
@@ -364,6 +365,18 @@ export default function AdminPage() {
                   ))}
                 </select>
               </div>
+              {/* Car Model */}
+              <div>
+                  <label className={labelClass}>Модел на возило *</label>
+                  <input required value={form.car_model}
+                    onChange={(e) => update("car_model", e.target.value)}
+                          placeholder="пр. A3, Golf, Seria 3, C-Klasse"
+                        className={inputClass}
+                        />
+                    <p className="mt-1 text-xs text-zinc-600">
+                  Само основниот модел — без варијанта
+                  </p>
+                    </div>
 
               <div>
                 <label className={labelClass}>Модел *</label>
