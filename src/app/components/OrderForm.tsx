@@ -63,7 +63,7 @@ export default function OrderForm({ productTitle, productPrice, productSku }: Pr
 
   return (
     <form onSubmit={handleSubmit} className="rounded-2xl border border-zinc-800 bg-[#111111] p-8">
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
 
         <div>
           <label className={labelClass}>Ime *</label>
