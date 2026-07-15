@@ -13,6 +13,7 @@ export type Product = {
   images?: string[];
   description: string;
   sku?: string;
+  in_stock?: boolean;
 };
 export async function getProducts(): Promise<Product[]> {
   const { data, error } = await supabase
