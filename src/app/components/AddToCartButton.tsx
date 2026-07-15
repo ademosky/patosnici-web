@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { ShoppingCart, CheckCircle } from "lucide-react";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../context/CartContext";
 
 type Props = {
   product: {
