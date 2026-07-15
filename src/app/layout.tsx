@@ -17,12 +17,46 @@ const dmSans = DM_Sans({
   weight: ["400", "500", "600"],
 });
 
+const SITE_URL = "https://www.originalpatosnici.com";
+const OG_IMAGE = `${SITE_URL}/images/hero-bg.png`;
+
 export const metadata: Metadata = {
-  title: "Original Patosnici | Оригинални гумени патосници",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Original Patosnici | Оригинални гумени патосници",
+    template: "%s | Original Patosnici",
+  },
   description:
-    "Оригинални гумени патосници за сите марки возила. Издржливи, практични и лесни за одржување. Достава низ цела Македонија.",
+    "Оригинални гумени патосници за сите марки возила — VW, BMW, Audi, Mercedes, Škoda и уште 30+ брендови. Достава низ цела Македонија. Плаќање при подигање.",
   keywords:
-    "патосници, гумени патосници, автомобилски патосници, VW, BMW, Audi, Mercedes, Škoda",
+    "патосници, гумени патосници, автомобилски патосници, VW, BMW, Audi, Mercedes, Škoda, Македонија",
+  openGraph: {
+    type: "website",
+    locale: "mk_MK",
+    url: SITE_URL,
+    siteName: "Original Patosnici",
+    title: "Original Patosnici | Гумени патосници за сите возила",
+    description:
+      "Оригинални гумени патосници за 30+ брендови. Достава низ цела Македонија. Плаќање при подигање.",
+    images: [
+      {
+        url: OG_IMAGE,
+        width: 1200,
+        height: 630,
+        alt: "Original Patosnici — Гумени патосници за автомобили",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Original Patosnici | Гумени патосници",
+    description: "Оригинални гумени патосници за 30+ брендови. Македонија.",
+    images: [OG_IMAGE],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
