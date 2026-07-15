@@ -107,6 +107,41 @@ export async function POST(req: NextRequest) {
       `,
     });
 
+    // Ако клиентот внел email — испрати потврда и до него
+    if (body.email) {
+      const customerSubject = "Вашата нарачка е примена — Original Patosnici";
+      const itemsList = isCartOrder
+        ? (body.items as CartItem[]).map((i: CartItem) =>
+            `• ${i.title} x${i.quantity} — ${i.price}`
+          ).join("\n")
+        : `• ${body.productTitle} — ${body.productPrice}`;
+
+      await transporter.sendMail({
+        from: '"Original Patosnici" <patosnicimk@gmail.com>',
+        to: body.email,
+        subject: customerSubject,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto;">
+            <div style="background: #dc2626; padding: 24px; border-radius: 12px 12px 0 0;">
+              <h1 style="color: white; margin: 0; font-size: 20px;">✅ Нарачката е примена!</h1>
+            </div>
+            <div style="background: #111; padding: 24px; border-radius: 0 0 12px 12px; border: 1px solid #333;">
+              <p style="color: #a1a1aa; margin-bottom: 16px;">Ви благодариме за нарачката! Ќе ве контактираме наскоро за потврда и достава.</p>
+
+              <div style="background: #1a1a1a; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                <p style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Нарачани производи</p>
+                <pre style="color: white; font-size: 14px; white-space: pre-wrap; margin: 0;">${itemsList}</pre>
+              </div>
+
+              <p style="color: #888; font-size: 13px; margin: 0;">
+                За прашања: <a href="mailto:patosnicimk@gmail.com" style="color: #dc2626;">patosnicimk@gmail.com</a>
+              </p>
+            </div>
+          </div>
+        `,
+      });
+    }
+
     return NextResponse.json({ success: true });
   } catch (err: any) {
     console.error("Email error:", err?.message ?? err);
