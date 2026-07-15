@@ -9,7 +9,7 @@ import { Trash2, Plus, Minus, ShoppingCart, Send, CheckCircle, Loader2, ArrowLef
 
 export default function CartPage() {
   const { items, removeItem, updateQty, clearCart } = useCart();
-  const [form, setForm] = useState({ name: "", surname: "", address: "", city: "", phone: "" });
+  const [form, setForm] = useState({ name: "", surname: "", address: "", city: "", phone: "", email: "" });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
@@ -175,6 +175,14 @@ export default function CartPage() {
                   <div>
                     <label className={labelClass}>Telefon *</label>
                     <input type="tel" required value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+389 70 123 456" className={inputClass} />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className={labelClass}>
+                      Email{" "}
+                      <span className="font-normal normal-case text-zinc-600">(опционален — за потврда)</span>
+                    </label>
+                    <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="vasiot@email.com" className={inputClass} />
                   </div>
 
                   {error && (
