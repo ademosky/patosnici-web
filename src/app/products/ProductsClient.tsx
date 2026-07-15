@@ -122,29 +122,32 @@ function ProductsContent({ initialProducts, brands }: Props) {
               <p className="mb-3 text-xs font-bold uppercase tracking-widest text-zinc-500">
                 Избери модел на {activeBrandName}:
               </p>
-              <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={() => router.push(`/products?brand=${activeBrand}`)}
-                  className={`rounded-2xl px-6 py-3 text-sm font-bold uppercase tracking-wide transition ${
-                    activeCarModel === "all"
-                      ? "bg-red-600 text-white"
-                      : "border-2 border-zinc-700 text-zinc-300 hover:border-red-600 hover:text-white"
-                  }`}
-                >
-                  Сите {activeBrandName}
-                </button>
-                {carModels.map((model) => (
-                  <button key={model}
-                    onClick={() => router.push(`/products?brand=${activeBrand}&car_model=${encodeURIComponent(model)}`)}
-                    className={`rounded-2xl px-6 py-3 text-sm font-bold uppercase tracking-wide transition ${
-                      activeCarModel === model
+              {/* Horizontal scroll on mobile, wrap on larger screens */}
+              <div className="-mx-6 px-6 sm:mx-0 sm:px-0">
+                <div className="flex gap-3 overflow-x-auto pb-2 sm:flex-wrap sm:overflow-x-visible sm:pb-0">
+                  <button
+                    onClick={() => router.push(`/products?brand=${activeBrand}`)}
+                    className={`flex-shrink-0 rounded-2xl px-6 py-3 text-sm font-bold uppercase tracking-wide transition ${
+                      activeCarModel === "all"
                         ? "bg-red-600 text-white"
                         : "border-2 border-zinc-700 text-zinc-300 hover:border-red-600 hover:text-white"
                     }`}
                   >
-                    {activeBrandName} {model}
+                    Сите {activeBrandName}
                   </button>
-                ))}
+                  {carModels.map((model) => (
+                    <button key={model}
+                      onClick={() => router.push(`/products?brand=${activeBrand}&car_model=${encodeURIComponent(model)}`)}
+                      className={`flex-shrink-0 rounded-2xl px-6 py-3 text-sm font-bold uppercase tracking-wide transition ${
+                        activeCarModel === model
+                          ? "bg-red-600 text-white"
+                          : "border-2 border-zinc-700 text-zinc-300 hover:border-red-600 hover:text-white"
+                      }`}
+                    >
+                      {activeBrandName} {model}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}
