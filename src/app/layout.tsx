@@ -3,6 +3,7 @@ import { Barlow_Condensed, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Footer from "./components/Footer";
 import { CartProvider } from "./context/CartContext";
+import FacebookFloat from "./components/FacebookFloat";
 
 const barlowCondensed = Barlow_Condensed({
   variable: "--font-heading",
@@ -37,6 +38,7 @@ export default function RootLayout({
         <CartProvider>
           {children}
           <Footer />
+          <FacebookFloat />
         </CartProvider>
       </body>
     </html>
