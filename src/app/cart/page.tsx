@@ -138,11 +138,26 @@ export default function CartPage() {
                 ))}
 
                 <div className="rounded-2xl border border-zinc-800 bg-[#111] p-5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-zinc-400">Вкупно производи:</span>
-                    <span className="font-bold text-white">{items.reduce((s, i) => s + i.quantity, 0)} ком</span>
+                  {/* Вкупно производи */}
+                  <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+                    <span className="text-sm text-zinc-400">Вкупно производи:</span>
+                    <span className="font-semibold text-white">{items.reduce((s, i) => s + i.quantity, 0)} ком</span>
                   </div>
-                  <p className="mt-2 text-xs text-zinc-600">* Цената се потврдува при контакт · Плаќање при подигање</p>
+
+                  {/* Вкупна цена */}
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="text-sm font-semibold text-zinc-300">Вкупна цена:</span>
+                    <span className="text-2xl font-extrabold text-red-500">
+                      {items.reduce((sum, item) => {
+                        const num = parseInt(item.price.replace(/\./g, "").replace(/[^\d]/g, ""), 10) || 0;
+                        return sum + num * item.quantity;
+                      }, 0).toLocaleString("mk-MK")} ден
+                    </span>
+                  </div>
+
+                  <p className="mt-3 text-xs text-zinc-600">
+                    Плаќање при подигање · Достава низ цела Македонија
+                  </p>
                 </div>
               </div>
 
