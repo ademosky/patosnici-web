@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Barlow_Condensed, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Footer from "./components/Footer";
+import { CartProvider } from "./context/CartContext";
 
 const barlowCondensed = Barlow_Condensed({
   variable: "--font-heading",
@@ -33,8 +34,10 @@ export default function RootLayout({
       <body
         className={`${barlowCondensed.variable} ${dmSans.variable} antialiased`}
       >
-        {children}
-        <Footer />
+        <CartProvider>
+          {children}
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );
