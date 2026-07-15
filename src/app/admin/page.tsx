@@ -64,6 +64,7 @@ export default function AdminPage() {
   const [loading, setLoading]     = useState(false);
   const [uploading, setUploading] = useState(false);
   const [toast, setToast]         = useState<{ msg: string; ok: boolean } | null>(null);
+  const [listSearch, setListSearch] = useState("");
 
   const showToast = (msg: string, ok = true) => {
     setToast({ msg, ok });
@@ -279,51 +280,93 @@ export default function AdminPage() {
       <div className="mx-auto max-w-6xl px-6 py-10">
         <div className="grid gap-10 lg:grid-cols-[1fr_420px]">
 
-          {/* ЛИСТА */}
+          {/* ЛИСТА — групирана по бренд */}
           <div>
-            <h2 className="mb-6 text-xl font-black uppercase text-white">Производи</h2>
-            <div className="space-y-3">
-              {products.map((p) => (
-                <div key={p.id}
-                  className={`flex items-center gap-4 rounded-2xl border px-5 py-4 transition ${editId === p.id ? "border-red-600 bg-[#1a0808]" : "border-zinc-800 bg-[#111] hover:border-zinc-700"}`}
-                >
-                  <div className="relative h-16 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-zinc-900">
-                    {p.image ? (
-                      <Image src={p.image} alt={p.title} fill className="object-cover" unoptimized />
-                    ) : (
-                      <div className="flex h-full items-center justify-center">
-                        <ImageIcon size={18} className="text-zinc-600" />
+            <div className="mb-6 flex items-center justify-between gap-4">
+              <h2 className="text-xl font-black uppercase text-white">
+                Производи <span className="text-base font-normal text-zinc-500">({products.length})</span>
+              </h2>
+              <input
+                type="text"
+                placeholder="Пребарај..."
+                value={listSearch}
+                onChange={(e) => setListSearch(e.target.value)}
+                className="w-36 rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2 text-sm text-white outline-none transition focus:border-red-600"
+              />
+            </div>
+
+            {products.length === 0 && (
+              <p className="py-10 text-center text-zinc-600">Нема производи.</p>
+            )}
+
+            {Object.entries(
+              products
+                .filter((p) =>
+                  !listSearch ||
+                  p.title.toLowerCase().includes(listSearch.toLowerCase()) ||
+                  p.brand.toLowerCase().includes(listSearch.toLowerCase()) ||
+                  (p.car_model || "").toLowerCase().includes(listSearch.toLowerCase())
+                )
+                .reduce((acc: Record<string, typeof products>, p) => {
+                  const key = p.brand || "other";
+                  if (!acc[key]) acc[key] = [];
+                  acc[key].push(p);
+                  return acc;
+                }, {})
+            )
+              .sort(([a], [b]) => a.localeCompare(b))
+              .map(([brand, brandProducts]) => (
+                <div key={brand} className="mb-6">
+                  <div className="mb-3 flex items-center gap-3">
+                    <div className="h-px flex-1 bg-zinc-800" />
+                    <span className="flex items-center gap-2 rounded-lg bg-zinc-800 px-3 py-1 text-xs font-bold uppercase tracking-wider text-zinc-300">
+                      {brand}
+                      <span className="text-zinc-500">({brandProducts.length})</span>
+                    </span>
+                    <div className="h-px flex-1 bg-zinc-800" />
+                  </div>
+                  <div className="space-y-2">
+                    {brandProducts.map((p) => (
+                      <div key={p.id}
+                        className={`flex items-center gap-4 rounded-2xl border px-5 py-4 transition ${editId === p.id ? "border-red-600 bg-[#1a0808]" : "border-zinc-800 bg-[#111] hover:border-zinc-700"}`}
+                      >
+                        <div className="relative flex-shrink-0 overflow-hidden rounded-xl bg-zinc-900" style={{width:"72px",height:"56px"}}>
+                          {p.image ? (
+                            <Image src={p.image} alt={p.title} fill className="object-cover" unoptimized />
+                          ) : (
+                            <div className="flex h-full items-center justify-center">
+                              <ImageIcon size={16} className="text-zinc-600" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold text-white">{p.title}</p>
+                          <div className="mt-0.5 flex items-center gap-2">
+                            <p className="text-xs text-zinc-500">
+                              {p.car_model && <span className="text-zinc-400">{p.car_model} · </span>}
+                              {p.model} · {p.year}
+                            </p>
+                            {p.sku && (
+                              <span className="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-xs text-zinc-400">{p.sku}</span>
+                            )}
+                          </div>
+                        </div>
+                        <span className="flex-shrink-0 text-sm font-bold text-red-500">{p.price}</span>
+                        <button onClick={() => editId === p.id ? cancelEdit() : handleEditClick(p)}
+                          className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border transition ${editId === p.id ? "border-red-600 bg-red-600/20 text-red-400" : "border-zinc-700 text-zinc-400 hover:border-blue-500 hover:text-blue-400"}`}
+                        >
+                          {editId === p.id ? <X size={15} /> : <Pencil size={15} />}
+                        </button>
+                        <button onClick={() => handleDelete(p.id, p.title)}
+                          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-zinc-700 text-zinc-500 transition hover:border-red-600 hover:text-red-500"
+                        >
+                          <Trash2 size={15} />
+                        </button>
                       </div>
-                    )}
+                    ))}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold text-white">{p.title}</p>
-                    <div className="mt-0.5 flex items-center gap-2">
-                      <p className="text-xs text-zinc-500">{p.model} · {p.year}</p>
-                      {p.sku && (
-                        <span className="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-xs text-zinc-400">
-                          {p.sku}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <span className="flex-shrink-0 font-bold text-red-500">{p.price}</span>
-                  <button onClick={() => editId === p.id ? cancelEdit() : handleEditClick(p)}
-                    className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border transition ${editId === p.id ? "border-red-600 bg-red-600/20 text-red-400" : "border-zinc-700 text-zinc-400 hover:border-blue-500 hover:text-blue-400"}`}
-                  >
-                    {editId === p.id ? <X size={15} /> : <Pencil size={15} />}
-                  </button>
-                  <button onClick={() => handleDelete(p.id, p.title)}
-                    className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-zinc-700 text-zinc-500 transition hover:border-red-600 hover:text-red-500"
-                  >
-                    <Trash2 size={15} />
-                  </button>
                 </div>
               ))}
-              {products.length === 0 && (
-                <p className="py-10 text-center text-zinc-600">Нема производи.</p>
-              )}
-            </div>
           </div>
 
           {/* ФОРМА */}
