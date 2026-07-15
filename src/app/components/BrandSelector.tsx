@@ -20,22 +20,22 @@ type SearchResult = {
 };
 
 export default function BrandSelector() {
-  const [search, setSearch]         = useState("");
-  const [results, setResults]       = useState<SearchResult[]>([]);
-  const [loading, setLoading]       = useState(false);
+  const [search, setSearch]             = useState("");
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+  const [results, setResults]           = useState<SearchResult[]>([]);
+  const [loading, setLoading]           = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const router  = useRouter();
+  const router   = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const dropRef  = useRef<HTMLDivElement>(null);
 
-  // Live search — debounce 300ms
+  // Live search debounce
   useEffect(() => {
     if (!search.trim()) {
       setResults([]);
       setShowDropdown(false);
       return;
     }
-
     const timer = setTimeout(async () => {
       setLoading(true);
       try {
@@ -49,7 +49,6 @@ export default function BrandSelector() {
         setLoading(false);
       }
     }, 300);
-
     return () => clearTimeout(timer);
   }, [search]);
 
@@ -86,6 +85,19 @@ export default function BrandSelector() {
     router.push(`/products/${slug}`);
   };
 
+  // Кликнат бренд — прикажи само него
+  const handleBrandClick = (brandId: string) => {
+    if (selectedBrand === brandId) {
+      // Втор клик → оди на производи
+      router.push(`/products?brand=${brandId}`);
+    } else {
+      // Прв клик → избери го
+      setSelectedBrand(brandId);
+    }
+  };
+
+  const selectedBrandObj = brands.find((b) => b.id === selectedBrand);
+
   return (
     <section className="bg-[#111111] py-20">
       <div className="mx-auto max-w-7xl px-6">
@@ -100,7 +112,7 @@ export default function BrandSelector() {
           </p>
         </div>
 
-        {/* Search со live dropdown */}
+        {/* Search */}
         <div className="mx-auto mt-10 max-w-xl">
           <form onSubmit={handleSearch}>
             <div className="relative">
@@ -113,8 +125,6 @@ export default function BrandSelector() {
                 placeholder="Пребарај бренд или модел... (пр. Audi A3, Golf 5)"
                 className="w-full rounded-xl border border-zinc-700 bg-[#181818] py-4 pl-5 pr-14 text-white outline-none transition focus:border-red-600"
               />
-
-              {/* Clear / Search icon */}
               {search ? (
                 <button type="button"
                   onClick={() => { setSearch(""); setResults([]); setShowDropdown(false); }}
@@ -123,7 +133,6 @@ export default function BrandSelector() {
                   <X size={16} />
                 </button>
               ) : null}
-
               <button type="submit"
                 className="absolute right-3 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-lg bg-red-600 text-white transition hover:bg-red-700"
               >
@@ -144,27 +153,18 @@ export default function BrandSelector() {
                       onClick={() => handleResultClick(r.slug)}
                       className="flex w-full items-center gap-4 px-4 py-3 text-left transition hover:bg-zinc-800"
                     >
-                      {/* Слика */}
                       <div className="relative h-12 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-zinc-900">
-                        {r.image && (
-                          <Image src={r.image} alt={r.title} fill className="object-cover" unoptimized />
-                        )}
+                        {r.image && <Image src={r.image} alt={r.title} fill className="object-cover" unoptimized />}
                       </div>
-
-                      {/* Инфо */}
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-white">{r.title}</p>
                         <p className="text-xs text-zinc-500">
                           {r.car_model ? `${r.brand.toUpperCase()} ${r.car_model} · ` : ""}{r.year}
                         </p>
                       </div>
-
-                      {/* Цена */}
                       <span className="flex-shrink-0 text-sm font-bold text-red-500">{r.price}</span>
                     </button>
                   ))}
-
-                  {/* Покажи ги сите резултати */}
                   <button type="button"
                     onClick={() => { setShowDropdown(false); router.push(`/products?q=${encodeURIComponent(search)}`); }}
                     className="flex w-full items-center justify-center gap-2 border-t border-zinc-800 py-3 text-sm text-zinc-400 transition hover:bg-zinc-800 hover:text-white"
@@ -174,8 +174,6 @@ export default function BrandSelector() {
                   </button>
                 </div>
               )}
-
-              {/* No results */}
               {showDropdown && results.length === 0 && !loading && search.trim() && (
                 <div ref={dropRef}
                   className="absolute left-0 right-0 top-full z-50 mt-2 rounded-2xl border border-zinc-700 bg-[#141414] p-4 text-center text-sm text-zinc-500 shadow-2xl"
@@ -187,28 +185,56 @@ export default function BrandSelector() {
           </form>
         </div>
 
-        {/* Brand grid (се крие ако е активна пребарувачката) */}
-        <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
-          {filteredBrands.map((brand) => (
-            <BrandCard
-              key={brand.id}
-              brand={brand}
-              onClick={() => router.push(`/products?brand=${brand.id}`)}
-            />
-          ))}
-          {search === "" && (
-            <BrandCard
-              brand={{ id: "all", name: "Сите", logo: "" }}
-              isViewAll
-              onClick={() => router.push("/products")}
-            />
-          )}
-        </div>
+        {/* ── BRAND GRID ── */}
+        {selectedBrand ? (
+          /* Избран бренд — покажи само него + Сите */
+          <div className="mt-12">
+            {/* Сите брендови копче */}
+            <div className="mb-6 flex justify-center">
+              <button
+                onClick={() => setSelectedBrand(null)}
+                className="flex items-center gap-2 rounded-xl border border-zinc-600 px-6 py-3 text-sm font-bold uppercase tracking-wide text-zinc-300 transition hover:border-red-600 hover:text-white"
+              >
+                ← Сите брендови
+              </button>
+            </div>
 
-        {filteredBrands.length === 0 && search !== "" && !showDropdown && (
-          <p className="mt-6 text-center text-sm text-zinc-600">
-            Нема бренд — пробај Enter за да пребараш во сите производи
-          </p>
+            {/* Само избраниот бренд — поголем приказ */}
+            {selectedBrandObj && (
+              <div className="flex flex-col items-center gap-6">
+                <div className="w-48">
+                  <BrandCard
+                    brand={selectedBrandObj}
+                    onClick={() => router.push(`/products?brand=${selectedBrandObj.id}`)}
+                  />
+                </div>
+                <button
+                  onClick={() => router.push(`/products?brand=${selectedBrandObj.id}`)}
+                  className="rounded-xl bg-red-600 px-10 py-4 text-sm font-bold uppercase tracking-widest text-white transition hover:bg-red-700"
+                >
+                  Види сите {selectedBrandObj.name} патосници →
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Сите брендови */
+          <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
+            {filteredBrands.map((brand) => (
+              <BrandCard
+                key={brand.id}
+                brand={brand}
+                onClick={() => handleBrandClick(brand.id)}
+              />
+            ))}
+            {search === "" && (
+              <BrandCard
+                brand={{ id: "all", name: "Сите", logo: "" }}
+                isViewAll
+                onClick={() => router.push("/products")}
+              />
+            )}
+          </div>
         )}
 
       </div>
