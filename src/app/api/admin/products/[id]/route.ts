@@ -27,6 +27,7 @@ export async function PUT(
       image: body.image,
       description: body.description,
       sku: body.sku ?? "",
+      images: body.images || [],
     })
     .eq("id", parseInt(id))
     .select()
