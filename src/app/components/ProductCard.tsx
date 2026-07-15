@@ -41,8 +41,15 @@ export default function ProductCard({ product }: ProductCardProps) {
             alt={product.title}
             fill
             priority
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className={`object-cover transition-transform duration-500 group-hover:scale-105 ${product.in_stock === false ? "opacity-50" : ""}`}
           />
+          {product.in_stock === false && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="rounded-xl bg-zinc-900/90 px-4 py-2 text-sm font-bold uppercase tracking-wide text-zinc-300 border border-zinc-600">
+                Нема залиха
+              </span>
+            </div>
+          )}
         </div>
       </Link>
 
