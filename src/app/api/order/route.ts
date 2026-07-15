@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
               <h1 style="color: white; margin: 0; font-size: 20px;">✅ Нарачката е примена!</h1>
             </div>
             <div style="background: #111; padding: 24px; border-radius: 0 0 12px 12px; border: 1px solid #333;">
-              <p style="color: #a1a1aa; margin-bottom: 16px;">Ви благодариме за нарачката! Ќе ве контактираме наскоро за потврда и достава.</p>
+              <p style="color: #a1a1aa; margin-bottom: 16px;">Ви благодариме за нарачката! Ќе ви биде доставена за 2-4 работни дена. Очекувајте повик од карго курирот.</p>
 
               <div style="background: #1a1a1a; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
                 <p style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Нарачани производи</p>
