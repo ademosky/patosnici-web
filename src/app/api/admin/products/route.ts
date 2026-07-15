@@ -45,6 +45,7 @@ const slug = `${baseSlug}-${Date.now()}`;
       images: body.images || [],
       description: body.description || "",
       sku: body.sku || "",
+      in_stock: body.in_stock !== false,
     }])
     .select()
     .single();
