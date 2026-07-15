@@ -126,7 +126,7 @@ export default function AdminPage() {
       const compressedKB = Math.round(compressed.size / 1024);
       const saved        = Math.round((1 - compressed.size / file.size) * 100);
 
-      setForm((prev) => ({ ...prev, image: data.publicUrl }));
+      addImage(data.publicUrl);
       showToast(`✓ ${originalKB}KB → ${compressedKB}KB (-${saved}%)`);
 
     } catch (err) {
@@ -156,9 +156,10 @@ export default function AdminPage() {
   const handleEditClick = (p: Product) => {
     setEditId(p.id);
     setForm({
-      title: p.title, brand: p.brand, model: p.model,car_model: p.car_model ?? "",
+      title: p.title, brand: p.brand, car_model: p.car_model ?? "", model: p.model,
       year: p.year, price: p.price, image: p.image,
       description: p.description, sku: p.sku ?? "",
+      images: p.images && p.images.length > 0 ? p.images : (p.image ? [p.image] : []),
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
