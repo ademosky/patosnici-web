@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingCart, Eye } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { Product } from "../data/products";
 import { useCart } from "../context/CartContext";
@@ -33,7 +33,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <article className="group overflow-hidden rounded-2xl border border-zinc-800 bg-[#141414] transition-all duration-300 hover:-translate-y-2 hover:border-red-600 hover:shadow-[0_10px_35px_rgba(220,38,38,0.20)]">
 
-      {/* IMAGE - клик оди на детали */}
+      {/* IMAGE */}
       <Link href={`/products/${product.slug}`} className="block">
         <div className="relative h-64 overflow-hidden bg-black">
           <Image
@@ -64,28 +64,31 @@ export default function ProductCard({ product }: ProductCardProps) {
           <span className="text-3xl font-extrabold text-red-600">{product.price}</span>
         </div>
 
-        {/* Двe копчиња */}
+        {/* Копчиња: Детали (поголемо) + Корпа (помало) */}
         <div className="mt-5 flex gap-2">
-          {/* Додај во корпа */}
+
+          {/* ДЕТАЛИ — главно копче */}
+          <Link
+            href={`/products/${product.slug}`}
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-red-700"
+          >
+            Детали
+          </Link>
+
+          {/* КОРПА — секундарно копче */}
           <button
             onClick={handleAddToCart}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold uppercase tracking-wide transition ${
+            title="Додај во корпа"
+            className={`flex items-center justify-center gap-1.5 rounded-xl border px-4 py-3 text-sm font-semibold transition ${
               added
-                ? "bg-green-600 text-white"
-                : "bg-red-600 text-white hover:bg-red-700"
+                ? "border-green-600 bg-green-600/20 text-green-400"
+                : "border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-red-400"
             }`}
           >
             <ShoppingCart size={16} />
-            {added ? "Додадено ✓" : "Во корпа"}
+            {added ? "✓" : ""}
           </button>
 
-          {/* Детали */}
-          <Link
-            href={`/products/${product.slug}`}
-            className="flex items-center justify-center rounded-xl border border-zinc-700 px-4 py-3 text-zinc-400 transition hover:border-red-600 hover:text-white"
-          >
-            <Eye size={16} />
-          </Link>
         </div>
       </div>
     </article>
