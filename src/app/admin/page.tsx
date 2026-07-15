@@ -22,11 +22,13 @@ type Product = {
   image: string;
   description: string;
   sku?: string;
+  images?: string[];
+  car_model?: string;
 };
 
 const EMPTY_FORM = {
   title: "", brand: "", car_model: "", model: "", year: "",
-  price: "", image: "", description: "", sku: "",
+  price: "", image: "", description: "", sku: "", images: [] as string[],
 };
 
 async function compressImage(file: File): Promise<Blob> {
@@ -173,7 +175,10 @@ export default function AdminPage() {
       {
         method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json", "x-admin-password": pw },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          images: form.images || [],
+        }),
       },
     );
     setLoading(false);
@@ -208,6 +213,19 @@ export default function AdminPage() {
 
   const update = (k: string, v: string) =>
     setForm((prev) => ({ ...prev, [k]: v }));
+
+  const addImage = (url: string) =>
+    setForm((prev) => ({
+      ...prev,
+      images: [...(prev.images || []), url],
+      image: prev.image || url,
+    }));
+
+  const removeImage = (idx: number) =>
+    setForm((prev) => {
+      const imgs = (prev.images || []).filter((_, i) => i !== idx);
+      return { ...prev, images: imgs, image: imgs[0] || "" };
+    });
 
   const inputClass =
     "w-full rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600";
@@ -458,49 +476,52 @@ export default function AdminPage() {
                 <p className="mt-1 text-xs text-zinc-600">Интерен код за идентификација</p>
               </div>
 
-              {/* СЛИКА */}
+              {/* СЛИКИ — повеќе слики */}
               <div>
-                <label className={labelClass}>Слика на производот</label>
-                <label className={`group flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl border-2 border-dashed border-zinc-700 bg-[#151515] py-7 text-sm text-zinc-400 transition hover:border-red-600 hover:text-white ${uploading ? "pointer-events-none opacity-60" : ""}`}>
+                <div className="mb-2 flex items-center justify-between">
+                  <label className={labelClass}>
+                    Слики ({(form.images || []).length} прикачени)
+                  </label>
+                </div>
+
+                <label className={`group flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl border-2 border-dashed border-zinc-700 bg-[#151515] py-6 text-sm text-zinc-400 transition hover:border-red-600 hover:text-white ${uploading ? "pointer-events-none opacity-60" : ""}`}>
                   <input type="file" accept=".jpg,.jpeg,.png,.webp,.heic"
                     onChange={handleFileUpload} disabled={uploading} className="hidden"
                   />
                   {uploading ? (
-                    <><Loader2 size={20} className="animate-spin text-red-500" /><span>Компресирање и прикачување...</span></>
+                    <><Loader2 size={18} className="animate-spin text-red-500" /><span>Прикачување...</span></>
                   ) : (
-                    <><Upload size={20} className="text-zinc-500 group-hover:text-red-500 transition" /><span>Кликни за прикачување слика</span></>
+                    <><Upload size={18} className="text-zinc-500 group-hover:text-red-500 transition" />
+                    <span>+ Додај слика {(form.images || []).length > 0 ? `(${(form.images || []).length} додадени)` : ""}</span></>
                   )}
                 </label>
-                <p className="mt-2 text-center text-xs text-zinc-600">
-                  JPG, PNG, WebP · Автоматски се компресира во WebP
+                <p className="mt-1.5 text-center text-xs text-zinc-600">
+                  JPG, PNG, WebP · Автоматски компресира · Прва слика = главна
                 </p>
 
-                <div className="my-3 flex items-center gap-3">
-                  <div className="h-px flex-1 bg-zinc-800" />
-                  <span className="text-xs text-zinc-600">или рачно</span>
-                  <div className="h-px flex-1 bg-zinc-800" />
-                </div>
-
-                <input value={form.image}
-                  onChange={(e) => update("image", e.target.value)}
-                  placeholder="https://... или /products/..."
-                  className={inputClass}
-                />
-
-                {form.image ? (
-                  <div className="relative mt-3 h-36 overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900">
-                    <Image src={form.image} alt="preview" fill className="object-cover" unoptimized />
-                    <button type="button" onClick={() => update("image", "")}
-                      className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-white transition hover:bg-red-600"
-                    >
-                      <X size={13} />
-                    </button>
+                {(form.images || []).length > 0 ? (
+                  <div className="mt-4 grid grid-cols-3 gap-2">
+                    {(form.images || []).map((img, idx) => (
+                      <div key={idx} className="relative overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900" style={{height:"90px"}}>
+                        <Image src={img} alt={`slika ${idx+1}`} fill className="object-cover" unoptimized />
+                        {idx === 0 && (
+                          <div className="absolute left-1 top-1 rounded bg-red-600 px-1.5 py-0.5 text-[9px] font-bold text-white">
+                            ГЛАВНА
+                          </div>
+                        )}
+                        <button type="button" onClick={() => removeImage(idx)}
+                          className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-white transition hover:bg-red-600"
+                        >
+                          <X size={11} />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 ) : (
-                  <div className="mt-3 flex h-36 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/40">
+                  <div className="mt-3 flex h-20 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/40">
                     <div className="text-center text-zinc-600">
-                      <ImageIcon size={26} className="mx-auto mb-2 opacity-40" />
-                      <p className="text-xs">Нема слика</p>
+                      <ImageIcon size={20} className="mx-auto mb-1 opacity-40" />
+                      <p className="text-xs">Нема слики</p>
                     </div>
                   </div>
                 )}
