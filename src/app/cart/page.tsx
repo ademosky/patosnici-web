@@ -151,7 +151,7 @@ export default function CartPage() {
                 <h2 className="mb-5 text-xl font-black uppercase text-white">Детали за нарачка</h2>
                 <form onSubmit={handleOrder} className="space-y-4 rounded-2xl border border-zinc-800 bg-[#111] p-6">
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label className={labelClass}>Ime *</label>
                       <input required value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Марко" className={inputClass} />
