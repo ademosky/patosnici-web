@@ -6,6 +6,7 @@ import OrderForm from "../../components/OrderForm";
 import ImageCarousel from "../../components/ImageCarousel";
 import { getProducts, getProductBySlug } from "../../data/products";
 import { CheckCircle, ArrowLeft, Tag } from "lucide-react";
+import AddToCartButton from "../../components/AddToCartButton";
 
 export const dynamic = "force-dynamic";
 
@@ -103,12 +104,14 @@ export default async function ProductPage({ params }: Props) {
                 ))}
               </ul>
 
-              <a
-                href="#naracaj"
-                className="mt-10 flex items-center justify-center gap-3 rounded-xl bg-red-600 py-4 text-sm font-bold uppercase tracking-widest text-white transition hover:bg-red-700"
-              >
-                Нарачај сега →
-              </a>
+              <AddToCartButton product={{
+                id: product.id,
+                slug: product.slug,
+                title: product.title,
+                price: product.price,
+                image: product.image,
+                brand: product.brand,
+              }} />
             </div>
           </div>
 
