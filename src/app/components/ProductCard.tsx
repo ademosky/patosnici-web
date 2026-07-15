@@ -35,13 +35,13 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       {/* IMAGE */}
       <Link href={`/products/${product.slug}`} className="block">
-        <div className="relative h-64 overflow-hidden bg-black">
+        <div className="relative h-56 overflow-hidden bg-[#0d0d0d]">
           <Image
             src={product.image}
             alt={product.title}
             fill
             priority
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-contain p-3 transition-transform duration-500 group-hover:scale-105"
           />
         </div>
       </Link>
