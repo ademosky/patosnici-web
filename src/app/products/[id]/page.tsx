@@ -55,6 +55,13 @@ export default async function ProductPage({ params }: Props) {
                 <Tag size={12} />
                 Оригинален производ
               </div>
+              {product.in_stock === false && (
+                <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60">
+                  <span className="rounded-2xl border border-zinc-500 bg-zinc-900/95 px-8 py-4 text-xl font-black uppercase tracking-widest text-zinc-300">
+                    Нема залиха
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Инфо */}
