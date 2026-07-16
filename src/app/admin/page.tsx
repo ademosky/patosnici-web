@@ -24,11 +24,12 @@ type Product = {
   sku?: string;
   images?: string[];
   car_model?: string;
+  in_stock?: boolean;
 };
 
 const EMPTY_FORM = {
   title: "", brand: "", car_model: "", model: "", year: "",
-  price: "", image: "", description: "", sku: "", images: [] as string[],
+  price: "", image: "", description: "", sku: "", images: [] as string[], in_stock: true,
 };
 
 async function compressImage(file: File): Promise<Blob> {
@@ -160,6 +161,7 @@ export default function AdminPage() {
       year: p.year, price: p.price, image: p.image,
       description: p.description, sku: p.sku ?? "",
       images: p.images && p.images.length > 0 ? p.images : (p.image ? [p.image] : []),
+      in_stock: p.in_stock !== false,
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -535,6 +537,27 @@ export default function AdminPage() {
                   placeholder="Краток опис на производот..."
                   className={`${inputClass} resize-none`}
                 />
+              </div>
+
+              {/* Залиха */}
+              <div className={`flex items-center justify-between rounded-xl border px-5 py-4 transition cursor-pointer ${
+                form.in_stock ? "border-green-800 bg-green-950/20" : "border-red-800 bg-red-950/20"
+              }`}
+                onClick={() => setForm((prev) => ({ ...prev, in_stock: !prev.in_stock }))}
+              >
+                <div>
+                  <p className="text-sm font-semibold text-white">
+                    {form.in_stock ? "✅ Има залиха" : "❌ Нема залиха"}
+                  </p>
+                  <p className="text-xs text-zinc-500 mt-0.5">
+                    {form.in_stock
+                      ? "Производот е достапен за нарачка"
+                      : "Ќе се прикаже "Нема залиха" на производот"}
+                  </p>
+                </div>
+                <div className={`h-6 w-11 rounded-full transition-colors ${form.in_stock ? "bg-green-600" : "bg-zinc-700"}`}>
+                  <div className={`h-5 w-5 mt-0.5 rounded-full bg-white shadow transition-transform ${form.in_stock ? "translate-x-5 ml-0.5" : "translate-x-0.5"}`} />
+                </div>
               </div>
 
               <button type="submit" disabled={loading || uploading}
