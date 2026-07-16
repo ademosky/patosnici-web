@@ -97,14 +97,11 @@ export default function AdminPage() {
     setUploading(true);
 
     try {
-      const compressed = await compressImage(file);
-
       const safeName = file.name
         .toLowerCase()
         .replace(/\.[^.]+$/, "")
         .replace(/[^a-z0-9-]/g, "-")
         .slice(0, 40) || "slika";
-      const filename = `${safeName}-${Date.now()}.webp`;
 
       const { createClient } = await import("@supabase/supabase-js");
       const sb = createClient(
@@ -112,23 +109,53 @@ export default function AdminPage() {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       );
 
+      let uploadBlob: Blob;
+      let filename: string;
+      let contentType: string;
+      const originalKB = Math.round(file.size / 1024);
+      let finalKB: number;
+      let savedPct: number;
+
+      if (file.size > 300 * 1024) {
+        // Голема слика → компресирај
+        const compressed = await compressImage(file);
+        if (compressed.size < file.size) {
+          uploadBlob = compressed;
+          filename = `${safeName}-${Date.now()}.webp`;
+          contentType = "image/webp";
+          finalKB = Math.round(compressed.size / 1024);
+          savedPct = Math.round((1 - compressed.size / file.size) * 100);
+        } else {
+          // Компресираното е поголемо → употреби оригинал
+          uploadBlob = file;
+          filename = `${safeName}-${Date.now()}.${file.name.split(".").pop() || "jpg"}`;
+          contentType = file.type;
+          finalKB = originalKB;
+          savedPct = 0;
+        }
+      } else {
+        // Веке мала слика → прати директно без компресија
+        uploadBlob = file;
+        filename = `${safeName}-${Date.now()}.${file.name.split(".").pop() || "jpg"}`;
+        contentType = file.type;
+        finalKB = originalKB;
+        savedPct = 0;
+      }
+
       const { error } = await sb.storage
         .from("products")
-        .upload(filename, compressed, {
-          contentType: "image/webp",
-          upsert: false,
-        });
+        .upload(filename, uploadBlob, { contentType, upsert: false });
 
       if (error) throw error;
 
       const { data } = sb.storage.from("products").getPublicUrl(filename);
+      setForm((prev) => ({ ...prev, image: data.publicUrl }));
 
-      const originalKB   = Math.round(file.size / 1024);
-      const compressedKB = Math.round(compressed.size / 1024);
-      const saved        = Math.round((1 - compressed.size / file.size) * 100);
-
-      addImage(data.publicUrl);
-      showToast(`✓ ${originalKB}KB → ${compressedKB}KB (-${saved}%)`);
+      showToast(
+        savedPct > 0
+          ? `✓ ${originalKB}KB → ${finalKB}KB (-${savedPct}%)`
+          : `✓ Прикачено ${finalKB}KB`
+      );
 
     } catch (err) {
       showToast(`Грешка: ${String(err)}`, false);
@@ -136,24 +163,7 @@ export default function AdminPage() {
       setUploading(false);
       e.target.value = "";
     }
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    const res = await fetch("/api/admin/products", {
-      headers: { "x-admin-password": password },
-    });
-    setLoading(false);
-    if (res.ok) {
-      sessionStorage.setItem("adminPw", password);
-      setAuthed(true);
-      setProducts(await res.json());
-    } else {
-      setAuthError("Погрешна лозинка!");
-    }
-  };
-
+  }
   const handleEditClick = (p: Product) => {
     setEditId(p.id);
     setForm({
