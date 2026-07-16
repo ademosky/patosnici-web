@@ -540,25 +540,22 @@ export default function AdminPage() {
               </div>
 
               {/* Залиха */}
-              <div className={`flex items-center justify-between rounded-xl border px-5 py-4 transition cursor-pointer ${
-                form.in_stock ? "border-green-800 bg-green-950/20" : "border-red-800 bg-red-950/20"
-              }`}
-                onClick={() => setForm((prev) => ({ ...prev, in_stock: !prev.in_stock }))}
-              >
+              <label className="flex cursor-pointer items-center justify-between rounded-xl border border-zinc-700 bg-[#1a1a1a] px-5 py-4 transition hover:border-zinc-600">
                 <div>
                   <p className="text-sm font-semibold text-white">
-                    {form.in_stock ? "✅ Има залиха" : "❌ Нема залиха"}
+                    {form.in_stock ? "Има залиха" : "Нема залиха"}
                   </p>
-                  <p className="text-xs text-zinc-500 mt-0.5">
-                    {form.in_stock
-                      ? "Производот е достапен за нарачка"
-                      : "Ќе се прикаже "Нема залиха" на производот"}
+                  <p className="mt-0.5 text-xs text-zinc-500">
+                    {form.in_stock ? "Производот е достапен" : "Ke se prikaze badge Nema zaliha"}
                   </p>
                 </div>
-                <div className={`h-6 w-11 rounded-full transition-colors ${form.in_stock ? "bg-green-600" : "bg-zinc-700"}`}>
-                  <div className={`h-5 w-5 mt-0.5 rounded-full bg-white shadow transition-transform ${form.in_stock ? "translate-x-5 ml-0.5" : "translate-x-0.5"}`} />
-                </div>
-              </div>
+                <input
+                  type="checkbox"
+                  checked={form.in_stock}
+                  onChange={(e) => setForm((prev) => ({ ...prev, in_stock: e.target.checked }))}
+                  className="h-5 w-5 accent-red-600 cursor-pointer"
+                />
+              </label>
 
               <button type="submit" disabled={loading || uploading}
                 className={`flex w-full items-center justify-center gap-2 rounded-xl py-4 text-sm font-bold uppercase tracking-wide text-white transition disabled:opacity-60 ${editId !== null ? "bg-blue-600 hover:bg-blue-700" : "bg-red-600 hover:bg-red-700"}`}
