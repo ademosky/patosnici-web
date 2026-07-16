@@ -349,14 +349,21 @@ export default function AdminPage() {
               .sort(([a], [b]) => a.localeCompare(b))
               .map(([brand, brandProducts]) => (
                 <div key={brand} className="mb-6">
-                  <div className="mb-3 flex items-center gap-3">
+                  {/* Collapsible brand header */}
+                  <button
+                    type="button"
+                    onClick={() => toggleBrand(brand)}
+                    className="mb-2 flex w-full items-center gap-3 text-left"
+                  >
                     <div className="h-px flex-1 bg-zinc-800" />
-                    <span className="flex items-center gap-2 rounded-lg bg-zinc-800 px-3 py-1 text-xs font-bold uppercase tracking-wider text-zinc-300">
+                    <span className="flex items-center gap-2 rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-zinc-300 transition hover:bg-zinc-700">
                       {brand}
                       <span className="text-zinc-500">({brandProducts.length})</span>
+                      <span className="ml-1 text-zinc-600">{expandedBrands[brand] ? "▲" : "▼"}</span>
                     </span>
                     <div className="h-px flex-1 bg-zinc-800" />
-                  </div>
+                  </button>
+                  {expandedBrands[brand] && (
                   <div className="space-y-2">
                     {brandProducts.map((p) => (
                       <div key={p.id}
