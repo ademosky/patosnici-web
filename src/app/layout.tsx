@@ -3,6 +3,7 @@ import { Barlow_Condensed, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Footer from "./components/Footer";
 import { CartProvider } from "./context/CartContext";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import FacebookFloat from "./components/FacebookFloat";
 
 const barlowCondensed = Barlow_Condensed({
@@ -79,6 +80,9 @@ export default function RootLayout({
           <Footer />
           <FacebookFloat />
         </CartProvider>
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+        )}
       </body>
     </html>
   );
