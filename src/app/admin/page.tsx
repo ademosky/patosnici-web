@@ -115,16 +115,14 @@ export default function AdminPage() {
       let finalKB = originalKB;
       let savedPct = 0;
 
-      // Compress only large images
-      if (file.size > 300 * 1024) {
-        const compressed = await compressImage(file);
-        if (compressed.size < file.size) {
-          uploadBlob = compressed;
-          filename = `${safeName}-${Date.now()}.webp`;
-          contentType = "image/webp";
-          finalKB = Math.round(compressed.size / 1024);
-          savedPct = Math.round((1 - compressed.size / file.size) * 100);
-        }
+      // Always compress to WebP (smaller result wins)
+      const compressed = await compressImage(file);
+      if (compressed.size < file.size) {
+        uploadBlob = compressed;
+        filename = `${safeName}-${Date.now()}.webp`;
+        contentType = "image/webp";
+        finalKB = Math.round(compressed.size / 1024);
+        savedPct = Math.round((1 - compressed.size / file.size) * 100);
       }
 
       // Upload to Supabase Storage
