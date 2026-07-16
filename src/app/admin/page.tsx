@@ -165,6 +165,25 @@ export default function AdminPage() {
       e.target.value = "";
     }
   };
+  const toggleBrand = (brand: string) =>
+    setExpandedBrands((prev) => ({ ...prev, [brand]: !prev[brand] }));
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const res = await fetch("/api/admin/products", {
+      headers: { "x-admin-password": password },
+    });
+    setLoading(false);
+    if (res.ok) {
+      sessionStorage.setItem("adminPw", password);
+      setAuthed(true);
+      setProducts(await res.json());
+    } else {
+      setAuthError("Погрешна лозинка!");
+    }
+  };
+
   const handleEditClick = (p: Product) => {
     setEditId(p.id);
     setForm({
