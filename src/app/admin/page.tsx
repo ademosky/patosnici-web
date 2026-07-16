@@ -6,7 +6,6 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { brands } from "../data/brands";
-import { supabase } from "../../lib/supabase";
 import {
   Lock, Plus, Trash2, LogOut, Package,
   CheckCircle, AlertCircle, Loader2, Pencil,
@@ -101,23 +100,23 @@ export default function AdminPage() {
     setUploading(true);
 
     try {
+      // Detect extension and content type
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
       const safeName = file.name
         .toLowerCase()
         .replace(/\.[^.]+$/, "")
         .replace(/[^a-z0-9-]/g, "-")
         .slice(0, 40) || "slika";
 
-      const sb = supabase;
-
-      let uploadBlob: Blob;
-      let filename: string;
-      let contentType: string;
+      let uploadBlob: Blob = file;
+      let filename = `${safeName}-${Date.now()}.${ext}`;
+      let contentType = file.type || `image/${ext}`;
       const originalKB = Math.round(file.size / 1024);
-      let finalKB: number;
-      let savedPct: number;
+      let finalKB = originalKB;
+      let savedPct = 0;
 
+      // Compress only large images
       if (file.size > 300 * 1024) {
-        // Голема слика → компресирај
         const compressed = await compressImage(file);
         if (compressed.size < file.size) {
           uploadBlob = compressed;
@@ -125,46 +124,51 @@ export default function AdminPage() {
           contentType = "image/webp";
           finalKB = Math.round(compressed.size / 1024);
           savedPct = Math.round((1 - compressed.size / file.size) * 100);
-        } else {
-          // Компресираното е поголемо → употреби оригинал
-          uploadBlob = file;
-          filename = `${safeName}-${Date.now()}.${file.name.split(".").pop() || "jpg"}`;
-          contentType = file.type;
-          finalKB = originalKB;
-          savedPct = 0;
         }
-      } else {
-        // Веке мала слика → прати директно без компресија
-        uploadBlob = file;
-        filename = `${safeName}-${Date.now()}.${file.name.split(".").pop() || "jpg"}`;
-        contentType = file.type;
-        finalKB = originalKB;
-        savedPct = 0;
       }
 
-      const { error } = await sb.storage
-        .from("products")
-        .upload(filename, uploadBlob, { contentType, upsert: false });
+      // Upload to Supabase Storage
+      const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+      const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-      if (error) throw error;
+      const arrayBuffer = await uploadBlob.arrayBuffer();
+      const uploadRes = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/products/${filename}`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": contentType,
+            "x-upsert": "false",
+          },
+          body: arrayBuffer,
+        }
+      );
 
-      const { data } = sb.storage.from("products").getPublicUrl(filename);
-      setForm((prev) => ({ ...prev, image: data.publicUrl }));
+      if (!uploadRes.ok) {
+        const errText = await uploadRes.text();
+        throw new Error(errText || uploadRes.statusText);
+      }
+
+      const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${filename}`;
+      setForm((prev) => ({ ...prev, image: publicUrl }));
 
       showToast(
         savedPct > 0
-          ? `✓ ${originalKB}KB → ${finalKB}KB (-${savedPct}%)`
-          : `✓ Прикачено ${finalKB}KB`
+          ? `Прикачено: ${originalKB}KB → ${finalKB}KB (-${savedPct}%)`
+          : `Прикачено: ${finalKB}KB`
       );
 
-    } catch (err) {
-      showToast(`Грешка: ${String(err)}`, false);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast(`Upload грешка: ${msg}`, false);
     } finally {
       setUploading(false);
       e.target.value = "";
     }
   };
-  const toggleBrand = (brand: string) =>
+
+    const toggleBrand = (brand: string) =>
     setExpandedBrands((prev) => ({ ...prev, [brand]: !prev[brand] }));
 
   const handleLogin = async (e: React.FormEvent) => {
