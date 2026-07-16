@@ -7,6 +7,7 @@ import ImageCarousel from "../../components/ImageCarousel";
 import { getProducts, getProductBySlug } from "../../data/products";
 import { CheckCircle, ArrowLeft, Tag } from "lucide-react";
 import AddToCartButton from "../../components/AddToCartButton";
+import ProductDescription from "../../components/ProductDescription";
 
 export const dynamic = "force-dynamic";
 
@@ -89,9 +90,7 @@ export default async function ProductPage({ params }: Props) {
                 )}
               </div>
 
-              <p className="mt-5 text-base leading-8 text-zinc-400">
-                {product.description}
-              </p>
+              <ProductDescription description_mk={product.description} description_sq={product.description_sq} />
 
               <div className="mt-8 flex items-end gap-3">
                 <span className="text-5xl font-extrabold text-red-600">
