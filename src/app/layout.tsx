@@ -3,6 +3,7 @@ import { Barlow_Condensed, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Footer from "./components/Footer";
 import { CartProvider } from "./context/CartContext";
+import { LanguageProvider } from "./context/LanguageContext";
 import Script from "next/script";
 import FacebookFloat from "./components/FacebookFloat";
 
@@ -75,6 +76,7 @@ export default function RootLayout({
       <body
         className={`${barlowCondensed.variable} ${dmSans.variable} antialiased`}
       >
+        <LanguageProvider>
         <CartProvider>
           {children}
           <Footer />
@@ -89,6 +91,7 @@ export default function RootLayout({
             }}
           />
         </CartProvider>
+        </LanguageProvider>
       </body>
     </html>
   );
