@@ -38,26 +38,47 @@ async function compressImage(file: File): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const img = new window.Image();
     const url = URL.createObjectURL(file);
+
     img.onload = () => {
       URL.revokeObjectURL(url);
-      const MAX = 1200;
-      const ratio = Math.min(1, MAX / img.width);
+
+      const MAX_W = 1200;
+      const MAX_H = 1600;
+
+      // Scale down to fit within 1200x1600 keeping aspect ratio
+      let w = img.width;
+      let h = img.height;
+
+      if (w > MAX_W || h > MAX_H) {
+        const ratioW = MAX_W / w;
+        const ratioH = MAX_H / h;
+        const ratio  = Math.min(ratioW, ratioH);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+
       const canvas = document.createElement("canvas");
-      canvas.width  = Math.round(img.width  * ratio);
-      canvas.height = Math.round(img.height * ratio);
+      canvas.width  = w;
+      canvas.height = h;
+
       const ctx = canvas.getContext("2d");
-      if (!ctx) return reject(new Error("Canvas error"));
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      if (!ctx) return reject(new Error("Canvas not supported"));
+
+      ctx.drawImage(img, 0, 0, w, h);
+
+      // WebP at 82% quality — targets ~200–300KB for typical product photos
       canvas.toBlob(
-        (blob) => blob ? resolve(blob) : reject(new Error("Compress failed")),
+        (blob) => (blob ? resolve(blob) : reject(new Error("Compression failed"))),
         "image/webp",
         0.82
       );
     };
-    img.onerror = reject;
+
+    img.onerror = () => reject(new Error("Image load failed"));
     img.src = url;
   });
 }
+
 
 export default function AdminPage() {
   const [password, setPassword]   = useState("");
