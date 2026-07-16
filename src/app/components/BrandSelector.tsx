@@ -6,20 +6,15 @@ import { Search, X } from "lucide-react";
 import Image from "next/image";
 import BrandCard from "./BrandCard";
 import { brands } from "../data/brands";
+import { useLanguage } from "../context/LanguageContext";
 
 type SearchResult = {
-  id: number;
-  slug: string;
-  title: string;
-  brand: string;
-  car_model?: string;
-  model: string;
-  year: string;
-  price: string;
-  image: string;
+  id: number; slug: string; title: string; brand: string;
+  car_model?: string; model: string; year: string; price: string; image: string;
 };
 
 export default function BrandSelector() {
+  const { t } = useLanguage();
   const [search, setSearch]             = useState("");
   const [results, setResults]           = useState<SearchResult[]>([]);
   const [loading, setLoading]           = useState(false);
@@ -67,13 +62,9 @@ export default function BrandSelector() {
       <div className="mx-auto max-w-7xl px-6">
 
         <div className="text-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-red-600">Категории</p>
-          <h2 className="mt-3 text-4xl font-black uppercase text-white">
-            Пронајди патосници за твоето возило
-          </h2>
-          <p className="mt-4 text-zinc-400">
-            Избери бренд или пребарај директно по модел
-          </p>
+          <p className="text-xs font-bold uppercase tracking-widest text-red-600">{t("cat_label")}</p>
+          <h2 className="mt-3 text-4xl font-black uppercase text-white">{t("cat_title")}</h2>
+          <p className="mt-4 text-zinc-400">{t("cat_desc")}</p>
         </div>
 
         {/* Search */}
@@ -83,7 +74,7 @@ export default function BrandSelector() {
               <input ref={inputRef} type="text" value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onFocus={() => results.length > 0 && setShowDropdown(true)}
-                placeholder="Пребарај по модел... пр. Audi A3, Golf 5, BMW E90"
+                placeholder={t("search_placeholder")}
                 className="w-full rounded-xl border border-zinc-700 bg-[#181818] py-4 pl-5 pr-14 text-white outline-none transition focus:border-red-600"
               />
               {search && (
@@ -100,7 +91,7 @@ export default function BrandSelector() {
                   : <Search size={16} />}
               </button>
 
-              {/* Live dropdown results */}
+              {/* Live dropdown */}
               {showDropdown && results.length > 0 && (
                 <div ref={dropRef}
                   className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-zinc-700 bg-[#141414] shadow-2xl">
@@ -121,7 +112,7 @@ export default function BrandSelector() {
                   <button type="button"
                     onClick={() => { setShowDropdown(false); router.push(`/products?q=${encodeURIComponent(search)}`); }}
                     className="flex w-full items-center justify-center gap-2 border-t border-zinc-800 py-3 text-sm text-zinc-400 transition hover:bg-zinc-800 hover:text-white">
-                    <Search size={14} /> Покажи ги сите резултати за &quot;{search}&quot;
+                    <Search size={14} /> {t("search_show_all")} &quot;{search}&quot;
                   </button>
                 </div>
               )}
@@ -129,29 +120,26 @@ export default function BrandSelector() {
               {showDropdown && results.length === 0 && !loading && search.trim() && (
                 <div ref={dropRef}
                   className="absolute left-0 right-0 top-full z-50 mt-2 rounded-2xl border border-zinc-700 bg-[#141414] p-4 text-center text-sm text-zinc-500 shadow-2xl">
-                  Нема резултати — <button type="submit" className="text-red-500 underline">пребарај во сите производи</button>
+                  {t("search_no_results")}
                 </div>
               )}
             </div>
           </form>
         </div>
 
-        {/* Brand Grid — клик → директно на /products?brand=id */}
+        {/* Brand Grid */}
         <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
           {filteredBrands.map((brand) => (
-            <BrandCard key={brand.id} brand={brand}
-              onClick={() => router.push(`/products?brand=${brand.id}`)} />
+            <BrandCard key={brand.id} brand={brand} onClick={() => router.push(`/products?brand=${brand.id}`)} />
           ))}
           {search === "" && (
-            <BrandCard brand={{ id: "all", name: "Сите", logo: "" }} isViewAll
+            <BrandCard brand={{ id: "all", name: t("all"), logo: "" }} isViewAll
               onClick={() => router.push("/products")} />
           )}
         </div>
 
         {filteredBrands.length === 0 && search && (
-          <p className="mt-8 text-center text-sm text-zinc-600">
-            Нема бренд — притисни Enter за да пребараш во производите
-          </p>
+          <p className="mt-8 text-center text-sm text-zinc-600">{t("search_no_results")}</p>
         )}
 
       </div>
