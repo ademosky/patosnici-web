@@ -28,6 +28,7 @@ export async function PUT(
       description: body.description,
       sku: body.sku ?? "",
       images: body.images || [],
+      description_sq: body.description_sq ?? "",
       in_stock: body.in_stock !== false,
     })
     .eq("id", parseInt(id))
