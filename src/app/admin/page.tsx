@@ -31,7 +31,7 @@ type Product = {
 
 const EMPTY_FORM = {
   title: "", brand: "", car_model: "", model: "", year: "",
-  price: "", image: "", description: "", sku: "", images: [] as string[], in_stock: true,
+  price: "", image: "", description: "", description_sq: "", sku: "", images: [] as string[], in_stock: true,
 };
 
 async function compressImage(file: File): Promise<Blob> {
@@ -214,6 +214,7 @@ export default function AdminPage() {
       description: p.description, sku: p.sku ?? "",
       images: p.images && p.images.length > 0 ? p.images : (p.image ? [p.image] : []),
       in_stock: p.in_stock !== false,
+      description_sq: p.description_sq ?? "",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -591,10 +592,25 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className={labelClass}>Опис</label>
+                <label className={labelClass}>
+                  Опис{" "}
+                  <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-zinc-500">МКД</span>
+                </label>
                 <textarea rows={3} value={form.description}
                   onChange={(e) => update("description", e.target.value)}
                   placeholder="Краток опис на производот..."
+                  className={`${inputClass} resize-none`}
+                />
+              </div>
+
+              <div>
+                <label className={labelClass}>
+                  Опис{" "}
+                  <span className="rounded bg-red-900/40 px-1.5 py-0.5 text-xs text-red-400">SHQ — Shqip</span>
+                </label>
+                <textarea rows={3} value={form.description_sq}
+                  onChange={(e) => update("description_sq", e.target.value)}
+                  placeholder="Përshkrim i shkurtër i produktit... (Albanski)"
                   className={`${inputClass} resize-none`}
                 />
               </div>
