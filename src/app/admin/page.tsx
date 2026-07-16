@@ -68,6 +68,7 @@ export default function AdminPage() {
   const [uploading, setUploading] = useState(false);
   const [toast, setToast]         = useState<{ msg: string; ok: boolean } | null>(null);
   const [listSearch, setListSearch] = useState("");
+  const [expandedBrands, setExpandedBrands] = useState<Record<string,boolean>>({});
 
   const showToast = (msg: string, ok = true) => {
     setToast({ msg, ok });
@@ -396,6 +397,7 @@ export default function AdminPage() {
                       </div>
                     ))}
                   </div>
+                  )}
                 </div>
               ))}
           </div>
