@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { brands } from "../data/brands";
+import { supabase } from "../../lib/supabase";
 import {
   Lock, Plus, Trash2, LogOut, Package,
   CheckCircle, AlertCircle, Loader2, Pencil,
@@ -106,11 +107,7 @@ export default function AdminPage() {
         .replace(/[^a-z0-9-]/g, "-")
         .slice(0, 40) || "slika";
 
-      const { createClient } = await import("@supabase/supabase-js");
-      const sb = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
+      const sb = supabase;
 
       let uploadBlob: Blob;
       let filename: string;
