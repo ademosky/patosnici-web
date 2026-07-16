@@ -163,7 +163,7 @@ export default function AdminPage() {
       setUploading(false);
       e.target.value = "";
     }
-  }
+  };
   const handleEditClick = (p: Product) => {
     setEditId(p.id);
     setForm({
