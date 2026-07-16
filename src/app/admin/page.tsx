@@ -151,7 +151,7 @@ export default function AdminPage() {
       }
 
       const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${filename}`;
-      setForm((prev) => ({ ...prev, image: publicUrl }));
+      addImage(publicUrl);
 
       showToast(
         savedPct > 0
