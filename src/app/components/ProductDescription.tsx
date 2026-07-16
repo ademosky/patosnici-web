@@ -1,6 +1,6 @@
 "use client";
 
-import { useLanguage } from "../../context/LanguageContext";
+import { useLanguage } from "../context/LanguageContext";
 
 type Props = {
   description_mk: string;
