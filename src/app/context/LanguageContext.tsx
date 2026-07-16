@@ -118,6 +118,9 @@ const mk = {
   prod_select_model: "Избери модел на",
   prod_contact: "Контактирај не",
   prod_contact_msg: "Контактирај не — ги имаме и за овој модел!",
+  best_title: "Најпродавани производи",
+  best_desc: "Избрани оригинални патосници од нашата понуда.",
+  best_view_all: "Види ги сите →",
 };
 
 const sq: typeof mk = {
@@ -222,6 +225,9 @@ const sq: typeof mk = {
   prod_select_model: "Zgjidh modelin e",
   prod_contact: "Na kontaktoni",
   prod_contact_msg: "Na kontaktoni — i kemi edhe për këtë model!",
+  best_title: "Produktet më të shitura",
+  best_desc: "Tapete origjinale të zgjedhura nga oferta jonë.",
+  best_view_all: "Shiko të gjitha →",
 };
 
 export type TKey = keyof typeof mk;
