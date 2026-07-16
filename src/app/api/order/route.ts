@@ -45,10 +45,11 @@ export async function POST(req: NextRequest) {
       subject = `Нарачка: ${productTitle}`;
       itemsHtml = `
         <tr style="border-bottom: 1px solid #333;">
-          <td style="padding: 10px 0; color: white;">${productTitle}${productSku ? ` <span style="color:#888;font-size:12px;">(${productSku})</span>` : ""}</td>
+          <td style="padding: 10px 0; color: white;">${productTitle}</td>
           <td style="padding: 10px 0; color: #888; text-align:center;">1x</td>
           <td style="padding: 10px 0; color: #dc2626; text-align:right; font-weight:bold;">${productPrice}</td>
         </tr>
+        ${productSku ? `<tr><td colspan="3" style="padding:4px 0;color:#888;font-size:12px;">SKU: <span style='font-family:monospace;color:#aaa;'>${productSku}</span></td></tr>` : ""}
       `;
     }
 
