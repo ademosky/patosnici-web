@@ -374,16 +374,17 @@ export default function AdminPage() {
       )}
 
       <header className="sticky top-0 z-40 border-b border-zinc-800 bg-black/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <div className="flex items-center gap-3">
+        {/* Main row */}
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:h-16 sm:px-6">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Package size={20} className="text-red-600" />
-            <span className="font-black uppercase tracking-wide text-white">Admin Панел</span>
-            <span className="rounded-full bg-zinc-800 px-3 py-0.5 text-xs text-zinc-400">
+            <span className="font-black uppercase tracking-wide text-white text-sm sm:text-base">Admin Панел</span>
+            <span className="hidden sm:inline rounded-full bg-zinc-800 px-3 py-0.5 text-xs text-zinc-400">
               {products.length} производи
             </span>
           </div>
-          <div className="flex items-center gap-4">
-            {/* Tabs */}
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* Tabs — desktop only (mobile tabs are below) */}
             <div className="hidden items-center overflow-hidden rounded-xl border border-zinc-700 sm:flex">
               <button onClick={() => setActiveTab("products")}
                 className={`px-4 py-2 text-xs font-bold uppercase transition ${activeTab === "products" ? "bg-red-600 text-white" : "text-zinc-400 hover:text-white"}`}>
@@ -399,15 +400,37 @@ export default function AdminPage() {
                 )}
               </button>
             </div>
-            <Link href="/" className="text-sm text-zinc-400 transition hover:text-white">
+            <Link href="/" className="hidden sm:block text-sm text-zinc-400 transition hover:text-white">
               ← Кон сајтот
             </Link>
             <button onClick={handleLogout}
-              className="flex items-center gap-2 rounded-xl border border-zinc-700 px-4 py-2 text-sm text-zinc-400 transition hover:border-red-600 hover:text-white"
+              className="flex items-center gap-1.5 rounded-xl border border-zinc-700 px-3 py-1.5 text-xs text-zinc-400 transition hover:border-red-600 hover:text-white sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
             >
-              <LogOut size={14} /> Излез
+              <LogOut size={14} />
+              <span className="hidden sm:inline">Излез</span>
             </button>
           </div>
+        </div>
+        {/* Mobile tab bar — visible only on portrait/small screens */}
+        <div className="flex border-t border-zinc-800 sm:hidden">
+          <button
+            onClick={() => setActiveTab("products")}
+            className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs font-bold uppercase transition ${activeTab === "products" ? "bg-red-600 text-white" : "text-zinc-400 active:bg-zinc-800"}`}
+          >
+            <Package size={14} /> Производи
+          </button>
+          <div className="w-px bg-zinc-800" />
+          <button
+            onClick={() => { setActiveTab("orders"); fetchOrders(); }}
+            className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs font-bold uppercase transition ${activeTab === "orders" ? "bg-red-600 text-white" : "text-zinc-400 active:bg-zinc-800"}`}
+          >
+            <ShoppingCart size={14} /> Нарачки
+            {orders.filter(o => o.status === "new").length > 0 && (
+              <span className="rounded-full bg-yellow-500 px-1.5 py-0.5 text-[10px] text-black font-bold">
+                {orders.filter(o => o.status === "new").length}
+              </span>
+            )}
+          </button>
         </div>
       </header>
 
