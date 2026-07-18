@@ -143,29 +143,46 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Save order to Supabase
+    // Save order to Supabase via REST API
     try {
-      const { createClient } = await import("@supabase/supabase-js");
-      const sb = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-      await sb.from("orders").insert([{
-        name: body.name,
-        surname: body.surname,
-        address: body.address,
-        city: body.city,
-        phone: body.phone,
-        email: body.email || null,
-        items: isCartOrder ? body.items : null,
-        product_title: isCartOrder ? null : body.productTitle,
-        product_price: isCartOrder ? null : body.productPrice,
-        product_sku: isCartOrder ? null : body.productSku,
-        status: "new",
-      }]);
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+      if (supabaseUrl && supabaseKey) {
+        const orderData = {
+          name: body.name,
+          surname: body.surname,
+          address: body.address,
+          city: body.city,
+          phone: body.phone,
+          email: body.email || null,
+          items: isCartOrder ? body.items : null,
+          product_title: isCartOrder ? null : body.productTitle,
+          product_price: isCartOrder ? null : body.productPrice,
+          product_sku: isCartOrder ? null : (body.productSku || null),
+          status: "new",
+        };
+
+        const dbRes = await fetch(`${supabaseUrl}/rest/v1/orders`, {
+          method: "POST",
+          headers: {
+            "apikey": supabaseKey,
+            "Authorization": `Bearer ${supabaseKey}`,
+            "Content-Type": "application/json",
+            "Prefer": "return=minimal",
+          },
+          body: JSON.stringify(orderData),
+        });
+
+        if (!dbRes.ok) {
+          const errText = await dbRes.text();
+          console.error("Order DB save failed:", dbRes.status, errText);
+        } else {
+          console.log("Order saved to DB successfully");
+        }
+      }
     } catch (dbErr) {
-      console.error("DB save error:", dbErr);
-      // Don't fail the request if DB save fails - email was sent
+      console.error("Order DB save error:", dbErr);
     }
 
     return NextResponse.json({ success: true });
