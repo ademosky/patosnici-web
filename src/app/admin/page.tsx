@@ -92,6 +92,11 @@ export default function AdminPage() {
   const [toast, setToast]         = useState<{ msg: string; ok: boolean } | null>(null);
   const [listSearch, setListSearch] = useState("");
   const [expandedBrands, setExpandedBrands] = useState<Record<string,boolean>>({});
+  const [activeTab, setActiveTab] = useState<"products" | "orders">("products");
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersMonth, setOrdersMonth] = useState("");
+  const [ordersStatus, setOrdersStatus] = useState("");
+  const [ordersLoading, setOrdersLoading] = useState(false);
 
   const showToast = (msg: string, ok = true) => {
     setToast({ msg, ok });
@@ -112,6 +117,29 @@ export default function AdminPage() {
     const pw = getPw();
     if (pw) { setAuthed(true); fetchProducts(pw); }
   }, [fetchProducts]);
+
+  const fetchOrders = async (month = ordersMonth, status = ordersStatus) => {
+    const pw = getPw();
+    if (!pw) return;
+    setOrdersLoading(true);
+    const params = new URLSearchParams();
+    if (month) params.set("month", month);
+    if (status) params.set("status", status);
+    const res = await fetch(`/api/admin/orders?${params}`, {
+      headers: { "x-admin-password": pw },
+    });
+    if (res.ok) setOrders(await res.json());
+    setOrdersLoading(false);
+  };
+
+  const updateOrderStatus = async (id: number, status: string) => {
+    const res = await fetch(`/api/admin/orders/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", "x-admin-password": getPw() },
+      body: JSON.stringify({ status }),
+    });
+    if (res.ok) fetchOrders();
+  };
 
   // ── UPLOAD — компресија во браузер + директно кон Supabase ──
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -339,6 +367,22 @@ export default function AdminPage() {
             </span>
           </div>
           <div className="flex items-center gap-4">
+            {/* Tabs */}
+            <div className="hidden items-center overflow-hidden rounded-xl border border-zinc-700 sm:flex">
+              <button onClick={() => setActiveTab("products")}
+                className={`px-4 py-2 text-xs font-bold uppercase transition ${activeTab === "products" ? "bg-red-600 text-white" : "text-zinc-400 hover:text-white"}`}>
+                <Package size={13} className="mr-1 inline" /> Производи
+              </button>
+              <button onClick={() => { setActiveTab("orders"); fetchOrders(); }}
+                className={`px-4 py-2 text-xs font-bold uppercase transition ${activeTab === "orders" ? "bg-red-600 text-white" : "text-zinc-400 hover:text-white"}`}>
+                <ShoppingCart size={13} className="mr-1 inline" /> Нарачки
+                {orders.filter(o => o.status === "new").length > 0 && (
+                  <span className="ml-1 rounded-full bg-yellow-500 px-1.5 py-0.5 text-[10px] text-black font-bold">
+                    {orders.filter(o => o.status === "new").length}
+                  </span>
+                )}
+              </button>
+            </div>
             <Link href="/" className="text-sm text-zinc-400 transition hover:text-white">
               ← Кон сајтот
             </Link>
