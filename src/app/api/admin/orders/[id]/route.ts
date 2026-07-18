@@ -26,3 +26,22 @@ export async function PATCH(
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
 }
+
+// DELETE — permanently remove an order
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!checkAuth(req))
+    return NextResponse.json({ error: "Неовластен пристап" }, { status: 401 });
+
+  const { id } = await params;
+
+  const { error } = await supabase
+    .from("orders")
+    .delete()
+    .eq("id", parseInt(id));
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ success: true });
+}
