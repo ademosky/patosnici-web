@@ -157,6 +157,19 @@ export default function AdminPage() {
     if (res.ok) fetchOrders();
   };
 
+  const deleteOrder = async (id: number) => {
+    if (!confirm("Сигурно сакаш да ја избришеш оваа нарачка?")) return;
+    const res = await fetch(`/api/admin/orders/${id}`, {
+      method: "DELETE",
+      headers: { "x-admin-password": getPw() },
+    });
+    if (res.ok) {
+      setOrders((prev) => prev.filter((o) => o.id !== id));
+      setToast({ msg: "Нарачката е избришана", ok: true });
+      setTimeout(() => setToast(null), 3000);
+    }
+  };
+
   // ── UPLOAD — компресија во браузер + директно кон Supabase ──
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -808,7 +821,7 @@ export default function AdminPage() {
                     </div>
 
                     {/* Status buttons */}
-                    <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-2">
+                    <div className="grid grid-cols-3 gap-2 sm:flex sm:gap-2">
                       <button
                         onClick={() => updateOrderStatus(order.id, "in_process")}
                         disabled={order.status === "in_process"}
@@ -822,6 +835,13 @@ export default function AdminPage() {
                         className="rounded-xl border border-green-700 px-3 py-2.5 sm:py-1.5 text-xs font-semibold text-green-400 transition hover:bg-green-600/20 disabled:opacity-40 active:bg-green-600/30"
                       >
                         ✅ Испратена
+                      </button>
+                      <button
+                        onClick={() => deleteOrder(order.id)}
+                        className="rounded-xl border border-red-900 px-3 py-2.5 sm:py-1.5 text-xs font-semibold text-red-500 transition hover:bg-red-600/20 active:bg-red-600/30"
+                        title="Избриши нарачка"
+                      >
+                        <Trash2 size={13} className="inline" />
                       </button>
                     </div>
                   </div>
