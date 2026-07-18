@@ -143,6 +143,31 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Save order to Supabase
+    try {
+      const { createClient } = await import("@supabase/supabase-js");
+      const sb = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      await sb.from("orders").insert([{
+        name: body.name,
+        surname: body.surname,
+        address: body.address,
+        city: body.city,
+        phone: body.phone,
+        email: body.email || null,
+        items: isCartOrder ? body.items : null,
+        product_title: isCartOrder ? null : body.productTitle,
+        product_price: isCartOrder ? null : body.productPrice,
+        product_sku: isCartOrder ? null : body.productSku,
+        status: "new",
+      }]);
+    } catch (dbErr) {
+      console.error("DB save error:", dbErr);
+      // Don't fail the request if DB save fails - email was sent
+    }
+
     return NextResponse.json({ success: true });
   } catch (err: any) {
     console.error("Email error:", err?.message ?? err);
