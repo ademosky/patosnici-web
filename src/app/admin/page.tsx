@@ -7,9 +7,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { brands } from "../data/brands";
 import {
-  Lock, Plus, Trash2, LogOut, Package,
+  Lock, Plus, Trash2, LogOut, Package, ShoppingCart,
   CheckCircle, AlertCircle, Loader2, Pencil,
-  X, Upload, ImageIcon,
+  X, Upload, ImageIcon, Phone, Mail as MailIcon, Clock,
 } from "lucide-react";
 
 type Product = {
@@ -27,6 +27,22 @@ type Product = {
   images?: string[];
   car_model?: string;
   in_stock?: boolean;
+};
+
+type Order = {
+  id: number;
+  name: string;
+  surname: string;
+  address: string;
+  city: string;
+  phone: string;
+  email?: string;
+  items?: Array<{ title: string; price: string; quantity: number; sku?: string }>;
+  product_title?: string;
+  product_price?: string;
+  product_sku?: string;
+  status: "new" | "in_process" | "sent";
+  created_at: string;
 };
 
 const EMPTY_FORM = {
@@ -395,6 +411,7 @@ export default function AdminPage() {
         </div>
       </header>
 
+      {activeTab === "products" && (
       <div className="mx-auto max-w-6xl px-6 py-10">
         <div className="grid gap-10 lg:grid-cols-[1fr_420px]">
 
@@ -689,6 +706,148 @@ export default function AdminPage() {
 
         </div>
       </div>
+      )}
+
+      {/* ── НАРАЧКИ ТАБ ── */}
+      {activeTab === "orders" && (
+        <div className="mx-auto max-w-6xl px-6 py-10">
+
+          {/* Filters */}
+          <div className="mb-6 flex flex-wrap items-center gap-4">
+            <h2 className="text-xl font-black uppercase text-white">Нарачки</h2>
+
+            {/* Month filter */}
+            <input type="month" value={ordersMonth}
+              onChange={(e) => { setOrdersMonth(e.target.value); fetchOrders(e.target.value, ordersStatus); }}
+              className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2 text-sm text-white outline-none transition focus:border-red-600"
+            />
+
+            {/* Status filter */}
+            <div className="flex gap-2">
+              {[
+                { v: "", label: "Сите" },
+                { v: "new", label: "🆕 Нова" },
+                { v: "in_process", label: "⚙️ Во процес" },
+                { v: "sent", label: "✅ Испратена" },
+              ].map(({ v, label }) => (
+                <button key={v}
+                  onClick={() => { setOrdersStatus(v); fetchOrders(ordersMonth, v); }}
+                  className={`rounded-xl px-3 py-2 text-xs font-bold uppercase transition ${ordersStatus === v ? "bg-red-600 text-white" : "border border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-white"}`}>
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <span className="ml-auto text-xs text-zinc-500">{orders.length} нарачки</span>
+          </div>
+
+          {/* Orders list */}
+          {ordersLoading ? (
+            <div className="flex justify-center py-20">
+              <Loader2 size={32} className="animate-spin text-red-600" />
+            </div>
+          ) : orders.length === 0 ? (
+            <div className="py-20 text-center text-zinc-600">
+              <ShoppingCart size={48} className="mx-auto mb-4 opacity-30" />
+              <p>Нема нарачки</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {orders.map((order) => (
+                <div key={order.id}
+                  className={`rounded-2xl border bg-[#111] p-5 transition ${
+                    order.status === "new" ? "border-yellow-700/50" :
+                    order.status === "in_process" ? "border-blue-700/50" :
+                    "border-green-700/50"
+                  }`}
+                >
+                  {/* Order header */}
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      {/* Status badge */}
+                      <span className={`rounded-lg px-2.5 py-1 text-xs font-bold uppercase ${
+                        order.status === "new" ? "bg-yellow-600/20 text-yellow-400" :
+                        order.status === "in_process" ? "bg-blue-600/20 text-blue-400" :
+                        "bg-green-600/20 text-green-400"
+                      }`}>
+                        {order.status === "new" ? "🆕 Нова" :
+                         order.status === "in_process" ? "⚙️ Во процес" :
+                         "✅ Испратена"}
+                      </span>
+                      <span className="text-xs text-zinc-500">
+                        <Clock size={11} className="mr-1 inline" />
+                        {new Date(order.created_at).toLocaleDateString("mk-MK", {
+                          day: "numeric", month: "long", year: "numeric",
+                          hour: "2-digit", minute: "2-digit"
+                        })}
+                      </span>
+                      <span className="text-xs text-zinc-600">#{order.id}</span>
+                    </div>
+
+                    {/* Status buttons */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => updateOrderStatus(order.id, "in_process")}
+                        disabled={order.status === "in_process"}
+                        className="rounded-xl border border-blue-700 px-3 py-1.5 text-xs font-semibold text-blue-400 transition hover:bg-blue-600/20 disabled:opacity-40"
+                      >
+                        ⚙️ Во процес
+                      </button>
+                      <button
+                        onClick={() => updateOrderStatus(order.id, "sent")}
+                        disabled={order.status === "sent"}
+                        className="rounded-xl border border-green-700 px-3 py-1.5 text-xs font-semibold text-green-400 transition hover:bg-green-600/20 disabled:opacity-40"
+                      >
+                        ✅ Испратена
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    {/* Customer info */}
+                    <div>
+                      <p className="mb-2 text-xs font-bold uppercase tracking-wider text-zinc-500">Купувач</p>
+                      <p className="font-semibold text-white">{order.name} {order.surname}</p>
+                      <p className="mt-1 text-sm text-zinc-400">{order.address}, {order.city}</p>
+                      <a href={`tel:${order.phone}`} className="mt-1 flex items-center gap-1.5 text-sm text-red-500 hover:text-red-400">
+                        <Phone size={13} /> {order.phone}
+                      </a>
+                      {order.email && (
+                        <a href={`mailto:${order.email}`} className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300">
+                          <MailIcon size={11} /> {order.email}
+                        </a>
+                      )}
+                    </div>
+
+                    {/* Ordered items */}
+                    <div>
+                      <p className="mb-2 text-xs font-bold uppercase tracking-wider text-zinc-500">Нарачано</p>
+                      {order.items && order.items.length > 0 ? (
+                        <ul className="space-y-1">
+                          {order.items.map((item, i) => (
+                            <li key={i} className="text-sm text-zinc-300">
+                              <span className="font-semibold">{item.quantity}×</span> {item.title}
+                              <span className="ml-2 font-bold text-red-500">{item.price}</span>
+                              {item.sku && <span className="ml-1 font-mono text-xs text-zinc-600">({item.sku})</span>}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <div className="text-sm text-zinc-300">
+                          {order.product_title}
+                          <span className="ml-2 font-bold text-red-500">{order.product_price}</span>
+                          {order.product_sku && <span className="ml-1 font-mono text-xs text-zinc-600">({order.product_sku})</span>}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
     </div>
   );
 }
