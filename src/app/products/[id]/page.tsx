@@ -8,6 +8,7 @@ import { getProducts, getProductBySlug } from "../../data/products";
 import { CheckCircle, ArrowLeft, Tag } from "lucide-react";
 import AddToCartButton from "../../components/AddToCartButton";
 import ProductDescription from "../../components/ProductDescription";
+import ProductViewEvent from "../../components/ProductViewEvent";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,12 @@ export default async function ProductPage({ params }: Props) {
   return (
     <>
       <Header />
+      {/* Meta Pixel — ViewContent fired once on product page mount */}
+      <ProductViewEvent
+        productId={product.id}
+        productName={product.title}
+        productPrice={product.price}
+      />
       <main className="min-h-screen bg-[#0b0b0b] pt-28">
         <div className="mx-auto max-w-6xl px-6 py-12">
 
