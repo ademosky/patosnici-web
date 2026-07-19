@@ -66,6 +66,9 @@ export default function CartPage() {
   const inputClass = "w-full rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600";
   const labelClass = "mb-1.5 block text-xs font-bold uppercase tracking-wider text-zinc-400";
 
+  // Prevents double-firing Purchase if handleOrder somehow runs twice
+  const purchaseFiredRef = useRef(false);
+
   const handleOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -79,6 +82,30 @@ export default function CartPage() {
       });
 
       if (res.ok) {
+        // ── Meta Pixel: Purchase ──────────────────────────────────────────
+        // Fires HERE and ONLY here — after the server returns 200 (order saved).
+        // NOT on button click, NOT on form submit, NOT if request fails.
+        // No polling needed: by the time user submits, fbq is already loaded.
+        if (!purchaseFiredRef.current) {
+          purchaseFiredRef.current = true;
+          const totalValue = items.reduce((sum, item) => {
+            const num =
+              parseInt(item.price.replace(/\./g, "").replace(/[^\d]/g, ""), 10) || 0;
+            return sum + num * item.quantity;
+          }, 0);
+          type Win = Window & { fbq?: (...args: unknown[]) => void };
+          const win = window as Win;
+          if (typeof win.fbq === "function") {
+            win.fbq("track", "Purchase", {
+              content_ids: items.map((i) => String(i.id)),
+              content_name: items.map((i) => i.title).join(", "),
+              content_type: "product",
+              value: totalValue,
+              currency: "MKD",
+            });
+          }
+        }
+        // ─────────────────────────────────────────────────────────────────
         clearCart();
         setSent(true);
       } else {
