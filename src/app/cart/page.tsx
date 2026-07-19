@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Header from "../components/Header";
@@ -13,6 +13,46 @@ export default function CartPage() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+
+  // ── Meta Pixel: InitiateCheckout ──
+  // Fires once on mount if the cart has items.
+  // Uses polling because fbq (afterInteractive Script) loads after useEffect.
+  const pixelFiredRef = useRef(false);
+  useEffect(() => {
+    if (pixelFiredRef.current || items.length === 0) return;
+    pixelFiredRef.current = true;
+
+    // Calculate total value using the same logic as the cart total display
+    const totalValue = items.reduce((sum, item) => {
+      const num = parseInt(item.price.replace(/\./g, "").replace(/[^\d]/g, ""), 10) || 0;
+      return sum + num * item.quantity;
+    }, 0);
+
+    type Fbq = (...args: unknown[]) => void;
+    type Win = Window & { fbq?: Fbq };
+
+    let fired = false;
+    const fire = (): boolean => {
+      if (fired) return true;
+      const win = window as Win;
+      if (typeof win.fbq !== "function") return false;
+      fired = true;
+      win.fbq("track", "InitiateCheckout", {
+        content_ids: items.map((i) => String(i.id)),
+        content_name: items.map((i) => i.title).join(", "),
+        content_type: "product",
+        value: totalValue,
+        currency: "MKD",
+      });
+      return true;
+    };
+
+    if (fire()) return;
+
+    const interval = setInterval(() => { if (fire()) clearInterval(interval); }, 100);
+    const timeout = setTimeout(() => clearInterval(interval), 10_000);
+    return () => { clearInterval(interval); clearTimeout(timeout); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const update = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
 
