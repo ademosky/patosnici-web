@@ -7,7 +7,6 @@ import { LanguageProvider } from "./context/LanguageContext";
 import Script from "next/script";
 import FacebookFloat from "./components/FacebookFloat";
 import MetaPixel from "@/components/MetaPixel";
-import { FB_PIXEL_ID } from "@/lib/facebookPixel";
 
 const barlowCondensed = Barlow_Condensed({
   variable: "--font-heading",
@@ -93,32 +92,15 @@ export default function RootLayout({
             }}
           />
 
-          {/* ── Meta Pixel ── */}
-          <Script
-            id="fb-pixel"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-                !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){
-                n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-                n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;
-                s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
-                (window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-                fbq('init','${FB_PIXEL_ID}');
-                fbq('track','PageView');
-              `,
-            }}
-          />
-          {/* Tracks PageView on every client-side route change */}
+          {/* Meta Pixel — init + route tracking handled inside MetaPixel Client Component */}
           <MetaPixel />
-          {/* noscript fallback for browsers with JS disabled */}
+          {/* noscript fallback */}
           <noscript>
             <img
               height="1"
               width="1"
               style={{ display: "none" }}
-              src={`https://www.facebook.com/tr?id=${FB_PIXEL_ID}&ev=PageView&noscript=1`}
+              src="https://www.facebook.com/tr?id=1053477223792945&ev=PageView&noscript=1"
               alt=""
             />
           </noscript>
