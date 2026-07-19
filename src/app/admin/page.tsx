@@ -107,6 +107,7 @@ export default function AdminPage() {
   const [uploading, setUploading] = useState(false);
   const [toast, setToast]         = useState<{ msg: string; ok: boolean } | null>(null);
   const [listSearch, setListSearch] = useState("");
+  const [stockFilter, setStockFilter] = useState<"all" | "out_of_stock">("all");
   const [expandedBrands, setExpandedBrands] = useState<Record<string,boolean>>({});
   const [activeTab, setActiveTab] = useState<"products" | "orders">("products");
   const [orders, setOrders] = useState<Order[]>([]);
@@ -118,6 +119,17 @@ export default function AdminPage() {
     setToast({ msg, ok });
     setTimeout(() => setToast(null), 3500);
   };
+
+  // Auto-expand brands that have out-of-stock products when filter is active
+  useEffect(() => {
+    if (stockFilter === "out_of_stock") {
+      const expand: Record<string, boolean> = {};
+      products.filter((p) => p.in_stock === false).forEach((p) => {
+        if (p.brand) expand[p.brand] = true;
+      });
+      setExpandedBrands((prev) => ({ ...prev, ...expand }));
+    }
+  }, [stockFilter, products]);
 
   const getPw = () =>
     typeof window !== "undefined" ? sessionStorage.getItem("adminPw") ?? "" : "";
@@ -453,17 +465,45 @@ export default function AdminPage() {
 
           {/* ЛИСТА — групирана по бренд */}
           <div>
-            <div className="mb-6 flex items-center justify-between gap-4">
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="text-xl font-black uppercase text-white">
-                Производи <span className="text-base font-normal text-zinc-500">({products.length})</span>
+                Производи{" "}
+                <span className="text-base font-normal text-zinc-500">
+                  ({stockFilter === "out_of_stock"
+                    ? products.filter((p) => p.in_stock === false).length
+                    : products.length})
+                </span>
               </h2>
-              <input
-                type="text"
-                placeholder="Пребарај..."
-                value={listSearch}
-                onChange={(e) => setListSearch(e.target.value)}
-                className="w-36 rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2 text-sm text-white outline-none transition focus:border-red-600"
-              />
+              <div className="flex items-center gap-2">
+                {/* Out-of-stock filter toggle */}
+                <button
+                  type="button"
+                  onClick={() => setStockFilter((f) => f === "out_of_stock" ? "all" : "out_of_stock")}
+                  className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold uppercase transition ${
+                    stockFilter === "out_of_stock"
+                      ? "border-orange-500 bg-orange-600/20 text-orange-400"
+                      : "border-zinc-700 text-zinc-400 hover:border-orange-500 hover:text-orange-400"
+                  }`}
+                >
+                  Нема залиха
+                  {products.filter((p) => p.in_stock === false).length > 0 && (
+                    <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                      stockFilter === "out_of_stock"
+                        ? "bg-orange-500 text-black"
+                        : "bg-zinc-800 text-zinc-300"
+                    }`}>
+                      {products.filter((p) => p.in_stock === false).length}
+                    </span>
+                  )}
+                </button>
+                <input
+                  type="text"
+                  placeholder="Пребарај..."
+                  value={listSearch}
+                  onChange={(e) => setListSearch(e.target.value)}
+                  className="w-36 rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2 text-sm text-white outline-none transition focus:border-red-600"
+                />
+              </div>
             </div>
 
             {products.length === 0 && (
@@ -472,6 +512,9 @@ export default function AdminPage() {
 
             {Object.entries(
               products
+                .filter((p) =>
+                  stockFilter === "all" || p.in_stock === false
+                )
                 .filter((p) =>
                   !listSearch ||
                   p.title.toLowerCase().includes(listSearch.toLowerCase()) ||
