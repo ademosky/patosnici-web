@@ -1,36 +1,100 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Send, CheckCircle, Loader2 } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 
-type Props = { productTitle: string; productPrice: string; productSku?: string; };
+type Props = {
+  productTitle: string;
+  productPrice: string;
+  productSku?: string;
+  productId?: number; // used for content_ids in Pixel events
+};
 
-export default function OrderForm({ productTitle, productPrice, productSku }: Props) {
+export default function OrderForm({ productTitle, productPrice, productSku, productId }: Props) {
   const { t } = useLanguage();
   const [form, setForm] = useState({ name: "", surname: "", address: "", city: "", phone: "", email: "" });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
 
+  // Prevent duplicate Pixel events on re-render or accidental double-submit
+  const initiateCheckoutFiredRef = useRef(false);
+  const purchaseFiredRef = useRef(false);
+
   const update = (field: string, value: string) => setForm((prev) => ({ ...prev, [field]: value }));
   const inputClass = "w-full rounded-xl border border-zinc-700 bg-[#1a1a1a] px-5 py-3 text-sm text-white outline-none transition focus:border-red-600";
   const labelClass = "mb-2 block text-xs font-bold uppercase tracking-wide text-zinc-400";
+
+  // Helper: parse numeric value from price string e.g. "1500 МКД" → 1500
+  const numericPrice = parseFloat(productPrice.replace(/[^\d.]/g, "")) || 0;
+
+  // Helper: content_ids — prefer productId, fall back to SKU
+  const contentIds = productId
+    ? [String(productId)]
+    : productSku
+    ? [productSku]
+    : [];
+
+  type Win = Window & { fbq?: (...args: unknown[]) => void };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    // ── Meta Pixel: InitiateCheckout ─────────────────────────────────────
+    // Fires at form submit (all required fields valid, button clicked).
+    // fbq is guaranteed available by this point — no polling needed.
+    if (!initiateCheckoutFiredRef.current) {
+      initiateCheckoutFiredRef.current = true;
+      const win = window as Win;
+      if (typeof win.fbq === "function") {
+        win.fbq("track", "InitiateCheckout", {
+          content_ids: contentIds,
+          content_name: productTitle,
+          content_type: "product",
+          value: numericPrice,
+          currency: "MKD",
+        });
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────
+
     try {
       const res = await fetch("/api/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, productTitle, productPrice, productSku }),
       });
-      if (res.ok) setSent(true);
-      else setError(t("order_error"));
-    } catch { setError(t("order_no_net")); }
-    finally { setLoading(false); }
+
+      if (res.ok) {
+        // ── Meta Pixel: Purchase ────────────────────────────────────────
+        // Fires ONLY here — after server returns 200 (order confirmed in DB).
+        // NOT on button click. NOT if API fails or network errors.
+        if (!purchaseFiredRef.current) {
+          purchaseFiredRef.current = true;
+          const win = window as Win;
+          if (typeof win.fbq === "function") {
+            win.fbq("track", "Purchase", {
+              content_ids: contentIds,
+              content_name: productTitle,
+              content_type: "product",
+              value: numericPrice,
+              currency: "MKD",
+            });
+          }
+        }
+        // ───────────────────────────────────────────────────────────────
+        setSent(true);
+      } else {
+        setError(t("order_error"));
+      }
+    } catch {
+      setError(t("order_no_net"));
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (sent) {
