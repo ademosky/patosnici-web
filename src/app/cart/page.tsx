@@ -15,14 +15,16 @@ export default function CartPage() {
   const [error, setError] = useState("");
 
   // ── Meta Pixel: InitiateCheckout ──
-  // Fires once on mount if the cart has items.
-  // Uses polling because fbq (afterInteractive Script) loads after useEffect.
+  // BUG FIX: CartContext loads items ASYNC from localStorage via useEffect.
+  // On first mount, items = []. We must depend on [items] so the effect
+  // re-runs when items arrive. pixelFiredRef prevents duplicate fires.
   const pixelFiredRef = useRef(false);
   useEffect(() => {
-    if (pixelFiredRef.current || items.length === 0) return;
-    pixelFiredRef.current = true;
+    if (pixelFiredRef.current) return; // already fired — never fire again
+    if (items.length === 0) return;    // items not loaded yet — wait
 
-    // Calculate total value using the same logic as the cart total display
+    pixelFiredRef.current = true;      // lock before async polling starts
+
     const totalValue = items.reduce((sum, item) => {
       const num = parseInt(item.price.replace(/\./g, "").replace(/[^\d]/g, ""), 10) || 0;
       return sum + num * item.quantity;
@@ -37,6 +39,11 @@ export default function CartPage() {
       const win = window as Win;
       if (typeof win.fbq !== "function") return false;
       fired = true;
+      console.log("[MetaPixel] InitiateCheckout fired", {
+        content_ids: items.map((i) => String(i.id)),
+        value: totalValue,
+        currency: "MKD",
+      });
       win.fbq("track", "InitiateCheckout", {
         content_ids: items.map((i) => String(i.id)),
         content_name: items.map((i) => i.title).join(", "),
@@ -52,7 +59,7 @@ export default function CartPage() {
     const interval = setInterval(() => { if (fire()) clearInterval(interval); }, 100);
     const timeout = setTimeout(() => clearInterval(interval), 10_000);
     return () => { clearInterval(interval); clearTimeout(timeout); };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [items]); // re-runs when items load from localStorage
 
   const update = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
 
