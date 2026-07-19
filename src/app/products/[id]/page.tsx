@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -12,9 +13,56 @@ import ProductViewEvent from "../../components/ProductViewEvent";
 
 export const dynamic = "force-dynamic";
 
+const SITE_URL = "https://www.originalpatosnici.com";
+
 type Props = {
   params: Promise<{ id: string }>;
 };
+
+// Dynamic OG meta tags per product — enables image preview on Messenger/Facebook/WhatsApp
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getProductBySlug(id);
+
+  if (!product) {
+    return { title: "Производ не е пронајден | Original Patosnici" };
+  }
+
+  const ogImage = product.image?.startsWith("http")
+    ? product.image
+    : `${SITE_URL}/images/logo.png`;
+
+  const title = `${product.title} | Original Patosnici`;
+  const description =
+    product.description ||
+    `${product.brand} ${product.model} ${product.year} — Оригинален гумен патосник. Цена: ${product.price}. Достава низ цела Македонија. Плаќање при подигање.`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      type: "website",
+      url: `${SITE_URL}/products/${id}`,
+      siteName: "Original Patosnici",
+      title,
+      description,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: product.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
+  };
+}
 
 export default async function ProductPage({ params }: Props) {
   const { id } = await params;
