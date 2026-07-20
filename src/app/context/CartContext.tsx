@@ -9,6 +9,7 @@ export type CartItem = {
   price: string;
   image: string;
   brand: string;
+  sku?: string;   // optional — not all products have a SKU
   quantity: number;
 };
 
