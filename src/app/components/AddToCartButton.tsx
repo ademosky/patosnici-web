@@ -6,7 +6,7 @@ import { useCart } from "../context/CartContext";
 import { useLanguage } from "../context/LanguageContext";
 
 type Props = {
-  product: { id: number; slug: string; title: string; price: string; image: string; brand: string; };
+  product: { id: number; slug: string; title: string; price: string; image: string; brand: string; sku?: string; };
 };
 
 const MESSENGER_URL = "https://m.me/patosnici";
