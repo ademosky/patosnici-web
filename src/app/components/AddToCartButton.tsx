@@ -20,6 +20,21 @@ export default function AddToCartButton({ product }: Props) {
     addItem(product);
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
+
+    // Meta Pixel — AddToCart
+    // fbq is always loaded by the time the user clicks a button
+    const numericValue = parseFloat(product.price.replace(/\./g, "").replace(/[^\d]/g, "")) || 0;
+    type Win = Window & { fbq?: (...args: unknown[]) => void };
+    const win = window as Win;
+    if (typeof win.fbq === "function") {
+      win.fbq("track", "AddToCart", {
+        content_ids: [String(product.id)],
+        content_name: product.title,
+        content_type: "product",
+        value: numericValue,
+        currency: "MKD",
+      });
+    }
   };
 
   return (
