@@ -21,6 +21,20 @@ export default function ProductCard({ product }: ProductCardProps) {
     addItem({ id: product.id, slug: product.slug, title: product.title, price: product.price, image: product.image, brand: product.brand, sku: product.sku });
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
+
+    // Meta Pixel — AddToCart
+    const numericValue = parseFloat(product.price.replace(/\./g, "").replace(/[^\d]/g, "")) || 0;
+    type Win = Window & { fbq?: (...args: unknown[]) => void };
+    const win = window as Win;
+    if (typeof win.fbq === "function") {
+      win.fbq("track", "AddToCart", {
+        content_ids: [String(product.id)],
+        content_name: product.title,
+        content_type: "product",
+        value: numericValue,
+        currency: "MKD",
+      });
+    }
   };
 
   return (
