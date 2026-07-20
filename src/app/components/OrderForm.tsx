@@ -29,12 +29,9 @@ export default function OrderForm({ productTitle, productPrice, productSku, prod
   // Helper: parse numeric value from price string e.g. "1500 МКД" → 1500
   const numericPrice = parseFloat(productPrice.replace(/[^\d.]/g, "")) || 0;
 
-  // Helper: content_ids — prefer productId, fall back to SKU
-  const contentIds = productId
-    ? [String(productId)]
-    : productSku
-    ? [productSku]
-    : [];
+  // Helper: content_ids — always use numeric productId (DB primary key).
+  // Never fall back to SKU: SKU is a string and won't match the catalog <g:id>.
+  const contentIds = productId ? [String(productId)] : [];
 
   type Win = Window & { fbq?: (...args: unknown[]) => void };
 
