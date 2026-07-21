@@ -287,7 +287,7 @@ export default function CartPage() {
                     <textarea
                       value={form.note}
                       onChange={(e) => update("note", e.target.value)}
-                      placeholder="Пр. достава наутро, ве молам јавете се пред да испратите..."
+                      placeholder="Пр. достава наутро, достава на одреден датум..."
                       maxLength={300}
                       rows={2}
                       className="w-full resize-none rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600"
@@ -316,7 +316,7 @@ export default function CartPage() {
                   </button>
 
                   <p className="text-center text-xs text-zinc-600">
-                    Плаќање при подигање · Ќе ве контактираме за потврда
+                    Плаќање при подигање · 
                   </p>
                 </form>
               </div>
