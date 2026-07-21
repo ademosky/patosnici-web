@@ -82,6 +82,52 @@ export default async function ProductPage({ params }: Props) {
   return (
     <>
       <Header />
+
+      {/* ── Product JSON-LD — Google Rich Results / Schema.org ── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: product.title,
+            image: product.images && product.images.length > 0
+              ? product.images
+              : product.image
+              ? [product.image]
+              : [],
+            description:
+              product.description ||
+              `${product.brand} ${product.model} ${product.year} — Оригинален гумен патосник за автомобил. Достава низ цела Македонија.`,
+            sku: product.sku || undefined,
+            brand: {
+              "@type": "Brand",
+              name: product.brand,
+            },
+            offers: {
+              "@type": "Offer",
+              price:
+                parseFloat(
+                  product.price.replace(/\./g, "").replace(/[^\d]/g, "")
+                ) || 0,
+              priceCurrency: "MKD",
+              availability:
+                product.in_stock === false
+                  ? "https://schema.org/OutOfStock"
+                  : "https://schema.org/InStock",
+              itemCondition: "https://schema.org/NewCondition",
+              url: `${SITE_URL}/products/${product.slug}`,
+              seller: {
+                "@type": "Organization",
+                name: "Original Patosnici",
+                url: SITE_URL,
+              },
+            },
+            url: `${SITE_URL}/products/${product.slug}`,
+          }),
+        }}
+      />
+
       {/* Meta Pixel — ViewContent fired once on product page mount */}
       <ProductViewEvent
         productId={product.id}
