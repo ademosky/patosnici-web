@@ -28,21 +28,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Производ не е пронајден | Original Patosnici" };
   }
 
+  // ── Title: product | Оригинални гумени патосници | OriginalPatosnici.com
+  const title = `${product.title} | Оригинални гумени патосници | OriginalPatosnici.com`;
+
+  // ── Description: unique per product, SEO-optimised, max 160 chars
+  const descRaw = `Купете оригинални гумени патосници за ${product.title}. 100% еко гума без мирис, совршено вклопување, брза достава низ Македонија. Нарачајте онлајн.`;
+  const description =
+    descRaw.length > 160 ? descRaw.slice(0, 157) + "..." : descRaw;
+
+  // ── Canonical URL — always use the product slug, never the params id
+  const canonicalUrl = `${SITE_URL}/products/${product.slug}`;
+
+  // ── OG image — product image if absolute URL, else fallback to logo
   const ogImage = product.image?.startsWith("http")
     ? product.image
     : `${SITE_URL}/images/logo.png`;
 
-  const title = `${product.title} | Original Patosnici`;
-  const description =
-    product.description ||
-    `${product.brand} ${product.model} ${product.year} — Оригинален гумен патосник. Цена: ${product.price}. Достава низ цела Македонија. Плаќање при подигање.`;
-
   return {
     title,
     description,
+
+    // Canonical URL tells Google the definitive URL for this page
+    alternates: {
+      canonical: canonicalUrl,
+    },
+
     openGraph: {
       type: "website",
-      url: `${SITE_URL}/products/${id}`,
+      locale: "mk_MK",
+      url: canonicalUrl,
       siteName: "Original Patosnici",
       title,
       description,
@@ -51,10 +65,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           url: ogImage,
           width: 1200,
           height: 630,
-          alt: product.title,
+          alt: `${product.title} — Оригинални гумени патосници`,
         },
       ],
     },
+
     twitter: {
       card: "summary_large_image",
       title,
