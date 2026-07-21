@@ -903,6 +903,12 @@ export default function AdminPage() {
                           <MailIcon size={11} /> {order.email}
                         </a>
                       )}
+                      {(order as any).note && (
+                        <div className="mt-2 rounded-lg border border-amber-800/40 bg-amber-950/20 px-3 py-2">
+                          <p className="text-xs font-bold uppercase tracking-wider text-amber-600/80">Напомена</p>
+                          <p className="mt-0.5 text-sm italic text-amber-300">{(order as any).note}</p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Ordered items */}
