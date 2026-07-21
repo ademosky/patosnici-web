@@ -96,6 +96,10 @@ export async function POST(req: NextRequest) {
                 <td style="padding: 10px 0; color: #888; font-size: 13px;">Град</td>
                 <td style="padding: 10px 0; color: white;">${city}</td>
               </tr>
+              ${body.note ? `<tr style="border-top: 1px solid #333;">
+                <td style="padding: 10px 0; color: #888; font-size: 13px; vertical-align: top;">Напомена</td>
+                <td style="padding: 10px 0; color: #f59e0b; font-style: italic;">${body.note}</td>
+              </tr>` : ""}
             </table>
 
             <div style="margin-top: 20px; padding: 14px; background: #1a1a1a; border-radius: 8px; border-left: 4px solid #dc2626;">
@@ -156,6 +160,7 @@ export async function POST(req: NextRequest) {
           city: body.city,
           phone: body.phone,
           email: body.email || null,
+          note: body.note || null,
           items: isCartOrder ? body.items : null,
           product_title: isCartOrder ? null : body.productTitle,
           product_price: isCartOrder ? null : body.productPrice,
