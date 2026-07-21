@@ -13,7 +13,7 @@ type Props = {
 
 export default function OrderForm({ productTitle, productPrice, productSku, productId }: Props) {
   const { t } = useLanguage();
-  const [form, setForm] = useState({ name: "", surname: "", address: "", city: "", phone: "", email: "" });
+  const [form, setForm] = useState({ name: "", surname: "", address: "", city: "", phone: "", email: "", note: "" });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
@@ -119,6 +119,21 @@ export default function OrderForm({ productTitle, productPrice, productSku, prod
         </div>
       </div>
       {error && <p className="mt-4 rounded-xl border border-red-800 bg-red-950/30 px-4 py-3 text-sm text-red-400">{error}</p>}
+
+      {/* ── Напомена ── */}
+      <div className="mt-5">
+        <label className={labelClass}>
+          Напомена <span className="font-normal normal-case text-zinc-600">(опционално)</span>
+        </label>
+        <textarea
+          value={form.note}
+          onChange={(e) => update("note", e.target.value)}
+          placeholder="Пр. достава наутро, ве молам јавете се пред да испратите..."
+          maxLength={300}
+          rows={2}
+          className="w-full resize-none rounded-xl border border-zinc-700 bg-[#1a1a1a] px-5 py-3 text-sm text-white outline-none transition focus:border-red-600"
+        />
+      </div>
 
       {/* ── Начин на плаќање ── */}
       <div className="mt-6">
