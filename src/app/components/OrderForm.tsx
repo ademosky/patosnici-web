@@ -128,7 +128,7 @@ export default function OrderForm({ productTitle, productPrice, productSku, prod
         <textarea
           value={form.note}
           onChange={(e) => update("note", e.target.value)}
-          placeholder="Пр. достава наутро, ве молам јавете се пред да испратите..."
+          placeholder="Пр. достава наутро, достава на одреден датум..."
           maxLength={300}
           rows={2}
           className="w-full resize-none rounded-xl border border-zinc-700 bg-[#1a1a1a] px-5 py-3 text-sm text-white outline-none transition focus:border-red-600"
