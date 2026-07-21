@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
+    // Disable Vercel image optimization — images come from Supabase CDN
+    // which already serves optimised images. This prevents hitting the
+    // 5,000 free-tier transformation limit on Vercel.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
