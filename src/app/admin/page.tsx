@@ -1016,56 +1016,61 @@ export default function AdminPage() {
 
       {/* ── ЗАЛИХА ТАБ ── */}
       {activeTab === "inventory" && (
-        <div className="mx-auto max-w-4xl px-3 py-6 sm:px-6 sm:py-10">
+        <div className="mx-auto max-w-4xl px-3 py-4 sm:px-6 sm:py-8">
 
-          {/* Add form */}
-          <div className="mb-8 rounded-2xl border border-zinc-800 bg-[#111] p-5">
-            <div className="mb-4 flex items-center justify-between gap-4">
-              <h2 className="text-lg font-black uppercase text-white">
-                <Warehouse size={18} className="mr-2 inline text-red-600" />
-                Додај ставка
-              </h2>
-              <input
-                type="text"
-                placeholder="Пребарај SKU или Ime..."
-                value={invSearch}
-                onChange={(e) => setInvSearch(e.target.value)}
-                className="w-56 rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2 text-sm text-white outline-none transition focus:border-red-600"
-              />
-            </div>
-            <form onSubmit={addInvItem} className="grid gap-3 sm:grid-cols-[1fr_2fr_100px_auto]">
-              <input
-                required
-                placeholder="SKU број *"
-                value={invForm.sku}
-                onChange={(e) => setInvForm((p) => ({ ...p, sku: e.target.value }))}
-                className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600"
-              />
-              <input
-                required
-                placeholder="Ime / Опис *"
-                value={invForm.name}
-                onChange={(e) => setInvForm((p) => ({ ...p, name: e.target.value }))}
-                className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600"
-              />
-              <input
-                type="number"
-                min="0"
-                placeholder="Кол."
-                value={invForm.quantity}
-                onChange={(e) => setInvForm((p) => ({ ...p, quantity: e.target.value }))}
-                className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600"
-              />
-              <button type="submit" disabled={invAdding}
-                className="flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-red-700 disabled:opacity-60">
-                {invAdding ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
-                Додај
-              </button>
+          {/* ── Search ── full width on mobile */}
+          <input
+            type="text"
+            placeholder="🔍  Пребарај по SKU или Ime..."
+            value={invSearch}
+            onChange={(e) => setInvSearch(e.target.value)}
+            className="mb-4 w-full rounded-xl border border-zinc-700 bg-[#111] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600"
+          />
+
+          {/* ── Add form ── */}
+          <div className="mb-4 rounded-2xl border border-zinc-800 bg-[#111] p-4">
+            <p className="mb-3 text-xs font-bold uppercase tracking-wider text-zinc-500">
+              <Warehouse size={12} className="mr-1 inline text-red-600" /> Додај ставка
+            </p>
+            <form onSubmit={addInvItem} className="flex flex-col gap-2">
+              {/* Row 1: SKU + Количина */}
+              <div className="grid grid-cols-[1fr_90px] gap-2">
+                <input
+                  required
+                  placeholder="SKU број *"
+                  value={invForm.sku}
+                  onChange={(e) => setInvForm((p) => ({ ...p, sku: e.target.value }))}
+                  className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600"
+                />
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Кол."
+                  value={invForm.quantity}
+                  onChange={(e) => setInvForm((p) => ({ ...p, quantity: e.target.value }))}
+                  className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-3 py-3 text-center text-sm text-white outline-none transition focus:border-red-600"
+                />
+              </div>
+              {/* Row 2: Name + Submit */}
+              <div className="grid grid-cols-[1fr_auto] gap-2">
+                <input
+                  required
+                  placeholder="Ime / Опис *"
+                  value={invForm.name}
+                  onChange={(e) => setInvForm((p) => ({ ...p, name: e.target.value }))}
+                  className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600"
+                />
+                <button type="submit" disabled={invAdding}
+                  className="flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-red-700 active:scale-95 disabled:opacity-60">
+                  {invAdding ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
+                  <span className="hidden sm:inline">Додај</span>
+                </button>
+              </div>
             </form>
             {invError && <p className="mt-2 text-sm text-red-400">{invError}</p>}
           </div>
 
-          {/* Inventory list */}
+          {/* ── Inventory list ── */}
           {invLoading ? (
             <div className="flex justify-center py-16">
               <Loader2 size={28} className="animate-spin text-red-600" />
@@ -1076,15 +1081,7 @@ export default function AdminPage() {
               <p>Нема ставки во залиха</p>
             </div>
           ) : (
-            <div className="rounded-2xl border border-zinc-800 bg-[#111] overflow-hidden">
-              {/* Table header */}
-              <div className="hidden grid-cols-[120px_1fr_140px_48px] gap-4 border-b border-zinc-800 px-5 py-3 text-xs font-bold uppercase tracking-wider text-zinc-500 sm:grid">
-                <span>SKU</span>
-                <span>Ime / Опис</span>
-                <span className="text-center">Количина</span>
-                <span />
-              </div>
-              {/* Rows */}
+            <div className="space-y-2">
               {inventory
                 .filter((item) =>
                   !invSearch ||
@@ -1092,49 +1089,50 @@ export default function AdminPage() {
                   item.name.toLowerCase().includes(invSearch.toLowerCase())
                 )
                 .map((item) => (
-                <div key={item.id}
-                  className="grid grid-cols-[1fr_auto] gap-3 border-b border-zinc-800/60 px-4 py-4 last:border-0 sm:grid-cols-[120px_1fr_140px_48px] sm:items-center sm:gap-4 sm:px-5 sm:py-3">
-
-                  {/* SKU */}
-                  <span className="font-mono text-sm font-bold text-red-500">{item.sku}</span>
-
-                  {/* Name */}
-                  <span className="text-sm text-white">{item.name}</span>
-
-                  {/* Quantity controls */}
-                  <div className="flex items-center justify-center gap-2">
-                    <button
-                      onClick={() => updateInvQty(item.id, item.quantity - 1)}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white"
-                    >
-                      <Minus size={13} />
-                    </button>
-                    <span className="w-10 text-center text-base font-bold text-white">{item.quantity}</span>
-                    <button
-                      onClick={() => updateInvQty(item.id, item.quantity + 1)}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white"
-                    >
-                      <Plus size={13} />
-                    </button>
+                  <div key={item.id}
+                    className="rounded-2xl border border-zinc-800 bg-[#111] px-4 py-3">
+                    {/* Top row: SKU + Delete */}
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-sm font-bold text-red-500">{item.sku}</span>
+                      <button
+                        onClick={() => deleteInvItem(item.id)}
+                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-700 text-zinc-500 transition active:bg-red-600/20 hover:border-red-600 hover:text-red-500"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                    {/* Name */}
+                    <p className="mt-0.5 text-sm text-white">{item.name}</p>
+                    {/* Bottom row: Quantity controls */}
+                    <div className="mt-3 flex items-center gap-3">
+                      <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Количина</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => updateInvQty(item.id, item.quantity - 1)}
+                          className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-700 text-zinc-400 transition active:bg-zinc-700 hover:border-red-600 hover:text-white"
+                        >
+                          <Minus size={15} />
+                        </button>
+                        <span className="w-10 text-center text-lg font-black text-white">{item.quantity}</span>
+                        <button
+                          onClick={() => updateInvQty(item.id, item.quantity + 1)}
+                          className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-700 text-zinc-400 transition active:bg-zinc-700 hover:border-red-600 hover:text-white"
+                        >
+                          <Plus size={15} />
+                        </button>
+                      </div>
+                    </div>
                   </div>
+                ))
+              }
 
-                  {/* Delete */}
-                  <button
-                    onClick={() => deleteInvItem(item.id)}
-                    className="flex h-8 w-8 items-center justify-center rounded-xl border border-zinc-700 text-zinc-500 transition hover:border-red-600 hover:text-red-500"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              ))}
-
-              {/* Total row */}
-              <div className="flex items-center justify-between border-t border-zinc-700 px-5 py-3">
+              {/* Total */}
+              <div className="flex items-center justify-between rounded-2xl border border-zinc-700 bg-[#111] px-4 py-3">
                 <span className="text-xs text-zinc-500">
-                    {invSearch
-                      ? `${inventory.filter(i => i.sku.toLowerCase().includes(invSearch.toLowerCase()) || i.name.toLowerCase().includes(invSearch.toLowerCase())).length} / ${inventory.length} ставки`
-                      : `${inventory.length} ставки`}
-                  </span>
+                  {invSearch
+                    ? `${inventory.filter(i => i.sku.toLowerCase().includes(invSearch.toLowerCase()) || i.name.toLowerCase().includes(invSearch.toLowerCase())).length} / ${inventory.length} ставки`
+                    : `${inventory.length} ставки`}
+                </span>
                 <span className="text-sm font-bold text-white">
                   Вкупно: <span className="text-red-500">{inventory.reduce((s, i) => s + i.quantity, 0)} ком</span>
                 </span>
