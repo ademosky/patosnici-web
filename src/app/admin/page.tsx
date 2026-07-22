@@ -7,9 +7,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { brands } from "../data/brands";
 import {
-  Lock, Plus, Trash2, LogOut, Package, ShoppingCart,
+  Lock, Plus, Trash2, LogOut, Package, ShoppingCart, Warehouse,
   CheckCircle, AlertCircle, Loader2, Pencil,
-  X, Upload, ImageIcon, Phone, Mail as MailIcon, Clock,
+  X, Upload, ImageIcon, Phone, Mail as MailIcon, Clock, Minus,
 } from "lucide-react";
 
 type Product = {
@@ -109,11 +109,19 @@ export default function AdminPage() {
   const [listSearch, setListSearch] = useState("");
   const [stockFilter, setStockFilter] = useState<"all" | "out_of_stock">("all");
   const [expandedBrands, setExpandedBrands] = useState<Record<string,boolean>>({});
-  const [activeTab, setActiveTab] = useState<"products" | "orders">("products");
+  const [activeTab, setActiveTab] = useState<"products" | "orders" | "inventory">("products");
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersMonth, setOrdersMonth] = useState("");
   const [ordersStatus, setOrdersStatus] = useState("");
   const [ordersLoading, setOrdersLoading] = useState(false);
+
+  // ── Залиха state ──
+  type InvItem = { id: number; sku: string; name: string; quantity: number; created_at: string };
+  const [inventory, setInventory]       = useState<InvItem[]>([]);
+  const [invLoading, setInvLoading]     = useState(false);
+  const [invForm, setInvForm]           = useState({ sku: "", name: "", quantity: "1" });
+  const [invError, setInvError]         = useState("");
+  const [invAdding, setInvAdding]       = useState(false);
 
   const showToast = (msg: string, ok = true) => {
     setToast({ msg, ok });
@@ -179,6 +187,58 @@ export default function AdminPage() {
       setOrders((prev) => prev.filter((o) => o.id !== id));
       setToast({ msg: "Нарачката е избришана", ok: true });
       setTimeout(() => setToast(null), 3000);
+    }
+  };
+
+  // ── ЗАЛИХА functions ──────────────────────────────────────────────
+  const fetchInventory = async () => {
+    const pw = getPw(); if (!pw) return;
+    setInvLoading(true);
+    const res = await fetch("/api/admin/inventory", { headers: { "x-admin-password": pw } });
+    if (res.ok) setInventory(await res.json());
+    setInvLoading(false);
+  };
+
+  const addInvItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setInvError(""); setInvAdding(true);
+    const pw = getPw();
+    const res = await fetch("/api/admin/inventory", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-password": pw },
+      body: JSON.stringify({ sku: invForm.sku, name: invForm.name, quantity: parseInt(invForm.quantity) || 1 }),
+    });
+    if (res.ok) {
+      const item = await res.json();
+      setInventory((prev) => [item, ...prev]);
+      setInvForm({ sku: "", name: "", quantity: "1" });
+    } else {
+      const d = await res.json();
+      setInvError(d.error || "Грешка");
+    }
+    setInvAdding(false);
+  };
+
+  const deleteInvItem = async (id: number) => {
+    if (!confirm("Избриши ја оваа ставка?")) return;
+    const pw = getPw();
+    const res = await fetch(`/api/admin/inventory/${id}`, {
+      method: "DELETE", headers: { "x-admin-password": pw },
+    });
+    if (res.ok) setInventory((prev) => prev.filter((i) => i.id !== id));
+  };
+
+  const updateInvQty = async (id: number, qty: number) => {
+    if (qty < 0) return;
+    const pw = getPw();
+    const res = await fetch(`/api/admin/inventory/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", "x-admin-password": pw },
+      body: JSON.stringify({ quantity: qty }),
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setInventory((prev) => prev.map((i) => i.id === id ? updated : i));
     }
   };
 
@@ -424,6 +484,10 @@ export default function AdminPage() {
                   </span>
                 )}
               </button>
+              <button onClick={() => { setActiveTab("inventory"); fetchInventory(); }}
+                className={`px-4 py-2 text-xs font-bold uppercase transition ${activeTab === "inventory" ? "bg-red-600 text-white" : "text-zinc-400 hover:text-white"}`}>
+                <Warehouse size={13} className="mr-1 inline" /> Залиха
+              </button>
             </div>
             <Link href="/" className="hidden sm:block text-sm text-zinc-400 transition hover:text-white">
               ← Кон сајтот
@@ -455,6 +519,13 @@ export default function AdminPage() {
                 {orders.filter(o => o.status === "new").length}
               </span>
             )}
+          </button>
+          <div className="w-px bg-zinc-800" />
+          <button
+            onClick={() => { setActiveTab("inventory"); fetchInventory(); }}
+            className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs font-bold uppercase transition ${activeTab === "inventory" ? "bg-red-600 text-white" : "text-zinc-400 active:bg-zinc-800"}`}
+          >
+            <Warehouse size={14} /> Залиха
           </button>
         </div>
       </header>
@@ -936,6 +1007,118 @@ export default function AdminPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+      )}
+
+
+      {/* ── ЗАЛИХА ТАБ ── */}
+      {activeTab === "inventory" && (
+        <div className="mx-auto max-w-4xl px-3 py-6 sm:px-6 sm:py-10">
+
+          {/* Add form */}
+          <div className="mb-8 rounded-2xl border border-zinc-800 bg-[#111] p-5">
+            <h2 className="mb-4 text-lg font-black uppercase text-white">
+              <Warehouse size={18} className="mr-2 inline text-red-600" />
+              Додај ставка
+            </h2>
+            <form onSubmit={addInvItem} className="grid gap-3 sm:grid-cols-[1fr_2fr_100px_auto]">
+              <input
+                required
+                placeholder="SKU број *"
+                value={invForm.sku}
+                onChange={(e) => setInvForm((p) => ({ ...p, sku: e.target.value }))}
+                className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600"
+              />
+              <input
+                required
+                placeholder="Ime / Опис *"
+                value={invForm.name}
+                onChange={(e) => setInvForm((p) => ({ ...p, name: e.target.value }))}
+                className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600"
+              />
+              <input
+                type="number"
+                min="0"
+                placeholder="Кол."
+                value={invForm.quantity}
+                onChange={(e) => setInvForm((p) => ({ ...p, quantity: e.target.value }))}
+                className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600"
+              />
+              <button type="submit" disabled={invAdding}
+                className="flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-red-700 disabled:opacity-60">
+                {invAdding ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
+                Додај
+              </button>
+            </form>
+            {invError && <p className="mt-2 text-sm text-red-400">{invError}</p>}
+          </div>
+
+          {/* Inventory list */}
+          {invLoading ? (
+            <div className="flex justify-center py-16">
+              <Loader2 size={28} className="animate-spin text-red-600" />
+            </div>
+          ) : inventory.length === 0 ? (
+            <div className="py-16 text-center text-zinc-600">
+              <Warehouse size={48} className="mx-auto mb-4 opacity-30" />
+              <p>Нема ставки во залиха</p>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-zinc-800 bg-[#111] overflow-hidden">
+              {/* Table header */}
+              <div className="hidden grid-cols-[120px_1fr_140px_48px] gap-4 border-b border-zinc-800 px-5 py-3 text-xs font-bold uppercase tracking-wider text-zinc-500 sm:grid">
+                <span>SKU</span>
+                <span>Ime / Опис</span>
+                <span className="text-center">Количина</span>
+                <span />
+              </div>
+              {/* Rows */}
+              {inventory.map((item) => (
+                <div key={item.id}
+                  className="grid grid-cols-[1fr_auto] gap-3 border-b border-zinc-800/60 px-4 py-4 last:border-0 sm:grid-cols-[120px_1fr_140px_48px] sm:items-center sm:gap-4 sm:px-5 sm:py-3">
+
+                  {/* SKU */}
+                  <span className="font-mono text-sm font-bold text-red-500">{item.sku}</span>
+
+                  {/* Name */}
+                  <span className="text-sm text-white">{item.name}</span>
+
+                  {/* Quantity controls */}
+                  <div className="flex items-center justify-center gap-2">
+                    <button
+                      onClick={() => updateInvQty(item.id, item.quantity - 1)}
+                      className="flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white"
+                    >
+                      <Minus size={13} />
+                    </button>
+                    <span className="w-10 text-center text-base font-bold text-white">{item.quantity}</span>
+                    <button
+                      onClick={() => updateInvQty(item.id, item.quantity + 1)}
+                      className="flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white"
+                    >
+                      <Plus size={13} />
+                    </button>
+                  </div>
+
+                  {/* Delete */}
+                  <button
+                    onClick={() => deleteInvItem(item.id)}
+                    className="flex h-8 w-8 items-center justify-center rounded-xl border border-zinc-700 text-zinc-500 transition hover:border-red-600 hover:text-red-500"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))}
+
+              {/* Total row */}
+              <div className="flex items-center justify-between border-t border-zinc-700 px-5 py-3">
+                <span className="text-xs text-zinc-500">{inventory.length} ставки</span>
+                <span className="text-sm font-bold text-white">
+                  Вкупно: <span className="text-red-500">{inventory.reduce((s, i) => s + i.quantity, 0)} ком</span>
+                </span>
+              </div>
             </div>
           )}
         </div>
