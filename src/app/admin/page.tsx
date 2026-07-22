@@ -519,7 +519,8 @@ export default function AdminPage() {
                   !listSearch ||
                   p.title.toLowerCase().includes(listSearch.toLowerCase()) ||
                   p.brand.toLowerCase().includes(listSearch.toLowerCase()) ||
-                  (p.car_model || "").toLowerCase().includes(listSearch.toLowerCase())
+                  (p.car_model || "").toLowerCase().includes(listSearch.toLowerCase()) ||
+                  (p.sku || "").toLowerCase().includes(listSearch.toLowerCase())
                 )
                 .reduce((acc: Record<string, typeof products>, p) => {
                   const key = p.brand || "other";
