@@ -122,6 +122,7 @@ export default function AdminPage() {
   const [invForm, setInvForm]           = useState({ sku: "", name: "", quantity: "1" });
   const [invError, setInvError]         = useState("");
   const [invAdding, setInvAdding]       = useState(false);
+  const [invSearch, setInvSearch]       = useState("");
 
   const showToast = (msg: string, ok = true) => {
     setToast({ msg, ok });
@@ -1019,10 +1020,19 @@ export default function AdminPage() {
 
           {/* Add form */}
           <div className="mb-8 rounded-2xl border border-zinc-800 bg-[#111] p-5">
-            <h2 className="mb-4 text-lg font-black uppercase text-white">
-              <Warehouse size={18} className="mr-2 inline text-red-600" />
-              Додај ставка
-            </h2>
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <h2 className="text-lg font-black uppercase text-white">
+                <Warehouse size={18} className="mr-2 inline text-red-600" />
+                Додај ставка
+              </h2>
+              <input
+                type="text"
+                placeholder="Пребарај SKU или Ime..."
+                value={invSearch}
+                onChange={(e) => setInvSearch(e.target.value)}
+                className="w-56 rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2 text-sm text-white outline-none transition focus:border-red-600"
+              />
+            </div>
             <form onSubmit={addInvItem} className="grid gap-3 sm:grid-cols-[1fr_2fr_100px_auto]">
               <input
                 required
@@ -1075,7 +1085,13 @@ export default function AdminPage() {
                 <span />
               </div>
               {/* Rows */}
-              {inventory.map((item) => (
+              {inventory
+                .filter((item) =>
+                  !invSearch ||
+                  item.sku.toLowerCase().includes(invSearch.toLowerCase()) ||
+                  item.name.toLowerCase().includes(invSearch.toLowerCase())
+                )
+                .map((item) => (
                 <div key={item.id}
                   className="grid grid-cols-[1fr_auto] gap-3 border-b border-zinc-800/60 px-4 py-4 last:border-0 sm:grid-cols-[120px_1fr_140px_48px] sm:items-center sm:gap-4 sm:px-5 sm:py-3">
 
@@ -1110,11 +1126,15 @@ export default function AdminPage() {
                     <Trash2 size={14} />
                   </button>
                 </div>
-              ))}
+              )))}
 
               {/* Total row */}
               <div className="flex items-center justify-between border-t border-zinc-700 px-5 py-3">
-                <span className="text-xs text-zinc-500">{inventory.length} ставки</span>
+                <span className="text-xs text-zinc-500">
+                    {invSearch
+                      ? `${inventory.filter(i => i.sku.toLowerCase().includes(invSearch.toLowerCase()) || i.name.toLowerCase().includes(invSearch.toLowerCase())).length} / ${inventory.length} ставки`
+                      : `${inventory.length} ставки`}
+                  </span>
                 <span className="text-sm font-bold text-white">
                   Вкупно: <span className="text-red-500">{inventory.reduce((s, i) => s + i.quantity, 0)} ком</span>
                 </span>
