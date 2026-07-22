@@ -45,7 +45,8 @@ function ProductsContent({ initialProducts, brands }: Props) {
         p.title.toLowerCase().includes(q) ||
         p.model.toLowerCase().includes(q) ||
         (p.car_model || "").toLowerCase().includes(q) ||
-        p.brand.toLowerCase().includes(q);
+        p.brand.toLowerCase().includes(q) ||
+        (p.sku || "").toLowerCase().includes(q);
       return matchBrand && matchModel && matchSearch;
     });
   }, [activeBrand, activeCarModel, localSearch, initialProducts]);
