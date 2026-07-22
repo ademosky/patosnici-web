@@ -1126,7 +1126,7 @@ export default function AdminPage() {
                     <Trash2 size={14} />
                   </button>
                 </div>
-              )))}
+              ))}
 
               {/* Total row */}
               <div className="flex items-center justify-between border-t border-zinc-700 px-5 py-3">
