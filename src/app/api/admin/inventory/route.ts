@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
-function auth(req: NextRequest) {
+function checkAuth(req: NextRequest) {
   return req.headers.get("x-admin-password") === process.env.ADMIN_PASSWORD;
 }
 
-// GET — list all inventory items
 export async function GET(req: NextRequest) {
-  if (!auth(req)) return NextResponse.json({ error: "Неовластен" }, { status: 401 });
+  if (!checkAuth(req))
+    return NextResponse.json({ error: "Неовластен пристап" }, { status: 401 });
 
   const { data, error } = await supabase
     .from("inventory")
@@ -18,16 +18,17 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(data ?? []);
 }
 
-// POST — add new inventory item
 export async function POST(req: NextRequest) {
-  if (!auth(req)) return NextResponse.json({ error: "Неовластен" }, { status: 401 });
+  if (!checkAuth(req))
+    return NextResponse.json({ error: "Неовластен пристап" }, { status: 401 });
 
   const { sku, name, quantity } = await req.json();
-  if (!sku || !name) return NextResponse.json({ error: "SKU и Ime се задолжителни" }, { status: 400 });
+  if (!sku || !name)
+    return NextResponse.json({ error: "SKU и Име се задолжителни" }, { status: 400 });
 
   const { data, error } = await supabase
     .from("inventory")
-    .insert({ sku: sku.trim(), name: name.trim(), quantity: parseInt(quantity) || 1 })
+    .insert({ sku: sku.trim(), name: name.trim(), quantity: Number(quantity) || 1 })
     .select()
     .single();
 
