@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
 
   let query = supabase
     .from("products")
-    .select("id, slug, title, brand, car_model, model, year, price, image")
+    .select("id, slug, title, brand, car_model, model, year, price, image, sku")
     .order("created_at", { ascending: true });
 
   if (brand) {
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
 
   if (q) {
     query = query.or(
-      `title.ilike.%${q}%,model.ilike.%${q}%,car_model.ilike.%${q}%,brand.ilike.%${q}%`
+      `title.ilike.%${q}%,model.ilike.%${q}%,car_model.ilike.%${q}%,brand.ilike.%${q}%,sku.ilike.%${q}%`
     );
   }
 
