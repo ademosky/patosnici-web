@@ -114,6 +114,15 @@ export default function AdminPage() {
   const [ordersMonth, setOrdersMonth] = useState("");
   const [ordersStatus, setOrdersStatus] = useState("");
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [showManualForm, setShowManualForm] = useState(false);
+  const [manualForm, setManualForm] = useState({
+    name: "", surname: "", address: "", city: "", phone: "", email: "",
+    sku: "", product_title: "", product_price: "", product_sku: "",
+    note: "", source: "facebook",
+  });
+  const [manualSkuFound, setManualSkuFound] = useState<null | { title: string; price: string; sku: string }>(null);
+  const [manualSaving, setManualSaving] = useState(false);
+  const [manualError, setManualError] = useState("");
 
   // ── Залиха state ──
   type InvItem = { id: number; sku: string; name: string; quantity: number; created_at: string };
@@ -189,6 +198,45 @@ export default function AdminPage() {
       setToast({ msg: "Нарачката е избришана", ok: true });
       setTimeout(() => setToast(null), 3000);
     }
+  };
+
+  // ── MANUAL ORDER functions ──────────────────────────────────────────
+  const lookupSku = (sku: string) => {
+    const found = products.find(
+      (p) => p.sku && p.sku.toLowerCase() === sku.toLowerCase()
+    );
+    if (found) {
+      setManualSkuFound({ title: found.title, price: found.price, sku: found.sku || "" });
+      setManualForm((p) => ({
+        ...p, product_title: found.title, product_price: found.price, product_sku: found.sku || "",
+      }));
+    } else {
+      setManualSkuFound(null);
+    }
+  };
+
+  const saveManualOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setManualError(""); setManualSaving(true);
+    const pw = getPw();
+    const res = await fetch("/api/admin/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-password": pw },
+      body: JSON.stringify(manualForm),
+    });
+    if (res.ok) {
+      const newOrder = await res.json();
+      setOrders((prev) => [newOrder, ...prev]);
+      setManualForm({ name: "", surname: "", address: "", city: "", phone: "", email: "",
+        sku: "", product_title: "", product_price: "", product_sku: "", note: "", source: "facebook" });
+      setManualSkuFound(null);
+      setShowManualForm(false);
+      showToast("Нарачката е зачувана!", true);
+    } else {
+      const d = await res.json();
+      setManualError(d.error || "Грешка при зачувување");
+    }
+    setManualSaving(false);
   };
 
   // ── ЗАЛИХА functions ──────────────────────────────────────────────
@@ -863,6 +911,122 @@ export default function AdminPage() {
       {/* ── НАРАЧКИ ТАБ ── */}
       {activeTab === "orders" && (
         <div className="mx-auto max-w-6xl px-3 py-6 sm:px-6 sm:py-10">
+
+          {/* ── Рачна нарачка toggle ── */}
+          <div className="mb-4">
+            <button
+              onClick={() => setShowManualForm((v) => !v)}
+              className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-bold transition ${showManualForm ? "border-red-600 bg-red-600/10 text-red-400" : "border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-white"}`}
+            >
+              <Plus size={15} /> Рачна нарачка
+            </button>
+
+            {showManualForm && (
+              <form onSubmit={saveManualOrder}
+                className="mt-3 rounded-2xl border border-zinc-700 bg-[#111] p-4 sm:p-5">
+                <p className="mb-4 text-xs font-bold uppercase tracking-wider text-zinc-500">Нова рачна нарачка</p>
+
+                {/* Source selector */}
+                <div className="mb-4 flex gap-2">
+                  {[
+                    { v: "facebook", label: "🔵 Facebook" },
+                    { v: "phone",    label: "📞 Телефон" },
+                    { v: "manual",   label: "✏️ Рачно" },
+                  ].map(({ v, label }) => (
+                    <button key={v} type="button"
+                      onClick={() => setManualForm((p) => ({ ...p, source: v }))}
+                      className={`rounded-xl px-3 py-2 text-xs font-bold transition ${manualForm.source === v ? "bg-red-600 text-white" : "border border-zinc-700 text-zinc-400 hover:border-red-500"}`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* SKU lookup */}
+                <div className="mb-4">
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-zinc-500">SKU број (авто-пополнување)</label>
+                  <div className="flex gap-2">
+                    <input
+                      value={manualForm.sku}
+                      onChange={(e) => setManualForm((p) => ({ ...p, sku: e.target.value }))}
+                      onBlur={(e) => lookupSku(e.target.value)}
+                      placeholder="Пр. 212807"
+                      className="flex-1 rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600"
+                    />
+                    <button type="button" onClick={() => lookupSku(manualForm.sku)}
+                      className="rounded-xl border border-zinc-700 px-4 py-2.5 text-xs font-bold text-zinc-400 transition hover:border-red-600 hover:text-white">
+                      Пронајди
+                    </button>
+                  </div>
+                  {manualSkuFound && (
+                    <div className="mt-2 flex items-center gap-2 rounded-xl border border-green-800 bg-green-950/20 px-3 py-2">
+                      <CheckCircle size={14} className="text-green-500" />
+                      <span className="text-sm text-green-400 font-semibold">{manualSkuFound.title}</span>
+                      <span className="ml-auto font-bold text-red-500">{manualSkuFound.price}</span>
+                    </div>
+                  )}
+                  {manualForm.sku && !manualSkuFound && (
+                    <p className="mt-1.5 text-xs text-zinc-500">SKU не е пронајден — внеси рачно подолу</p>
+                  )}
+                </div>
+
+                {/* Manual product fields (shown if SKU not found) */}
+                {!manualSkuFound && manualForm.sku && (
+                  <div className="mb-4 grid gap-2 sm:grid-cols-3">
+                    <input value={manualForm.product_title}
+                      onChange={(e) => setManualForm((p) => ({ ...p, product_title: e.target.value }))}
+                      placeholder="Назив на производот"
+                      className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600 sm:col-span-2" />
+                    <input value={manualForm.product_price}
+                      onChange={(e) => setManualForm((p) => ({ ...p, product_price: e.target.value }))}
+                      placeholder="Цена (пр. 1500 ден)"
+                      className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600" />
+                  </div>
+                )}
+
+                {/* Customer fields */}
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <input required value={manualForm.name}
+                    onChange={(e) => setManualForm((p) => ({ ...p, name: e.target.value }))}
+                    placeholder="Ime *"
+                    className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600" />
+                  <input required value={manualForm.surname}
+                    onChange={(e) => setManualForm((p) => ({ ...p, surname: e.target.value }))}
+                    placeholder="Prezime *"
+                    className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600" />
+                  <input value={manualForm.address}
+                    onChange={(e) => setManualForm((p) => ({ ...p, address: e.target.value }))}
+                    placeholder="Adresa"
+                    className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600" />
+                  <input value={manualForm.city}
+                    onChange={(e) => setManualForm((p) => ({ ...p, city: e.target.value }))}
+                    placeholder="Grad"
+                    className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600" />
+                  <input required value={manualForm.phone}
+                    onChange={(e) => setManualForm((p) => ({ ...p, phone: e.target.value }))}
+                    placeholder="Telefon *"
+                    className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600" />
+                  <input value={manualForm.note}
+                    onChange={(e) => setManualForm((p) => ({ ...p, note: e.target.value }))}
+                    placeholder="Напомена (опционално)"
+                    className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600" />
+                </div>
+
+                {manualError && <p className="mt-2 text-sm text-red-400">{manualError}</p>}
+
+                <div className="mt-4 flex gap-2">
+                  <button type="submit" disabled={manualSaving}
+                    className="flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-red-700 disabled:opacity-60">
+                    {manualSaving ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}
+                    Зачувај нарачка
+                  </button>
+                  <button type="button" onClick={() => setShowManualForm(false)}
+                    className="rounded-xl border border-zinc-700 px-4 py-2.5 text-sm text-zinc-400 transition hover:border-red-600 hover:text-white">
+                    Откажи
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
 
           {/* Filters */}
           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
