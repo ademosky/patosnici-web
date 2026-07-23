@@ -961,7 +961,6 @@ export default function AdminPage() {
                     <div className="mt-2 flex items-center gap-2 rounded-xl border border-green-800 bg-green-950/20 px-3 py-2">
                       <CheckCircle size={14} className="text-green-500" />
                       <span className="text-sm text-green-400 font-semibold">{manualSkuFound.title}</span>
-                      <span className="ml-auto font-bold text-red-500">{manualSkuFound.price}</span>
                     </div>
                   )}
                   {manualForm.sku && !manualSkuFound && (
@@ -969,17 +968,19 @@ export default function AdminPage() {
                   )}
                 </div>
 
-                {/* Manual product fields (shown if SKU not found) */}
-                {!manualSkuFound && manualForm.sku && (
+                {/* Product fields — title editable only if SKU not found, price ALWAYS editable */}
+                {manualForm.sku && (
                   <div className="mb-4 grid gap-2 sm:grid-cols-3">
-                    <input value={manualForm.product_title}
-                      onChange={(e) => setManualForm((p) => ({ ...p, product_title: e.target.value }))}
-                      placeholder="Назив на производот"
-                      className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600 sm:col-span-2" />
+                    {!manualSkuFound && (
+                      <input value={manualForm.product_title}
+                        onChange={(e) => setManualForm((p) => ({ ...p, product_title: e.target.value }))}
+                        placeholder="Назив на производот"
+                        className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600 sm:col-span-2" />
+                    )}
                     <input value={manualForm.product_price}
                       onChange={(e) => setManualForm((p) => ({ ...p, product_price: e.target.value }))}
                       placeholder="Цена (пр. 1500 ден)"
-                      className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600" />
+                      className={`rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 text-sm text-white outline-none transition focus:border-red-600 ${manualSkuFound ? "sm:col-span-3" : ""}`} />
                   </div>
                 )}
 
