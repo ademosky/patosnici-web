@@ -1090,6 +1090,17 @@ export default function AdminPage() {
                          order.status === "in_process" ? "⚙️ Во процес" :
                          "✅ Испратена"}
                       </span>
+                      {/* Source badge — FB/Phone/Manual */}
+                      {order.source && order.source !== "web" && (
+                        <span className={`rounded-lg px-2 py-1 text-xs font-bold ${
+                          order.source === "facebook" ? "bg-blue-600/20 text-blue-400" :
+                          order.source === "phone"    ? "bg-purple-600/20 text-purple-400" :
+                          "bg-zinc-700/50 text-zinc-400"
+                        }`}>
+                          {order.source === "facebook" ? "🔵 FB" :
+                           order.source === "phone"    ? "📞" : "✏️"}
+                        </span>
+                      )}
                       <span className="text-xs text-zinc-500">
                         <Clock size={11} className="mr-1 inline" />
                         {new Date(order.created_at).toLocaleDateString("mk-MK", {
