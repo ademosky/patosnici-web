@@ -111,8 +111,9 @@ export default function AdminPage() {
   const [expandedBrands, setExpandedBrands] = useState<Record<string,boolean>>({});
   const [activeTab, setActiveTab] = useState<"products" | "orders" | "inventory">("products");
   const [orders, setOrders] = useState<Order[]>([]);
-  const [ordersMonth, setOrdersMonth] = useState("");
+  const [ordersMonth, setOrdersMonth] = useState(() => new Date().toISOString().slice(0,7));
   const [ordersStatus, setOrdersStatus] = useState("");
+  const [ordersSearch, setOrdersSearch] = useState("");
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [showManualForm, setShowManualForm] = useState(false);
   const [manualForm, setManualForm] = useState({
@@ -1030,33 +1031,104 @@ export default function AdminPage() {
           </div>
 
           {/* Filters */}
-          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-            <h2 className="text-xl font-black uppercase text-white">Нарачки</h2>
+          <div className="mb-4 rounded-2xl border border-zinc-800 bg-[#111] p-4">
+            <div className="flex flex-col gap-3">
 
-            {/* Month filter */}
-            <input type="month" value={ordersMonth}
-              onChange={(e) => { setOrdersMonth(e.target.value); fetchOrders(e.target.value, ordersStatus); }}
-              className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2 text-sm text-white outline-none transition focus:border-red-600"
-            />
+              {/* Row 1: Title + Month nav + Search */}
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-xl font-black uppercase text-white">Нарачки</h2>
+                  <span className="rounded-full bg-zinc-800 px-3 py-0.5 text-xs text-zinc-400">
+                    {orders.length}
+                  </span>
+                </div>
 
-            {/* Status filter */}
-            <div className="flex flex-wrap gap-2">
-              {[
-                { v: "", label: "Сите" },
-                { v: "new", label: "🆕 Нова" },
-                { v: "in_process", label: "⚙️ Во процес" },
-                { v: "sent", label: "✅ Испратена" },
-              ].map(({ v, label }) => (
-                <button key={v}
-                  onClick={() => { setOrdersStatus(v); fetchOrders(ordersMonth, v); }}
-                  className={`rounded-xl px-3 py-2 text-xs font-bold uppercase transition ${ordersStatus === v ? "bg-red-600 text-white" : "border border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-white"}`}>
-                  {label}
-                </button>
-              ))}
+                {/* Month navigation — prev/next + current month */}
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => {
+                      const [y,m] = ordersMonth.split("-").map(Number);
+                      const d = new Date(y, m-2, 1);
+                      const nm = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+                      setOrdersMonth(nm); fetchOrders(nm, ordersStatus);
+                    }}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white"
+                    title="Претходен месец"
+                  >←</button>
+
+                  <input type="month" value={ordersMonth}
+                    onChange={(e) => { setOrdersMonth(e.target.value); fetchOrders(e.target.value, ordersStatus); }}
+                    className="rounded-lg border border-zinc-700 bg-[#1a1a1a] px-3 py-1.5 text-sm font-semibold text-white outline-none transition focus:border-red-600"
+                  />
+
+                  <button
+                    onClick={() => {
+                      const [y,m] = ordersMonth.split("-").map(Number);
+                      const d = new Date(y, m, 1);
+                      const nm = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+                      setOrdersMonth(nm); fetchOrders(nm, ordersStatus);
+                    }}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white"
+                    title="Следен месец"
+                  >→</button>
+                </div>
+
+                {/* Customer search */}
+                <input
+                  type="text"
+                  placeholder="🔍  Пребарај по Ime / Telefon..."
+                  value={ordersSearch}
+                  onChange={(e) => setOrdersSearch(e.target.value)}
+                  className="w-full rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2 text-sm text-white outline-none transition focus:border-red-600 sm:w-56"
+                />
+              </div>
+
+              {/* Row 2: Status filter + Count */}
+              <div className="flex items-center gap-2">
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { v: "",         label: "Сите" },
+                    { v: "new",        label: "🆕 Нови" },
+                    { v: "in_process", label: "⚙️ Во процес" },
+                    { v: "sent",       label: "✅ Испратени" },
+                  ].map(({ v, label }) => (
+                    <button key={v}
+                      onClick={() => { setOrdersStatus(v); fetchOrders(ordersMonth, v); }}
+                      className={`rounded-lg px-2.5 py-1.5 text-xs font-bold uppercase transition ${
+                        ordersStatus === v
+                          ? "bg-red-600 text-white"
+                          : "border border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-white"
+                      }`}>
+                      {label}
+                      {v !== "" && (
+                        <span className="ml-1 opacity-60">
+                          ({orders.filter(o => o.status === v).length})
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-
-            <span className="text-xs text-zinc-500 sm:ml-auto">{orders.length} нарачки</span>
           </div>
+
+          {/* ── Summary card ── */}
+          {!ordersLoading && orders.length > 0 && (
+            <div className="mb-4 grid gap-2 sm:grid-cols-3">
+              <div className="rounded-xl border border-zinc-800 bg-[#111] px-4 py-3 text-center">
+                <p className="text-xs text-zinc-500 uppercase tracking-wider">Вкупно нарачки</p>
+                <p className="mt-1 text-2xl font-black text-white">{orders.length}</p>
+              </div>
+              <div className="rounded-xl border border-zinc-800 bg-[#111] px-4 py-3 text-center">
+                <p className="text-xs text-zinc-500 uppercase tracking-wider">Нови</p>
+                <p className="mt-1 text-2xl font-black text-yellow-400">{orders.filter(o => o.status === "new").length}</p>
+              </div>
+              <div className="rounded-xl border border-zinc-800 bg-[#111] px-4 py-3 text-center">
+                <p className="text-xs text-zinc-500 uppercase tracking-wider">Испратени</p>
+                <p className="mt-1 text-2xl font-black text-green-400">{orders.filter(o => o.status === "sent").length}</p>
+              </div>
+            </div>
+          )}
 
           {/* Orders list */}
           {ordersLoading ? (
@@ -1070,7 +1142,13 @@ export default function AdminPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {orders.map((order) => (
+              {orders
+                .filter((order) =>
+                  !ordersSearch ||
+                  `${order.name} ${order.surname}`.toLowerCase().includes(ordersSearch.toLowerCase()) ||
+                  (order.phone || "").includes(ordersSearch)
+                )
+                .map((order) => (
                 <div key={order.id}
                   className={`rounded-2xl border bg-[#111] p-3 sm:p-5 transition ${
                     order.status === "new" ? "border-yellow-700/50" :
@@ -1183,7 +1261,7 @@ export default function AdminPage() {
                     </div>
                   </div>
                 </div>
-              ))}
+              )))}
             </div>
           )}
         </div>
