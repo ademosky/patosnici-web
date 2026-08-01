@@ -99,7 +99,6 @@ export default function OrderForm({ productTitle, productPrice, productSku, prod
       <div className="rounded-2xl border border-green-800 bg-green-950/20 p-12 text-center">
         <CheckCircle size={52} className="mx-auto text-green-500" />
         <h3 className="mt-5 text-2xl font-black uppercase text-white">{t("order_success")}</h3>
-        <p className="mt-4 text-zinc-400 leading-7">{t("order_confirm").replace("{phone}", form.phone)}</p>
         {form.email && <p className="mt-2 text-sm text-zinc-500">Email: {form.email}</p>}
       </div>
     );
