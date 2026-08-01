@@ -127,8 +127,8 @@ export default function CartPage() {
             <CheckCircle size={60} className="mx-auto text-green-500" />
             <h1 className="mt-6 text-3xl font-black uppercase text-white">Нарачката е примена!</h1>
             <p className="mt-4 text-zinc-400 leading-7">
-              Ви благодариме! Ќе ве контактираме на{" "}
-              <span className="font-semibold text-white">{form.phone}</span> за потврда.
+             
+              <span className="font-semibold text-white">{form.phone}</span> 
             </p>
             <Link href="/products"
               className="mt-8 inline-flex items-center gap-2 rounded-xl bg-red-600 px-8 py-4 text-sm font-bold uppercase text-white transition hover:bg-red-700"
