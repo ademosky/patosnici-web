@@ -44,6 +44,9 @@ type Order = {
   product_sku?: string;
   status: "new" | "in_process" | "sent";
   created_at: string;
+  note?: string;
+  source?: string;
+  currency?: string;
 };
 
 const EMPTY_FORM = {
