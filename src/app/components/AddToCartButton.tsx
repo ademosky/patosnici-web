@@ -39,11 +39,13 @@ export default function AddToCartButton({ product }: Props) {
 
   return (
     <div className="mt-10 flex flex-col gap-3">
-      <div className="flex gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row">
         <button onClick={handle}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-4 text-sm font-bold uppercase tracking-widest text-white transition ${added ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}`}>
-          {added ? <CheckCircle size={18} /> : <ShoppingCart size={18} />}
-          {added ? t("prod_added") : t("prod_add_cart")}
+          className={`flex flex-1 items-center justify-center rounded-xl py-4 text-sm font-bold uppercase text-white transition ${added ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}`}>
+          <span className="flex items-center gap-2 tracking-wide sm:tracking-widest">
+            {added ? <CheckCircle size={18} /> : <ShoppingCart size={18} />}
+            {added ? t("prod_added") : t("prod_add_cart")}
+          </span>
         </button>
         <a href="#naracaj" className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-zinc-700 py-4 text-sm font-semibold text-white transition hover:border-red-600">
           {t("order_direct")}
