@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useLanguage } from "../context/LanguageContext";
 
 export default function Hero() {
-  const { t } = useLanguage();
+  const { t, localizedPath } = useLanguage();
 
   return (
     <section className="relative bg-[#0b0b0b] pt-28">
@@ -21,7 +21,7 @@ export default function Hero() {
               <span key={i}>{line}{i === 0 && <br />}</span>
             ))}
           </p>
-          <Link href="/products" className="mt-10 inline-block rounded-md bg-red-600 px-8 py-4 text-sm font-bold uppercase tracking-wide transition hover:bg-red-700">
+          <Link href={localizedPath("/products")} className="mt-10 inline-block rounded-md bg-red-600 px-8 py-4 text-sm font-bold uppercase tracking-wide transition hover:bg-red-700">
             {t("hero_cta")}
           </Link>
         </div>
