@@ -7,6 +7,14 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  async rewrites() {
+    return [
+      { source: "/ks", destination: "/" },
+      { source: "/ks/products", destination: "/products" },
+      { source: "/ks/products/:slug", destination: "/products/:slug" },
+      { source: "/ks/cart", destination: "/cart" },
+    ];
+  },
   images: {
     // Disable Vercel image optimization — images come from Supabase CDN
     // which already serves optimised images. This prevents hitting the
