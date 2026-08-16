@@ -108,14 +108,14 @@ export default function OrderForm({ productTitle, productPrice, productSku, prod
   return (
     <form onSubmit={handleSubmit} className="rounded-2xl border border-zinc-800 bg-[#111111] p-8">
       <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
-        <div><label className={labelClass}>Ime *</label><input type="text" required value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Марко" className={inputClass} /></div>
-        <div><label className={labelClass}>Prezime *</label><input type="text" required value={form.surname} onChange={(e) => update("surname", e.target.value)} placeholder="Петровски" className={inputClass} /></div>
-        <div><label className={labelClass}>Adresa *</label><input type="text" required value={form.address} onChange={(e) => update("address", e.target.value)} placeholder="ул. Македонија бр. 12" className={inputClass} /></div>
-        <div><label className={labelClass}>Grad *</label><input type="text" required value={form.city} onChange={(e) => update("city", e.target.value)} placeholder="Скопје" className={inputClass} /></div>
-        <div className="sm:col-span-2"><label className={labelClass}>Telefon *</label><input type="tel" required value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+389 70 123 456" className={inputClass} /></div>
+        <div><label className={labelClass}>{t("form_name")} *</label><input type="text" required value={form.name} onChange={(e) => update("name", e.target.value)} placeholder={t("form_name_ph")} className={inputClass} /></div>
+        <div><label className={labelClass}>{t("form_surname")} *</label><input type="text" required value={form.surname} onChange={(e) => update("surname", e.target.value)} placeholder={t("form_surname_ph")} className={inputClass} /></div>
+        <div><label className={labelClass}>{t("form_address")} *</label><input type="text" required value={form.address} onChange={(e) => update("address", e.target.value)} placeholder={t("form_address_ph")} className={inputClass} /></div>
+        <div><label className={labelClass}>{t("form_city")} *</label><input type="text" required value={form.city} onChange={(e) => update("city", e.target.value)} placeholder={t("form_city_ph")} className={inputClass} /></div>
+        <div className="sm:col-span-2"><label className={labelClass}>{t("form_phone")} *</label><input type="tel" required value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder={t("form_phone_ph")} className={inputClass} /></div>
         <div className="sm:col-span-2">
-          <label className={labelClass}>Email <span className="font-normal normal-case text-zinc-600">({t("order_email_opt")})</span></label>
-          <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="vasiot@email.com" className={inputClass} />
+          <label className={labelClass}>{t("form_email")} <span className="font-normal normal-case text-zinc-600">({t("order_email_opt")})</span></label>
+          <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="email@email.com" className={inputClass} />
         </div>
       </div>
       {error && <p className="mt-4 rounded-xl border border-red-800 bg-red-950/30 px-4 py-3 text-sm text-red-400">{error}</p>}
@@ -123,12 +123,12 @@ export default function OrderForm({ productTitle, productPrice, productSku, prod
       {/* ── Напомена ── */}
       <div className="mt-5">
         <label className={labelClass}>
-          Напомена <span className="font-normal normal-case text-zinc-600">(опционално)</span>
+          {t("form_note")} <span className="font-normal normal-case text-zinc-600">({t("form_note_opt")})</span>
         </label>
         <textarea
           value={form.note}
           onChange={(e) => update("note", e.target.value)}
-          placeholder="Пр. достава наутро, достава на одреден датум..."
+          placeholder={t("form_note_ph")}
           maxLength={300}
           rows={2}
           className="w-full resize-none rounded-xl border border-zinc-700 bg-[#1a1a1a] px-5 py-3 text-sm text-white outline-none transition focus:border-red-600"
