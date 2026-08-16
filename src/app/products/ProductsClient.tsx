@@ -97,7 +97,7 @@ function ProductsContent({ initialProducts, brands }: Props) {
             <div className="mb-6 flex flex-wrap gap-2">
               {brands.map((b) => (
                 <button key={b.id}
-                  onClick={() => router.push(`/products?brand=${b.id}`)}
+                  onClick={() => router.push(localizedPath(`/products?brand=${b.id}`))}
                   className="rounded-xl border border-zinc-700 px-4 py-2 text-xs font-bold uppercase tracking-wide text-zinc-400 transition hover:border-red-600 hover:text-white"
                 >
                   {b.name}
@@ -111,7 +111,7 @@ function ProductsContent({ initialProducts, brands }: Props) {
             <div className="mb-8">
               {/* Назад + бренд info */}
               <div className="mb-4 flex items-center gap-3">
-                <button onClick={() => router.push("/products")}
+                <button onClick={() => router.push(localizedPath("/products"))}
                   className="flex items-center gap-1.5 text-sm text-zinc-500 transition hover:text-white">
                   ← Сите брендови
                 </button>
@@ -127,7 +127,7 @@ function ProductsContent({ initialProducts, brands }: Props) {
               <div className="-mx-6 px-6 sm:mx-0 sm:px-0">
                 <div className="flex gap-3 overflow-x-auto pb-2 sm:flex-wrap sm:overflow-x-visible sm:pb-0">
                   <button
-                    onClick={() => router.push(`/products?brand=${activeBrand}`)}
+                    onClick={() => router.push(localizedPath(`/products?brand=${activeBrand}`))}
                     className={`flex-shrink-0 rounded-2xl px-6 py-3 text-sm font-bold uppercase tracking-wide transition ${
                       activeCarModel === "all"
                         ? "bg-red-600 text-white"
@@ -138,7 +138,7 @@ function ProductsContent({ initialProducts, brands }: Props) {
                   </button>
                   {carModels.map((model) => (
                     <button key={model}
-                      onClick={() => router.push(`/products?brand=${activeBrand}&car_model=${encodeURIComponent(model)}`)}
+                      onClick={() => router.push(localizedPath(`/products?brand=${activeBrand}&car_model=${encodeURIComponent(model)}`))}
                       className={`flex-shrink-0 rounded-2xl px-6 py-3 text-sm font-bold uppercase tracking-wide transition ${
                         activeCarModel === model
                           ? "bg-red-600 text-white"
@@ -155,7 +155,7 @@ function ProductsContent({ initialProducts, brands }: Props) {
 
           {/* Назад кога нема модели */}
           {activeBrand !== "all" && !isSearchMode && carModels.length === 0 && (
-            <button onClick={() => router.push("/products")}
+            <button onClick={() => router.push(localizedPath("/products"))}
               className="mb-6 flex items-center gap-1.5 text-sm text-zinc-500 transition hover:text-white">
               ← Сите брендови
             </button>
@@ -182,12 +182,12 @@ function ProductsContent({ initialProducts, brands }: Props) {
                   : "Контактирај не — ги имаме и за овој модел!"}
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                <Link href="/contact"
+                <Link href={localizedPath("/contact")}
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-8 py-4 text-sm font-bold uppercase text-white transition hover:bg-red-700">
                   <Mail size={16} /> Контактирај не
                 </Link>
                 {isSearchMode && (
-                  <button onClick={() => { setLocalSearch(""); router.push("/products"); }}
+                  <button onClick={() => { setLocalSearch(""); router.push(localizedPath("/products")); }}
                     className="inline-flex items-center justify-center rounded-xl border border-zinc-700 px-8 py-4 text-sm font-semibold text-white transition hover:border-red-600">
                     ← Сите производи
                   </button>
