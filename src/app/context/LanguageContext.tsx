@@ -284,6 +284,7 @@ const LanguageContext = createContext<{
   currency: Currency;
   formatPrice: (price: string, priceEur?: string | null) => string;
   isKs: boolean;
+  localizedPath: (path: string) => string;
 } | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
@@ -321,8 +322,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const formatPrice = (price: string, priceEur?: string | null): string =>
     formatPriceFn(price, currency, priceEur);
 
+  // Prefix a path with /ks when on the Kosovo version
+  const localizedPath = (path: string): string =>
+    isKs ? `/ks${path === "/" ? "" : path}` : path;
+
   return (
-    <LanguageContext.Provider value={{ lang, setLang: changeLang, t, currency, formatPrice, isKs }}>
+    <LanguageContext.Provider value={{ lang, setLang: changeLang, t, currency, formatPrice, isKs, localizedPath }}>
       {children}
     </LanguageContext.Provider>
   );
