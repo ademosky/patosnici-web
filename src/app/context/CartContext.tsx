@@ -10,6 +10,7 @@ export type CartItem = {
   image: string;
   brand: string;
   sku?: string;   // optional — not all products have a SKU
+  price_eur?: string; // optional — manual EUR override
   quantity: number;
 };
 
