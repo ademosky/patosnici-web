@@ -10,7 +10,7 @@ import { useLanguage } from "../context/LanguageContext";
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { total } = useCart();
-  const { lang, setLang, t } = useLanguage();
+  const { lang, setLang, t, isKs } = useLanguage();
 
   return (
     <header className="fixed top-0 left-0 z-50 w-full border-b border-white/10 bg-black/95 backdrop-blur">
@@ -29,7 +29,8 @@ export default function Header() {
 
         <div className="flex items-center gap-3 text-white">
 
-          {/* Language switcher */}
+          {/* Language switcher — hidden on /ks (Kosovo is locked Albanian+EUR) */}
+          {!isKs && (
           <div className="hidden items-center overflow-hidden rounded-xl border border-zinc-700 md:flex">
             <button
               onClick={() => setLang("mk")}
@@ -44,6 +45,7 @@ export default function Header() {
               SHQ
             </button>
           </div>
+          )}
 
           {/* Cart */}
           <Link href="/cart" className="relative">
@@ -72,11 +74,13 @@ export default function Header() {
             <Link href="/cart" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 hover:text-red-500">
               {t("nav_cart")} {total > 0 && <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs">{total}</span>}
             </Link>
-            {/* Mobile language switcher */}
+            {/* Mobile language switcher — hidden on /ks */}
+            {!isKs && (
             <div className="flex gap-2 pt-2 border-t border-zinc-800">
               <button onClick={() => setLang("mk")} className={`rounded-lg px-4 py-2 text-xs font-bold uppercase ${lang === "mk" ? "bg-red-600" : "border border-zinc-700 text-zinc-400"}`}>МКД</button>
               <button onClick={() => setLang("sq")} className={`rounded-lg px-4 py-2 text-xs font-bold uppercase ${lang === "sq" ? "bg-red-600" : "border border-zinc-700 text-zinc-400"}`}>SHQ</button>
             </div>
+            )}
           </nav>
         </div>
       )}
