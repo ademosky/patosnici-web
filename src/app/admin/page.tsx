@@ -793,6 +793,18 @@ export default function AdminPage() {
               </div>
 
               <div>
+                <label className={labelClass}>
+                  Цена во EUR{" "}
+                  <span className="font-normal normal-case text-zinc-600">(опционално — за /ks)</span>
+                </label>
+                <input value={form.price_eur}
+                  onChange={(e) => update("price_eur", e.target.value)}
+                  placeholder="пр. 45 (само број)"
+                  className={inputClass}
+                />
+              </div>
+
+              <div>
                 <label className={labelClass}>SKU број</label>
                 <input value={form.sku}
                   onChange={(e) => update("sku", e.target.value)}
