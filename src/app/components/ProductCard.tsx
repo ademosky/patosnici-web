@@ -12,7 +12,7 @@ type ProductCardProps = { product: Product; };
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
-  const { t } = useLanguage();
+  const { t, formatPrice } = useLanguage();
   const [added, setAdded] = useState(false);
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -55,7 +55,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <h3 className="mt-2 text-xl font-bold text-white hover:text-red-500 transition">{product.title}</h3>
         </Link>
         <p className="mt-2 text-sm text-zinc-400">{t("prod_original")}</p>
-        <div className="mt-4"><span className="text-3xl font-extrabold text-red-600">{product.price}</span></div>
+        <div className="mt-4"><span className="text-3xl font-extrabold text-red-600">{formatPrice(product.price, product.price_eur)}</span></div>
         <div className="mt-5 flex gap-2">
           <Link href={`/products/${product.slug}`}
             className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-red-700">
