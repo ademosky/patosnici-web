@@ -6,7 +6,7 @@ import { Mail } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 
 export default function Footer() {
-  const { t } = useLanguage();
+  const { t, localizedPath } = useLanguage();
 
   return (
     <footer className="border-t border-zinc-800 bg-[#080808]">
@@ -35,9 +35,9 @@ export default function Footer() {
           <div>
             <h4 className="text-sm font-bold uppercase tracking-widest text-white">{t("footer_nav")}</h4>
             <ul className="mt-5 space-y-3 text-sm text-zinc-400">
-              <li><Link href="/" className="transition hover:text-red-500">{t("nav_home")}</Link></li>
-              <li><Link href="/products" className="transition hover:text-red-500">{t("nav_products")}</Link></li>
-              <li><Link href="/contact" className="transition hover:text-red-500">{t("nav_contact")}</Link></li>
+              <li><Link href={localizedPath("/")} className="transition hover:text-red-500">{t("nav_home")}</Link></li>
+              <li><Link href={localizedPath("/products")} className="transition hover:text-red-500">{t("nav_products")}</Link></li>
+              <li><Link href={localizedPath("/contact")} className="transition hover:text-red-500">{t("nav_contact")}</Link></li>
             </ul>
           </div>
           <div>
