@@ -112,10 +112,10 @@ export default function CartPage() {
         clearCart();
         setSent(true);
       } else {
-        setError("Грешка при испраќање. Обидете се пак.");
+        setError(t("order_error"));
       }
     } catch {
-      setError("Нема интернет врска.");
+      setError(t("order_no_net"));
     } finally {
       setLoading(false);
     }
@@ -128,7 +128,7 @@ export default function CartPage() {
         <main className="flex min-h-screen items-center justify-center bg-[#0b0b0b] pt-28">
           <div className="mx-auto max-w-md px-6 text-center">
             <CheckCircle size={60} className="mx-auto text-green-500" />
-            <h1 className="mt-6 text-3xl font-black uppercase text-white">Нарачката е примена!</h1>
+            <h1 className="mt-6 text-3xl font-black uppercase text-white">{t("order_success")}</h1>
             <p className="mt-4 text-zinc-400 leading-7">
              
               <span className="font-semibold text-white">{form.phone}</span> 
@@ -136,7 +136,7 @@ export default function CartPage() {
             <Link href="/products"
               className="mt-8 inline-flex items-center gap-2 rounded-xl bg-red-600 px-8 py-4 text-sm font-bold uppercase text-white transition hover:bg-red-700"
             >
-              Продолжи со купување
+              {t("cart_continue")}
             </Link>
           </div>
         </main>
@@ -153,22 +153,22 @@ export default function CartPage() {
           <Link href="/products"
             className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white"
           >
-            <ArrowLeft size={15} /> Назад кон производи
+            <ArrowLeft size={15} /> {t("cart_back")}
           </Link>
 
           <h1 className="mb-8 text-4xl font-black uppercase text-white">
-            Корпа
-            <span className="ml-3 text-xl font-normal text-zinc-500">({items.length} производи)</span>
+            {t("nav_cart")}
+            <span className="ml-3 text-xl font-normal text-zinc-500">({items.length} {t("prod_count_suffix")})</span>
           </h1>
 
           {items.length === 0 ? (
             <div className="py-20 text-center">
               <ShoppingCart size={60} className="mx-auto text-zinc-700" />
-              <p className="mt-4 text-zinc-500">Корпата е празна</p>
+              <p className="mt-4 text-zinc-500">{t("cart_empty")}</p>
               <Link href="/products"
                 className="mt-6 inline-flex items-center gap-2 rounded-xl bg-red-600 px-8 py-4 text-sm font-bold uppercase text-white transition hover:bg-red-700"
               >
-                Разгледај производи
+                {t("cart_browse")}
               </Link>
             </div>
           ) : (
@@ -217,13 +217,13 @@ export default function CartPage() {
                 <div className="rounded-2xl border border-zinc-800 bg-[#111] p-5">
                   {/* Вкупно производи */}
                   <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-                    <span className="text-sm text-zinc-400">Вкупно производи:</span>
-                    <span className="font-semibold text-white">{items.reduce((s, i) => s + i.quantity, 0)} ком</span>
+                    <span className="text-sm text-zinc-400">{t("cart_total_items")}:</span>
+                    <span className="font-semibold text-white">{items.reduce((s, i) => s + i.quantity, 0)} {t("unit_pcs")}</span>
                   </div>
 
                   {/* Вкупна цена */}
                   <div className="mt-3 flex items-center justify-between">
-                    <span className="text-sm font-semibold text-zinc-300">Вкупна цена:</span>
+                    <span className="text-sm font-semibold text-zinc-300">{t("cart_total_price")}:</span>
                     <span className="text-2xl font-extrabold text-red-500">
                       {currency === "EUR"
                         ? `${items.reduce((sum, item) => sum + getEurValue(item.price, item.price_eur) * item.quantity, 0)} €`
@@ -235,14 +235,14 @@ export default function CartPage() {
                   </div>
 
                   <p className="mt-3 text-xs text-zinc-600">
-                    Плаќање при подигање · Достава низ цела Македонија
+                    {t("cart_payment_info")}
                   </p>
                 </div>
               </div>
 
               {/* Order form */}
               <div>
-                <h2 className="mb-5 text-xl font-black uppercase text-white">Детали за нарачка</h2>
+                <h2 className="mb-5 text-xl font-black uppercase text-white">{t("cart_order_details")}</h2>
                 <form onSubmit={handleOrder} className="space-y-4 rounded-2xl border border-zinc-800 bg-[#111] p-6">
 
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -286,13 +286,13 @@ export default function CartPage() {
                   {/* ── Напомена ── */}
                   <div>
                     <label className={labelClass}>
-                      Напомена{" "}
-                      <span className="font-normal normal-case text-zinc-600">(опционално)</span>
+                      {t("form_note")}{" "}
+                      <span className="font-normal normal-case text-zinc-600">({t("form_note_opt")})</span>
                     </label>
                     <textarea
                       value={form.note}
                       onChange={(e) => update("note", e.target.value)}
-                      placeholder="Пр. достава наутро, достава на одреден датум..."
+                      placeholder={t("form_note_ph")}
                       maxLength={300}
                       rows={2}
                       className="w-full resize-none rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600"
@@ -317,7 +317,7 @@ export default function CartPage() {
                     className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-4 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-red-700 disabled:opacity-60"
                   >
                     {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                    {loading ? "Испраќање..." : "Нарачај сè"}
+                    {loading ? t("order_sending") : t("cart_order_all")}
                   </button>
 
                   <p className="text-center text-xs text-zinc-600">
