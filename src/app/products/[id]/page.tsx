@@ -10,6 +10,7 @@ import { CheckCircle, ArrowLeft, Tag } from "lucide-react";
 import AddToCartButton from "../../components/AddToCartButton";
 import ProductDescription from "../../components/ProductDescription";
 import ProductViewEvent from "../../components/ProductViewEvent";
+import PriceDisplay from "../../components/PriceDisplay";
 
 export const dynamic = "force-dynamic";
 
@@ -209,9 +210,7 @@ export default async function ProductPage({ params }: Props) {
               <ProductDescription description_mk={product.description} description_sq={product.description_sq} />
 
               <div className="mt-8 flex items-end gap-3">
-                <span className="text-5xl font-extrabold text-red-600">
-                  {product.price}
-                </span>
+                <PriceDisplay price={product.price} priceEur={product.price_eur} className="text-5xl font-extrabold text-red-600" />
                 <span className="mb-1 text-sm text-zinc-500">
                   · плаќање при подигање
                 </span>
@@ -249,7 +248,7 @@ export default async function ProductPage({ params }: Props) {
                 Нарачувате:{" "}
                 <span className="font-semibold text-white">{product.title}</span>{" "}
                 —{" "}
-                <span className="font-bold text-red-500">{product.price}</span>
+                <PriceDisplay price={product.price} priceEur={product.price_eur} className="font-bold text-red-500" />
               </p>
             </div>
             <div className="mx-auto max-w-2xl">
