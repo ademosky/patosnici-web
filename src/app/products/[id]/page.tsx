@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import Header from "../../components/Header";
 import OrderForm from "../../components/OrderForm";
 import ImageCarousel from "../../components/ImageCarousel";
@@ -20,6 +21,17 @@ import PaymentNote from "../../components/PaymentNote";
 export const dynamic = "force-dynamic";
 
 const SITE_URL = "https://www.originalpatosnici.com";
+
+// Detect Kosovo locale from the request path (works with /ks rewrites)
+async function isKsRequest(): Promise<boolean> {
+  try {
+    const h = await headers();
+    const path = h.get("x-invoke-path") || h.get("x-pathname") || h.get("x-forwarded-uri") || "";
+    return path.startsWith("/ks");
+  } catch {
+    return false;
+  }
+}
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -42,8 +54,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description =
     descRaw.length > 160 ? descRaw.slice(0, 157) + "..." : descRaw;
 
-  // ── Canonical URL — always use the product slug, never the params id
-  const canonicalUrl = `${SITE_URL}/products/${product.slug}`;
+  // ── Canonical URL — preserve /ks locale prefix when present
+  const ks = await isKsRequest();
+  const canonicalUrl = ks
+    ? `${SITE_URL}/ks/products/${product.slug}`
+    : `${SITE_URL}/products/${product.slug}`;
 
   // ── OG image — product image if absolute URL, else fallback to logo
   const ogImage = product.image?.startsWith("http")
@@ -91,6 +106,12 @@ export default async function ProductPage({ params }: Props) {
 
   if (!product) notFound();
 
+  // Preserve /ks locale prefix in structured data URLs
+  const ks = await isKsRequest();
+  const productUrl = ks
+    ? `${SITE_URL}/ks/products/${product.slug}`
+    : `${SITE_URL}/products/${product.slug}`;
+
   return (
     <>
       <Header />
@@ -135,7 +156,7 @@ export default async function ProductPage({ params }: Props) {
                 url: SITE_URL,
               },
             },
-            url: `${SITE_URL}/products/${product.slug}`,
+            url: productUrl,
           }),
         }}
       />
