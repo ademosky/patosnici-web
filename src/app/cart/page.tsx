@@ -302,14 +302,14 @@ export default function CartPage() {
                   {/* ── Начин на плаќање ── */}
                   <div>
                     <p className="mb-2 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                      Начин на плаќање
+                      {t("payment_method")}
                     </p>
                     <div className="flex items-center gap-3 rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3.5">
                       <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 border-red-600 bg-red-600">
                         <div className="h-2 w-2 rounded-full bg-white" />
                       </div>
-                      <span className="text-sm font-semibold text-white">Готовина при прием</span>
-                      <span className="ml-auto text-xs text-zinc-500">Плаќање при достава</span>
+                      <span className="text-sm font-semibold text-white">{t("payment_cod")}</span>
+                      <span className="ml-auto text-xs text-zinc-500">{t("payment_delivery")}</span>
                     </div>
                   </div>
 
