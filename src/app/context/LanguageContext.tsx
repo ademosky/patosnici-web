@@ -283,37 +283,36 @@ const LanguageContext = createContext<{
   t: (key: TKey) => string;
   currency: Currency;
   formatPrice: (price: string, priceEur?: string | null) => string;
+  isKs: boolean;
 } | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Lang>("mk");
   const [currency, setCurrency] = useState<Currency>("MKD");
+  const [isKs, setIsKs] = useState(false);
 
   useEffect(() => {
-    // /ks prefix = Kosovo → force Albanian + EUR
-    const isKs = typeof window !== "undefined" && window.location.pathname.startsWith("/ks");
-    if (isKs) {
+    // /ks prefix = Kosovo → locked Albanian + EUR (no toggle)
+    const ks = typeof window !== "undefined" && window.location.pathname.startsWith("/ks");
+    setIsKs(ks);
+
+    if (ks) {
       setLang("sq");
       setCurrency("EUR");
-      localStorage.setItem("lang", "sq");
-      localStorage.setItem("currency", "EUR");
       return;
     }
-    // Otherwise restore saved preferences
+
+    // Macedonia → currency is ALWAYS MKD. Language from localStorage (mk or sq).
+    setCurrency("MKD");
     const saved = localStorage.getItem("lang") as Lang;
     if (saved === "sq") setLang("sq");
-    const savedCur = localStorage.getItem("currency") as Currency;
-    if (savedCur === "EUR") setCurrency("EUR");
   }, []);
 
   const changeLang = (l: Lang) => {
     setLang(l);
     localStorage.setItem("lang", l);
-    // Switching to Macedonian resets currency to MKD
-    if (l === "mk") {
-      setCurrency("MKD");
-      localStorage.setItem("currency", "MKD");
-    }
+    // Both MK and SHQ toggles are for Macedonia → always MKD prices.
+    setCurrency("MKD");
   };
 
   const t = (key: TKey): string =>
@@ -323,7 +322,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     formatPriceFn(price, currency, priceEur);
 
   return (
-    <LanguageContext.Provider value={{ lang, setLang: changeLang, t, currency, formatPrice }}>
+    <LanguageContext.Provider value={{ lang, setLang: changeLang, t, currency, formatPrice, isKs }}>
       {children}
     </LanguageContext.Provider>
   );
