@@ -18,7 +18,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem({ id: product.id, slug: product.slug, title: product.title, price: product.price, image: product.image, brand: product.brand, sku: product.sku });
+    addItem({ id: product.id, slug: product.slug, title: product.title, price: product.price, image: product.image, brand: product.brand, sku: product.sku, price_eur: product.price_eur });
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
 
