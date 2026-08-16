@@ -90,6 +90,7 @@ const mk = {
   payment_cod: "Готовина при прием",
   payment_delivery: "Плаќање при достава",
   payment_on_delivery: "плаќање при подигање",
+  unit_pcs: "ком",
   order_direct: "Нарачај директно →",
   order_messenger: "Прашај не на Messenger",
 
@@ -221,6 +222,7 @@ const sq: typeof mk = {
   payment_cod: "Pagesë me para në dorëzim",
   payment_delivery: "Pagesë në dorëzim",
   payment_on_delivery: "pagesë në dorëzim",
+  unit_pcs: "copë",
   order_direct: "Porosit direkt →",
   order_messenger: "Na kontakto në Messenger",
 
