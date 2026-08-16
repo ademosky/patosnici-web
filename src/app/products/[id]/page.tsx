@@ -13,6 +13,9 @@ import ProductViewEvent from "../../components/ProductViewEvent";
 import PriceDisplay from "../../components/PriceDisplay";
 import ProductFeatures from "../../components/ProductFeatures";
 import OrderHeader from "../../components/OrderHeader";
+import BackLink from "../../components/BackLink";
+import OriginalBadge from "../../components/OriginalBadge";
+import PaymentNote from "../../components/PaymentNote";
 
 export const dynamic = "force-dynamic";
 
@@ -146,13 +149,7 @@ export default async function ProductPage({ params }: Props) {
       <main className="min-h-screen bg-[#0b0b0b] pt-28">
         <div className="mx-auto max-w-6xl px-6 py-12">
 
-          <Link
-            href="/products"
-            className="mb-10 inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white"
-          >
-            <ArrowLeft size={15} />
-            Назад кон производи
-          </Link>
+          <BackLink />
 
           <div className="grid gap-12 lg:grid-cols-2">
 
@@ -162,10 +159,7 @@ export default async function ProductPage({ params }: Props) {
                 images={product.images && product.images.length > 0 ? product.images : [product.image]}
                 alt={product.title}
               />
-              <div className="absolute left-4 top-4 z-10 flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white">
-                <Tag size={12} />
-                Оригинален производ
-              </div>
+              <OriginalBadge />
               {product.in_stock === false && (
                 <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60">
                   <span className="rounded-2xl border border-zinc-500 bg-zinc-900/95 px-8 py-4 text-xl font-black uppercase tracking-widest text-zinc-300">
@@ -204,9 +198,7 @@ export default async function ProductPage({ params }: Props) {
 
               <div className="mt-8 flex items-end gap-3">
                 <PriceDisplay price={product.price} priceEur={product.price_eur} className="text-5xl font-extrabold text-red-600" />
-                <span className="mb-1 text-sm text-zinc-500">
-                  · плаќање при подигање
-                </span>
+                <PaymentNote />
               </div>
 
               <ProductFeatures />
