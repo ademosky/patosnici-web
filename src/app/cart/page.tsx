@@ -11,7 +11,7 @@ import { Trash2, Plus, Minus, ShoppingCart, Send, CheckCircle, Loader2, ArrowLef
 
 export default function CartPage() {
   const { items, removeItem, updateQty, clearCart } = useCart();
-  const { currency, formatPrice } = useLanguage();
+  const { currency, formatPrice, t } = useLanguage();
   const [form, setForm] = useState({ name: "", surname: "", address: "", city: "", phone: "", email: "", note: "" });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -247,36 +247,36 @@ export default function CartPage() {
 
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
-                      <label className={labelClass}>Ime *</label>
-                      <input required value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Марко" className={inputClass} />
+                      <label className={labelClass}>{t("form_name")} *</label>
+                      <input required value={form.name} onChange={(e) => update("name", e.target.value)} placeholder={t("form_name_ph")} className={inputClass} />
                     </div>
                     <div>
-                      <label className={labelClass}>Prezime *</label>
-                      <input required value={form.surname} onChange={(e) => update("surname", e.target.value)} placeholder="Петровски" className={inputClass} />
+                      <label className={labelClass}>{t("form_surname")} *</label>
+                      <input required value={form.surname} onChange={(e) => update("surname", e.target.value)} placeholder={t("form_surname_ph")} className={inputClass} />
                     </div>
                   </div>
 
                   <div>
-                    <label className={labelClass}>Adresa *</label>
-                    <input required value={form.address} onChange={(e) => update("address", e.target.value)} placeholder="ул. Македонија бр. 12" className={inputClass} />
+                    <label className={labelClass}>{t("form_address")} *</label>
+                    <input required value={form.address} onChange={(e) => update("address", e.target.value)} placeholder={t("form_address_ph")} className={inputClass} />
                   </div>
 
                   <div>
-                    <label className={labelClass}>Grad *</label>
-                    <input required value={form.city} onChange={(e) => update("city", e.target.value)} placeholder="Скопје" className={inputClass} />
+                    <label className={labelClass}>{t("form_city")} *</label>
+                    <input required value={form.city} onChange={(e) => update("city", e.target.value)} placeholder={t("form_city_ph")} className={inputClass} />
                   </div>
 
                   <div>
-                    <label className={labelClass}>Telefon *</label>
-                    <input type="tel" required value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+389 70 123 456" className={inputClass} />
+                    <label className={labelClass}>{t("form_phone")} *</label>
+                    <input type="tel" required value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder={t("form_phone_ph")} className={inputClass} />
                   </div>
 
                   <div className="col-span-2">
                     <label className={labelClass}>
-                      Email{" "}
-                      <span className="font-normal normal-case text-zinc-600">(опционален — за потврда)</span>
+                      {t("form_email")}{" "}
+                      <span className="font-normal normal-case text-zinc-600">({t("order_email_opt")})</span>
                     </label>
-                    <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="vasiot@email.com" className={inputClass} />
+                    <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="email@email.com" className={inputClass} />
                   </div>
 
                   {error && (
