@@ -11,7 +11,7 @@ import { Trash2, Plus, Minus, ShoppingCart, Send, CheckCircle, Loader2, ArrowLef
 
 export default function CartPage() {
   const { items, removeItem, updateQty, clearCart } = useCart();
-  const { currency, formatPrice, t } = useLanguage();
+  const { currency, formatPrice, t, localizedPath } = useLanguage();
   const [form, setForm] = useState({ name: "", surname: "", address: "", city: "", phone: "", email: "", note: "" });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -133,7 +133,7 @@ export default function CartPage() {
              
               <span className="font-semibold text-white">{form.phone}</span> 
             </p>
-            <Link href="/products"
+            <Link href={localizedPath("/products")}
               className="mt-8 inline-flex items-center gap-2 rounded-xl bg-red-600 px-8 py-4 text-sm font-bold uppercase text-white transition hover:bg-red-700"
             >
               {t("cart_continue")}
@@ -150,7 +150,7 @@ export default function CartPage() {
       <main className="min-h-screen bg-[#0b0b0b] pt-28">
         <div className="mx-auto max-w-6xl px-6 py-12">
 
-          <Link href="/products"
+          <Link href={localizedPath("/products")}
             className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white"
           >
             <ArrowLeft size={15} /> {t("cart_back")}
@@ -165,7 +165,7 @@ export default function CartPage() {
             <div className="py-20 text-center">
               <ShoppingCart size={60} className="mx-auto text-zinc-700" />
               <p className="mt-4 text-zinc-500">{t("cart_empty")}</p>
-              <Link href="/products"
+              <Link href={localizedPath("/products")}
                 className="mt-6 inline-flex items-center gap-2 rounded-xl bg-red-600 px-8 py-4 text-sm font-bold uppercase text-white transition hover:bg-red-700"
               >
                 {t("cart_browse")}
