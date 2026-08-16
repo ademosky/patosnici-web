@@ -2,6 +2,7 @@ export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { getEurValue } from "@/lib/pricing";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -26,6 +27,9 @@ export async function POST(req: NextRequest) {
 
     // Cart order (multiple items) OR single product order
     const isCartOrder = Array.isArray(body.items) && body.items.length > 0;
+    const currency = body.currency === "EUR" ? "EUR" : "MKD";
+    const fmtPrice = (price: string, priceEur?: string): string =>
+      currency === "EUR" ? `${getEurValue(price, priceEur)} €` : price;
 
     let itemsHtml = "";
     let subject = "";
@@ -37,7 +41,7 @@ export async function POST(req: NextRequest) {
         <tr style="border-bottom: 1px solid #333;">
           <td style="padding: 10px 0; color: white;">${item.title}${item.sku ? ` <span style="color:#888;font-size:12px;">(${item.sku})</span>` : ""}</td>
           <td style="padding: 10px 0; color: #888; text-align:center;">${item.quantity}x</td>
-          <td style="padding: 10px 0; color: #dc2626; text-align:right; font-weight:bold;">${item.price}</td>
+          <td style="padding: 10px 0; color: #dc2626; text-align:right; font-weight:bold;">${fmtPrice(item.price, item.price_eur)}</td>
         </tr>
       `).join("");
     } else {
@@ -47,7 +51,7 @@ export async function POST(req: NextRequest) {
         <tr style="border-bottom: 1px solid #333;">
           <td style="padding: 10px 0; color: white;">${productTitle}</td>
           <td style="padding: 10px 0; color: #888; text-align:center;">1x</td>
-          <td style="padding: 10px 0; color: #dc2626; text-align:right; font-weight:bold;">${productPrice}</td>
+          <td style="padding: 10px 0; color: #dc2626; text-align:right; font-weight:bold;">${fmtPrice(productPrice, body.productPriceEur)}</td>
         </tr>
         ${productSku ? `<tr><td colspan="3" style="padding:4px 0;color:#888;font-size:12px;">SKU: <span style='font-family:monospace;color:#aaa;'>${productSku}</span></td></tr>` : ""}
       `;
@@ -119,7 +123,7 @@ export async function POST(req: NextRequest) {
         ? (body.items as CartItem[]).map((i: CartItem) =>
             `• ${i.title} x${i.quantity} — ${i.price}`
           ).join("\n")
-        : `• ${body.productTitle} — ${body.productPrice}`;
+        : `• ${body.productTitle} — ${fmtPrice(body.productPrice, body.productPriceEur)}`;
 
       await transporter.sendMail({
         from: '"Original Patosnici" <patosnicimk@gmail.com>',
@@ -165,6 +169,7 @@ export async function POST(req: NextRequest) {
           product_title: isCartOrder ? null : body.productTitle,
           product_price: isCartOrder ? null : body.productPrice,
           product_sku: isCartOrder ? null : (body.productSku || null),
+          currency: currency,
           status: "new",
         };
 
