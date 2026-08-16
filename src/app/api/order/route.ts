@@ -118,10 +118,15 @@ export async function POST(req: NextRequest) {
 
     // Ако клиентот внел email — испрати потврда и до него
     if (body.email) {
-      const customerSubject = "Вашата нарачка е примена — Original Patosnici";
+      // Email copy depends on currency (EUR = Kosovo = Albanian)
+      const isEur = currency === "EUR";
+      const customerSubject = isEur
+        ? "Porosia juaj u pranua — Original Patosnici"
+        : "Вашата нарачка е примена — Original Patosnici";
+
       const itemsList = isCartOrder
         ? (body.items as CartItem[]).map((i: CartItem) =>
-            `• ${i.title} x${i.quantity} — ${i.price}`
+            `• ${i.title} x${i.quantity} — ${fmtPrice(i.price, i.price_eur)}`
           ).join("\n")
         : `• ${body.productTitle} — ${fmtPrice(body.productPrice, body.productPriceEur)}`;
 
@@ -132,18 +137,26 @@ export async function POST(req: NextRequest) {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto;">
             <div style="background: #dc2626; padding: 24px; border-radius: 12px 12px 0 0;">
-              <h1 style="color: white; margin: 0; font-size: 20px;">✅ Нарачката е примена!</h1>
+              <h1 style="color: white; margin: 0; font-size: 20px;">${isEur ? "✅ Porosia u pranua!" : "✅ Нарачката е примена!"}</h1>
             </div>
             <div style="background: #111; padding: 24px; border-radius: 0 0 12px 12px; border: 1px solid #333;">
-              <p style="color: #a1a1aa; margin-bottom: 16px;">Ви благодариме за нарачката! Ќе ви биде доставена за 2-4 работни дена. Очекувајте повик од карго курирот.</p>
+              <p style="color: #a1a1aa; margin-bottom: 16px;">${
+                isEur
+                  ? "Faleminderit për porosinë tuaj! Porosia do të dorëzohet brenda 5-7 ditë pune. Prisni thirrje nga korrieri."
+                  : "Ви благодариме за нарачката! Ќе ви биде доставена за 5-7 работни дена. Очекувајте повик од карго курирот."
+              }</p>
 
               <div style="background: #1a1a1a; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-                <p style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Нарачани производи</p>
+                <p style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">${
+                  isEur ? "Produktet e porositura" : "Нарачани производи"
+                }</p>
                 <pre style="color: white; font-size: 14px; white-space: pre-wrap; margin: 0;">${itemsList}</pre>
               </div>
 
               <p style="color: #888; font-size: 13px; margin: 0;">
-                За прашања: <a href="mailto:patosnicimk@gmail.com" style="color: #dc2626;">patosnicimk@gmail.com</a>
+                ${
+                  isEur ? "Për pyetje:" : "За прашања:"
+                } <a href="mailto:patosnicimk@gmail.com" style="color: #dc2626;">patosnicimk@gmail.com</a>
               </p>
             </div>
           </div>
