@@ -85,6 +85,7 @@ const mk = {
   order_now: "Нарачај сега →",
   order_label: "Нарачка",
   order_title: "Пополни ги деталите",
+  order_you_order: "Нарачувате:",
   order_direct: "Нарачај директно →",
   order_messenger: "Прашај не на Messenger",
 
@@ -211,6 +212,7 @@ const sq: typeof mk = {
   order_now: "Porosit tani →",
   order_label: "Porosia",
   order_title: "Plotëso të dhënat",
+  order_you_order: "Po porosisni:",
   order_direct: "Porosit direkt →",
   order_messenger: "Na kontakto në Messenger",
 
