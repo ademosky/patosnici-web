@@ -18,7 +18,7 @@ type Props = {
 function ProductsContent({ initialProducts, brands }: Props) {
   const searchParams = useSearchParams();
   const router       = useRouter();
-  const { localizedPath } = useLanguage();
+  const { localizedPath, t } = useLanguage();
 
   const activeBrand    = searchParams.get("brand")     || "all";
   const activeCarModel = searchParams.get("car_model") || "all";
@@ -64,17 +64,17 @@ function ProductsContent({ initialProducts, brands }: Props) {
 
           {/* ── НАСЛОВ ── */}
           <div className="mb-8">
-            <p className="text-xs font-bold uppercase tracking-widest text-red-600">Каталог</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-red-600">{t("prod_catalog")}</p>
             <h1 className="mt-2 text-4xl font-black uppercase text-white">
               {isSearchMode
-                ? `Резултати за „${localSearch}"`
+                ? `${t("search_results_for")} „${localSearch}"`
                 : activeCarModel !== "all"
-                  ? `${activeBrandName} ${activeCarModel} Патосници`
+                  ? `${activeBrandName} ${activeCarModel} ${t("prod_suffix")}`
                   : activeBrand !== "all"
-                    ? `${activeBrandName} Патосници`
-                    : "Сите Патосници"}
+                    ? `${activeBrandName} ${t("prod_suffix")}`
+                    : t("prod_all")}
             </h1>
-            <p className="mt-1 text-sm text-zinc-500">{filtered.length} производи</p>
+            <p className="mt-1 text-sm text-zinc-500">{filtered.length} {t("prod_count_suffix")}</p>
           </div>
 
           {/* ── ПРЕБАРУВАЧКА ── */}
@@ -82,7 +82,7 @@ function ProductsContent({ initialProducts, brands }: Props) {
             <div className="relative max-w-sm flex-1">
               <input type="text" value={localSearch}
                 onChange={(e) => setLocalSearch(e.target.value)}
-                placeholder="Пребарај модел..."
+                placeholder={t("prod_search")}
                 className="w-full rounded-xl border border-zinc-700 bg-[#141414] py-3 pl-5 pr-10 text-sm text-white outline-none transition focus:border-red-600"
               />
               {localSearch && (
@@ -115,7 +115,7 @@ function ProductsContent({ initialProducts, brands }: Props) {
               <div className="mb-4 flex items-center gap-3">
                 <button onClick={() => router.push(localizedPath("/products"))}
                   className="flex items-center gap-1.5 text-sm text-zinc-500 transition hover:text-white">
-                  ← Сите брендови
+                  ← {t("prod_all_brands")}
                 </button>
                 <span className="text-zinc-700">›</span>
                 <span className="text-sm font-semibold text-white">{activeBrandName}</span>
@@ -123,7 +123,7 @@ function ProductsContent({ initialProducts, brands }: Props) {
 
               {/* Модел копчиња — ГОЛЕМ приказ */}
               <p className="mb-3 text-xs font-bold uppercase tracking-widest text-zinc-500">
-                Избери модел на {activeBrandName}:
+                {t("prod_select_model")} {activeBrandName}:
               </p>
               {/* Horizontal scroll on mobile, wrap on larger screens */}
               <div className="-mx-6 px-6 sm:mx-0 sm:px-0">
@@ -136,7 +136,7 @@ function ProductsContent({ initialProducts, brands }: Props) {
                         : "border-2 border-zinc-700 text-zinc-300 hover:border-red-600 hover:text-white"
                     }`}
                   >
-                    Сите {activeBrandName}
+                    {t("all")} {activeBrandName}
                   </button>
                   {carModels.map((model) => (
                     <button key={model}
@@ -159,7 +159,7 @@ function ProductsContent({ initialProducts, brands }: Props) {
           {activeBrand !== "all" && !isSearchMode && carModels.length === 0 && (
             <button onClick={() => router.push(localizedPath("/products"))}
               className="mb-6 flex items-center gap-1.5 text-sm text-zinc-500 transition hover:text-white">
-              ← Сите брендови
+              ← {t("prod_all_brands")}
             </button>
           )}
 
@@ -176,22 +176,22 @@ function ProductsContent({ initialProducts, brands }: Props) {
                 <Mail size={32} className="text-red-600" />
               </div>
               <h2 className="mt-6 text-2xl font-black uppercase text-white">
-                {isSearchMode ? `Нема резултати` : "Нема производи"}
+                {isSearchMode ? t("search_no_results") : t("no_products")}
               </h2>
               <p className="mt-3 text-zinc-400 text-sm leading-7">
                 {isSearchMode
-                  ? `Не пронајдовме производи за „${localSearch}". Пробај поинаков термин или контактирај не.`
-                  : "Контактирај не — ги имаме и за овој модел!"}
+                  ? `${t("no_results_msg")} „${localSearch}".`
+                  : t("prod_contact_msg")}
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
                 <Link href={localizedPath("/contact")}
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-8 py-4 text-sm font-bold uppercase text-white transition hover:bg-red-700">
-                  <Mail size={16} /> Контактирај не
+                  <Mail size={16} /> {t("prod_contact")}
                 </Link>
                 {isSearchMode && (
                   <button onClick={() => { setLocalSearch(""); router.push(localizedPath("/products")); }}
                     className="inline-flex items-center justify-center rounded-xl border border-zinc-700 px-8 py-4 text-sm font-semibold text-white transition hover:border-red-600">
-                    ← Сите производи
+                    ← {t("back_all_products")}
                   </button>
                 )}
               </div>
