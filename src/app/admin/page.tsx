@@ -1088,7 +1088,7 @@ export default function AdminPage() {
                 {/* Customer search */}
                 <input
                   type="text"
-                  placeholder="🔍  Пребарај по Ime / Telefon..."
+                  placeholder="🔍  Пребарај по Ime / Telefon / SKU..."
                   value={ordersSearch}
                   onChange={(e) => setOrdersSearch(e.target.value)}
                   className="w-full rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2 text-sm text-white outline-none transition focus:border-red-600 sm:w-56"
@@ -1158,7 +1158,9 @@ export default function AdminPage() {
                 .filter((order) =>
                   !ordersSearch ||
                   `${order.name} ${order.surname}`.toLowerCase().includes(ordersSearch.toLowerCase()) ||
-                  (order.phone || "").includes(ordersSearch)
+                  (order.phone || "").includes(ordersSearch) ||
+                  (order.product_sku || "").toLowerCase().includes(ordersSearch.toLowerCase()) ||
+                  (order.items || []).some((it) => (it.sku || "").toLowerCase().includes(ordersSearch.toLowerCase()))
                 )
                 .map((order) => (
                 <div key={order.id}
