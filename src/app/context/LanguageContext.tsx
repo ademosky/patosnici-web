@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { Currency, formatPrice as formatPriceFn } from "@/lib/pricing";
 
 export type Lang = "mk" | "sq";
 
@@ -236,26 +237,49 @@ const LanguageContext = createContext<{
   lang: Lang;
   setLang: (l: Lang) => void;
   t: (key: TKey) => string;
+  currency: Currency;
+  formatPrice: (price: string, priceEur?: string | null) => string;
 } | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Lang>("mk");
+  const [currency, setCurrency] = useState<Currency>("MKD");
 
   useEffect(() => {
+    // /ks prefix = Kosovo → force Albanian + EUR
+    const isKs = typeof window !== "undefined" && window.location.pathname.startsWith("/ks");
+    if (isKs) {
+      setLang("sq");
+      setCurrency("EUR");
+      localStorage.setItem("lang", "sq");
+      localStorage.setItem("currency", "EUR");
+      return;
+    }
+    // Otherwise restore saved preferences
     const saved = localStorage.getItem("lang") as Lang;
     if (saved === "sq") setLang("sq");
+    const savedCur = localStorage.getItem("currency") as Currency;
+    if (savedCur === "EUR") setCurrency("EUR");
   }, []);
 
   const changeLang = (l: Lang) => {
     setLang(l);
     localStorage.setItem("lang", l);
+    // Switching to Macedonian resets currency to MKD
+    if (l === "mk") {
+      setCurrency("MKD");
+      localStorage.setItem("currency", "MKD");
+    }
   };
 
   const t = (key: TKey): string =>
     (lang === "sq" ? sq[key] : mk[key]) ?? mk[key] ?? key;
 
+  const formatPrice = (price: string, priceEur?: string | null): string =>
+    formatPriceFn(price, currency, priceEur);
+
   return (
-    <LanguageContext.Provider value={{ lang, setLang: changeLang, t }}>
+    <LanguageContext.Provider value={{ lang, setLang: changeLang, t, currency, formatPrice }}>
       {children}
     </LanguageContext.Provider>
   );
