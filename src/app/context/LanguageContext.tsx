@@ -86,6 +86,10 @@ const mk = {
   order_label: "Нарачка",
   order_title: "Пополни ги деталите",
   order_you_order: "Нарачувате:",
+  payment_method: "Начин на плаќање",
+  payment_cod: "Готовина при прием",
+  payment_delivery: "Плаќање при достава",
+  payment_on_delivery: "плаќање при подигање",
   order_direct: "Нарачај директно →",
   order_messenger: "Прашај не на Messenger",
 
@@ -213,6 +217,10 @@ const sq: typeof mk = {
   order_label: "Porosia",
   order_title: "Plotëso të dhënat",
   order_you_order: "Po porosisni:",
+  payment_method: "Mënyra e pagesës",
+  payment_cod: "Pagesë me para në dorëzim",
+  payment_delivery: "Pagesë në dorëzim",
+  payment_on_delivery: "pagesë në dorëzim",
   order_direct: "Porosit direkt →",
   order_messenger: "Na kontakto në Messenger",
 
