@@ -5,10 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import Header from "../components/Header";
 import { useCart } from "../context/CartContext";
+import { useLanguage } from "../context/LanguageContext";
+import { getEurValue } from "@/lib/pricing";
 import { Trash2, Plus, Minus, ShoppingCart, Send, CheckCircle, Loader2, ArrowLeft } from "lucide-react";
 
 export default function CartPage() {
   const { items, removeItem, updateQty, clearCart } = useCart();
+  const { currency, formatPrice } = useLanguage();
   const [form, setForm] = useState({ name: "", surname: "", address: "", city: "", phone: "", email: "", note: "" });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -185,7 +188,7 @@ export default function CartPage() {
 
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-white">{item.title}</p>
-                      <p className="mt-1 text-lg font-bold text-red-500">{item.price}</p>
+                      <p className="mt-1 text-lg font-bold text-red-500">{formatPrice(item.price, item.price_eur)}</p>
                     </div>
 
                     {/* Quantity */}
@@ -222,10 +225,12 @@ export default function CartPage() {
                   <div className="mt-3 flex items-center justify-between">
                     <span className="text-sm font-semibold text-zinc-300">Вкупна цена:</span>
                     <span className="text-2xl font-extrabold text-red-500">
-                      {items.reduce((sum, item) => {
-                        const num = parseInt(item.price.replace(/\./g, "").replace(/[^\d]/g, ""), 10) || 0;
-                        return sum + num * item.quantity;
-                      }, 0).toLocaleString("mk-MK")} ден
+                      {currency === "EUR"
+                        ? `${items.reduce((sum, item) => sum + getEurValue(item.price, item.price_eur) * item.quantity, 0)} €`
+                        : `${items.reduce((sum, item) => {
+                            const num = parseInt(item.price.replace(/\./g, "").replace(/[^\d]/g, ""), 10) || 0;
+                            return sum + num * item.quantity;
+                          }, 0).toLocaleString("mk-MK")} ден`}
                     </span>
                   </div>
 
