@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { brands } from "../data/brands";
+import { getEurValue } from "@/lib/pricing";
 import {
   Lock, Plus, Trash2, LogOut, Package, ShoppingCart, Warehouse,
   CheckCircle, AlertCircle, Loader2, Pencil,
@@ -37,7 +38,7 @@ type Order = {
   city: string;
   phone: string;
   email?: string;
-  items?: Array<{ title: string; price: string; quantity: number; sku?: string }>;
+  items?: Array<{ title: string; price: string; quantity: number; sku?: string; price_eur?: string }>;
   product_title?: string;
   product_price?: string;
   product_sku?: string;
@@ -1265,7 +1266,7 @@ export default function AdminPage() {
                           {order.items.map((item, i) => (
                             <li key={i} className="text-sm text-zinc-300">
                               <span className="font-semibold">{item.quantity}×</span> {item.title}
-                              <span className="ml-2 font-bold text-red-500">{item.price}</span>
+                              <span className="ml-2 font-bold text-red-500">{order.currency === "EUR" ? `${getEurValue(item.price, item.price_eur)} €` : item.price}</span>
                               {item.sku && <span className="ml-1 font-mono text-xs text-zinc-600">({item.sku})</span>}
                             </li>
                           ))}
@@ -1273,7 +1274,7 @@ export default function AdminPage() {
                       ) : (
                         <div className="text-sm text-zinc-300">
                           {order.product_title}
-                          <span className="ml-2 font-bold text-red-500">{order.product_price}</span>
+                          <span className="ml-2 font-bold text-red-500">{order.currency === "EUR" ? `${getEurValue(order.product_price || "")} €` : order.product_price}</span>
                           {order.product_sku && <span className="ml-1 font-mono text-xs text-zinc-600">({order.product_sku})</span>}
                         </div>
                       )}
