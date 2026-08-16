@@ -233,6 +233,7 @@ export default async function ProductPage({ params }: Props) {
                 image: product.image,
                 brand: product.brand,
                 sku: product.sku,
+                price_eur: product.price_eur,
               }} />
             </div>
           </div>
