@@ -15,6 +15,7 @@ export type Product = {
   sku?: string;
   in_stock?: boolean;
   description_sq?: string;
+  price_eur?: string;
 };
 export async function getProducts(): Promise<Product[]> {
   const { data, error } = await supabase
