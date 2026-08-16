@@ -11,6 +11,8 @@ import AddToCartButton from "../../components/AddToCartButton";
 import ProductDescription from "../../components/ProductDescription";
 import ProductViewEvent from "../../components/ProductViewEvent";
 import PriceDisplay from "../../components/PriceDisplay";
+import ProductFeatures from "../../components/ProductFeatures";
+import OrderHeader from "../../components/OrderHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -85,15 +87,6 @@ export default async function ProductPage({ params }: Props) {
   const product = await getProductBySlug(id);
 
   if (!product) notFound();
-
-  const features = [
-    "Прецизно пасување за овој модел",
-    "Еко гума без мирис",
-    "Лесно чистење со вода",
-    "Долготрајна заштита на подот",
-    "Плаќање при подигање",
-    "Достава низ цела Македонија",
-  ];
 
   return (
     <>
@@ -216,14 +209,7 @@ export default async function ProductPage({ params }: Props) {
                 </span>
               </div>
 
-              <ul className="mt-8 grid grid-cols-2 gap-3">
-                {features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-zinc-300">
-                    <CheckCircle size={15} className="flex-shrink-0 text-red-600" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
+              <ProductFeatures />
 
               <AddToCartButton product={{
                 id: product.id,
@@ -240,18 +226,7 @@ export default async function ProductPage({ params }: Props) {
 
           {/* Order Form */}
           <div id="naracaj" className="mt-20">
-            <div className="mb-8 text-center">
-              <p className="text-xs font-bold uppercase tracking-widest text-red-600">Нарачка</p>
-              <h2 className="mt-2 text-3xl font-black uppercase text-white">
-                Пополни ги деталите
-              </h2>
-              <p className="mt-3 text-zinc-400">
-                Нарачувате:{" "}
-                <span className="font-semibold text-white">{product.title}</span>{" "}
-                —{" "}
-                <PriceDisplay price={product.price} priceEur={product.price_eur} className="font-bold text-red-500" />
-              </p>
-            </div>
+            <OrderHeader productTitle={product.title} price={product.price} priceEur={product.price_eur} />
             <div className="mx-auto max-w-2xl">
               <OrderForm
                 productTitle={product.title}
