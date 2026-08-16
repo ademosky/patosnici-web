@@ -258,6 +258,7 @@ export default async function ProductPage({ params }: Props) {
                 productPrice={product.price}
                 productSku={product.sku}
                 productId={product.id}
+                priceEur={product.price_eur}
               />
             </div>
           </div>
