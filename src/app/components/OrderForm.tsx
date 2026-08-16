@@ -9,10 +9,11 @@ type Props = {
   productPrice: string;
   productSku?: string;
   productId?: number; // used for content_ids in Pixel events
+  priceEur?: string; // optional EUR price
 };
 
-export default function OrderForm({ productTitle, productPrice, productSku, productId }: Props) {
-  const { t } = useLanguage();
+export default function OrderForm({ productTitle, productPrice, productSku, productId, priceEur }: Props) {
+  const { t, currency } = useLanguage();
   const [form, setForm] = useState({ name: "", surname: "", address: "", city: "", phone: "", email: "", note: "" });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -62,7 +63,7 @@ export default function OrderForm({ productTitle, productPrice, productSku, prod
       const res = await fetch("/api/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, productTitle, productPrice, productSku }),
+        body: JSON.stringify({ ...form, productTitle, productPrice, productSku, productPriceEur: priceEur, currency }),
       });
 
       if (res.ok) {
