@@ -14,7 +14,7 @@ type SearchResult = {
 };
 
 export default function BrandSelector() {
-  const { t } = useLanguage();
+  const { t, localizedPath } = useLanguage();
   const [search, setSearch]             = useState("");
   const [results, setResults]           = useState<SearchResult[]>([]);
   const [loading, setLoading]           = useState(false);
@@ -54,7 +54,7 @@ export default function BrandSelector() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (search.trim()) { setShowDropdown(false); router.push(`/products?q=${encodeURIComponent(search.trim())}`); }
+    if (search.trim()) { setShowDropdown(false); router.push(localizedPath(`/products?q=${encodeURIComponent(search.trim())}`)); }
   };
 
   return (
@@ -97,7 +97,7 @@ export default function BrandSelector() {
                   className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-zinc-700 bg-[#141414] shadow-2xl">
                   {results.map((r) => (
                     <button key={r.id} type="button"
-                      onClick={() => { setShowDropdown(false); setSearch(""); router.push(`/products/${r.slug}`); }}
+                      onClick={() => { setShowDropdown(false); setSearch(""); router.push(localizedPath(`/products/${r.slug}`)); }}
                       className="flex w-full items-center gap-4 px-4 py-3 text-left transition hover:bg-zinc-800">
                       <div className="relative h-12 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-zinc-900">
                         {r.image && <Image src={r.image} alt={r.title} fill className="object-cover" unoptimized />}
@@ -110,7 +110,7 @@ export default function BrandSelector() {
                     </button>
                   ))}
                   <button type="button"
-                    onClick={() => { setShowDropdown(false); router.push(`/products?q=${encodeURIComponent(search)}`); }}
+                    onClick={() => { setShowDropdown(false); router.push(localizedPath(`/products?q=${encodeURIComponent(search)}`)); }}
                     className="flex w-full items-center justify-center gap-2 border-t border-zinc-800 py-3 text-sm text-zinc-400 transition hover:bg-zinc-800 hover:text-white">
                     <Search size={14} /> {t("search_show_all")} &quot;{search}&quot;
                   </button>
@@ -130,11 +130,11 @@ export default function BrandSelector() {
         {/* Brand Grid */}
         <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
           {filteredBrands.map((brand) => (
-            <BrandCard key={brand.id} brand={brand} onClick={() => router.push(`/products?brand=${brand.id}`)} />
+            <BrandCard key={brand.id} brand={brand} onClick={() => router.push(localizedPath(`/products?brand=${brand.id}`))} />
           ))}
           {search === "" && (
             <BrandCard brand={{ id: "all", name: t("all"), logo: "" }} isViewAll
-              onClick={() => router.push("/products")} />
+              onClick={() => router.push(localizedPath("/products"))} />
           )}
         </div>
 
