@@ -7,7 +7,7 @@ import { useLanguage } from "../context/LanguageContext";
 import type { Product } from "../data/products";
 
 export default function BestSellers() {
-  const { t } = useLanguage();
+  const { t, localizedPath } = useLanguage();
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function BestSellers() {
             <h2 className="text-4xl font-black uppercase text-white">{t("best_title")}</h2>
             <p className="mt-3 text-zinc-400">{t("best_desc")}</p>
           </div>
-          <Link href="/products"
+          <Link href={localizedPath("/products")}
             className="hidden rounded-xl border border-red-600 px-6 py-3 font-semibold text-white transition hover:bg-red-600 lg:block">
 {t("best_view_all")}
           </Link>
@@ -36,7 +36,7 @@ export default function BestSellers() {
           ))}
         </div>
         <div className="mt-10 text-center lg:hidden">
-          <Link href="/products" className="rounded-xl border border-red-600 px-6 py-3 font-semibold text-white transition hover:bg-red-600">
+          <Link href={localizedPath("/products")} className="rounded-xl border border-red-600 px-6 py-3 font-semibold text-white transition hover:bg-red-600">
 {t("best_view_all")}
           </Link>
         </div>
