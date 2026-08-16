@@ -8,6 +8,7 @@ import { Mail, X } from "lucide-react";
 import Link from "next/link";
 import type { Product } from "../data/products";
 import type { Brand } from "../data/brands";
+import { useLanguage } from "../context/LanguageContext";
 
 type Props = {
   initialProducts: Product[];
@@ -17,6 +18,7 @@ type Props = {
 function ProductsContent({ initialProducts, brands }: Props) {
   const searchParams = useSearchParams();
   const router       = useRouter();
+  const { localizedPath } = useLanguage();
 
   const activeBrand    = searchParams.get("brand")     || "all";
   const activeCarModel = searchParams.get("car_model") || "all";
