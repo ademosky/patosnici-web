@@ -321,7 +321,7 @@ export default function CartPage() {
                   </button>
 
                   <p className="text-center text-xs text-zinc-600">
-                    Плаќање при подигање · 
+                    {t("cart_payment_info")} 
                   </p>
                 </form>
               </div>
