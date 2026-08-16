@@ -109,7 +109,7 @@ export default function AdminPage() {
   const [listSearch, setListSearch] = useState("");
   const [stockFilter, setStockFilter] = useState<"all" | "out_of_stock">("all");
   const [expandedBrands, setExpandedBrands] = useState<Record<string,boolean>>({});
-  const [activeTab, setActiveTab] = useState<"products" | "orders" | "inventory">("products");
+  const [activeTab, setActiveTab] = useState<"products" | "orders" | "inventory">("orders");
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersMonth, setOrdersMonth] = useState(() => new Date().toISOString().slice(0,7));
   const [ordersStatus, setOrdersStatus] = useState("");
@@ -162,7 +162,12 @@ export default function AdminPage() {
 
   useEffect(() => {
     const pw = getPw();
-    if (pw) { setAuthed(true); fetchProducts(pw); }
+    if (pw) {
+      setAuthed(true);
+      fetchProducts(pw);
+      fetchOrders();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchProducts]);
 
   const fetchOrders = async (month = ordersMonth, status = ordersStatus) => {
