@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
               <p style="color: #a1a1aa; margin-bottom: 16px;">${
                 isEur
                   ? "Faleminderit për porosinë tuaj! Porosia do të dorëzohet brenda 5-7 ditë pune. Prisni thirrje nga korrieri."
-                  : "Ви благодариме за нарачката! Ќе ви биде доставена за 5-7 работни дена. Очекувајте повик од карго курирот."
+                  : "Ви благодариме за нарачката! Ќе ви биде доставена за 2-4 работни дена. Очекувајте повик од карго курирот."
               }</p>
 
               <div style="background: #1a1a1a; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
