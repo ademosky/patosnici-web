@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { Currency, formatPrice as formatPriceFn } from "@/lib/pricing";
 
 export type Lang = "mk" | "sq";
@@ -299,25 +300,33 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Lang>("mk");
   const [currency, setCurrency] = useState<Currency>("MKD");
   const [isKs, setIsKs] = useState(false);
+  const pathname = usePathname();
 
+  // Locale is determined SOLELY by the URL path — never by IP, browser
+  // language, cookies, or localStorage. This effect re-runs on every
+  // route change so client-side navigation between / and /ks is handled.
   useEffect(() => {
-    // /ks prefix = Kosovo → locked Albanian + EUR (no toggle)
-    const ks = typeof window !== "undefined" && window.location.pathname.startsWith("/ks");
+    const ks = (pathname || "").startsWith("/ks");
     setIsKs(ks);
 
     if (ks) {
+      // Kosovo → locked Albanian + EUR. URL always wins.
       setLang("sq");
       setCurrency("EUR");
       return;
     }
 
-    // Macedonia → currency is ALWAYS MKD. Language from localStorage (mk or sq).
+    // Macedonia → always MKD currency.
+    // Language: only the manual MK/SHQ toggle preference persists; URL
+    // itself (non-/ks) always means the Macedonian *currency*, never EUR.
     setCurrency("MKD");
     const saved = localStorage.getItem("lang") as Lang;
-    if (saved === "sq") setLang("sq");
-  }, []);
+    setLang(saved === "sq" ? "sq" : "mk");
+  }, [pathname]);
 
   const changeLang = (l: Lang) => {
+    // No language toggle on the Kosovo version — it's URL-locked.
+    if (isKs) return;
     setLang(l);
     localStorage.setItem("lang", l);
     // Both MK and SHQ toggles are for Macedonia → always MKD prices.
