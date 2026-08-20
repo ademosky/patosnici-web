@@ -22,11 +22,16 @@ export const dynamic = "force-dynamic";
 
 const SITE_URL = "https://www.originalpatosnici.com";
 
-// Detect Kosovo locale from the request path (works with /ks rewrites)
+// Detect Kosovo locale — set by src/middleware.ts BEFORE the /ks rewrite.
+// Reliable header instead of x-invoke-path (which Vercel does not populate).
 async function isKsRequest(): Promise<boolean> {
   try {
     const h = await headers();
-    const path = h.get("x-invoke-path") || h.get("x-pathname") || h.get("x-forwarded-uri") || "";
+    const ksHeader = h.get("x-ks-locale");
+    if (ksHeader === "1") return true;
+    if (ksHeader === "0") return false;
+    // Fallback: original path header
+    const path = h.get("x-original-path") || "";
     return path.startsWith("/ks");
   } catch {
     return false;
