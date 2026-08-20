@@ -471,6 +471,16 @@ export default function AdminPage() {
       return { ...prev, images: imgs, image: imgs[0] || "" };
     });
 
+  // Make a specific image the main one (move to front + set as image)
+  const setMainImage = (idx: number) =>
+    setForm((prev) => {
+      const imgs = [...(prev.images || [])];
+      if (idx <= 0 || idx >= imgs.length) return prev;
+      const [chosen] = imgs.splice(idx, 1);
+      imgs.unshift(chosen);
+      return { ...prev, images: imgs, image: chosen };
+    });
+
   const inputClass =
     "w-full rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600";
   const labelClass =
@@ -843,20 +853,30 @@ export default function AdminPage() {
                   )}
                 </label>
                 <p className="mt-1.5 text-center text-xs text-zinc-600">
-                  JPG, PNG, WebP · Автоматски компресира · Прва слика = главна
+                  JPG, PNG, WebP · Автоматски компресира · Кликни слика за главна
                 </p>
 
                 {(form.images || []).length > 0 ? (
                   <div className="mt-4 grid grid-cols-3 gap-2">
                     {(form.images || []).map((img, idx) => (
-                      <div key={idx} className="relative overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900" style={{height:"90px"}}>
+                      <div key={idx}
+                        onClick={() => idx !== 0 && setMainImage(idx)}
+                        title={idx === 0 ? "Главна слика" : "Кликни за главна слика"}
+                        className={`relative cursor-pointer overflow-hidden rounded-xl border bg-zinc-900 transition ${idx === 0 ? "border-red-600 ring-1 ring-red-600" : "border-zinc-700 hover:border-red-500"}`}
+                        style={{height:"90px"}}
+                      >
                         <Image src={img} alt={`slika ${idx+1}`} fill className="object-cover" unoptimized />
                         {idx === 0 && (
                           <div className="absolute left-1 top-1 rounded bg-red-600 px-1.5 py-0.5 text-[9px] font-bold text-white">
                             ГЛАВНА
                           </div>
                         )}
-                        <button type="button" onClick={() => removeImage(idx)}
+                        {idx !== 0 && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition hover:bg-black/40 hover:opacity-100">
+                            <span className="rounded bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white">★ Главна</span>
+                          </div>
+                        )}
+                        <button type="button" onClick={(e) => { e.stopPropagation(); removeImage(idx); }}
                           className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-white transition hover:bg-red-600"
                         >
                           <X size={11} />
