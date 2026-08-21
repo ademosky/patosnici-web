@@ -297,28 +297,37 @@ const LanguageContext = createContext<{
 } | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Lang>("mk");
-  const [currency, setCurrency] = useState<Currency>("MKD");
-  const [isKs, setIsKs] = useState(false);
-  const pathname = usePathname();
+  const pathname = usePathname(); // re-render trigger on navigation
 
-  // Locale is determined SOLELY by the URL path — never by IP, browser
-  // language, cookies, or localStorage. This effect re-runs on every
-  // route change so client-side navigation between / and /ks is handled.
+  // The real browser URL (window.location) is the ONLY source of truth for
+  // locale. usePathname() can return the rewritten destination path (e.g.
+  // /products/... instead of /ks/products/...) under rewrites, so we read
+  // window.location.pathname directly — including for the very first render.
+  const readKs = (): boolean => {
+    if (typeof window === "undefined") return false;
+    const p = window.location.pathname;
+    return p === "/ks" || p.startsWith("/ks/");
+  };
+
+  // Lazy initial state read straight from the URL — correct on first paint,
+  // before any effect or localStorage touches it.
+  const [isKs, setIsKs] = useState<boolean>(readKs);
+  const [lang, setLang] = useState<Lang>(() => (readKs() ? "sq" : "mk"));
+  const [currency, setCurrency] = useState<Currency>(() => (readKs() ? "EUR" : "MKD"));
+
   useEffect(() => {
-    const ks = (pathname || "").startsWith("/ks");
+    const ks = readKs();
     setIsKs(ks);
 
     if (ks) {
-      // Kosovo → locked Albanian + EUR. URL always wins.
+      // Kosovo → locked Albanian + EUR. URL always wins, never overridden.
       setLang("sq");
       setCurrency("EUR");
       return;
     }
 
     // Macedonia → always MKD currency.
-    // Language: only the manual MK/SHQ toggle preference persists; URL
-    // itself (non-/ks) always means the Macedonian *currency*, never EUR.
+    // Language: only the manual MK/SHQ toggle preference persists.
     setCurrency("MKD");
     const saved = localStorage.getItem("lang") as Lang;
     setLang(saved === "sq" ? "sq" : "mk");
