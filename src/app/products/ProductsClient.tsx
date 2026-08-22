@@ -39,16 +39,28 @@ function ProductsContent({ initialProducts, brands }: Props) {
 
   // Филтрирање
   const filtered = useMemo(() => {
-    const q = localSearch.toLowerCase().trim();
+    // Split query into words — every word must match at least one field
+    // (AND across words, OR across fields). Case-insensitive, partial.
+    const words = localSearch.toLowerCase().trim().split(/\s+/).filter(Boolean);
     return initialProducts.filter((p) => {
       const matchBrand  = activeBrand === "all" || p.brand === activeBrand;
       const matchModel  = activeCarModel === "all" || p.car_model === activeCarModel;
-      const matchSearch = !q ||
-        p.title.toLowerCase().includes(q) ||
-        p.model.toLowerCase().includes(q) ||
-        (p.car_model || "").toLowerCase().includes(q) ||
-        p.brand.toLowerCase().includes(q) ||
-        (p.sku || "").toLowerCase().includes(q);
+
+      const haystack = [
+        p.title,
+        p.model,
+        p.car_model,
+        p.brand,
+        p.sku,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      const matchSearch =
+        words.length === 0 ||
+        words.every((w) => haystack.includes(w));
+
       return matchBrand && matchModel && matchSearch;
     });
   }, [activeBrand, activeCarModel, localSearch, initialProducts]);
