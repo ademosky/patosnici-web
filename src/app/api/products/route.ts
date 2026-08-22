@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { normalizeSearchWords, matchesAllWords } from "@/lib/search";
 
 export async function GET(req: NextRequest) {
   const q     = req.nextUrl.searchParams.get("q")     || "";
@@ -7,7 +8,7 @@ export async function GET(req: NextRequest) {
 
   // Split the query into words so "mercedes c" matches
   // "MERCEDES (W204) C-KLASSE" (each word is matched independently).
-  const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const words = normalizeSearchWords(q);
 
   let query = supabase
     .from("products")
@@ -37,14 +38,14 @@ export async function GET(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   // JS AND-filter: every search word must appear in at least one field.
+  // Normalizes hyphens/parens so "C-KLASSE" matches "c klasse", etc.
   let results = data ?? [];
   if (words.length > 0) {
     results = results.filter((p) => {
       const haystack = [p.title, p.model, p.car_model, p.brand, p.sku]
         .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-      return words.every((w) => haystack.includes(w));
+        .join(" ");
+      return matchesAllWords(haystack, q);
     });
   }
 
