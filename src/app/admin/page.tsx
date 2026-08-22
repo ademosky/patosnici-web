@@ -10,7 +10,7 @@ import { getEurValue } from "@/lib/pricing";
 import {
   Lock, Plus, Trash2, LogOut, Package, ShoppingCart, Warehouse,
   CheckCircle, AlertCircle, Loader2, Pencil,
-  X, Upload, ImageIcon, Phone, Mail as MailIcon, Clock, Minus,
+  X, Upload, ImageIcon, Phone, Mail as MailIcon, Clock, Minus, Download,
 } from "lucide-react";
 
 type Product = {
@@ -230,6 +230,34 @@ export default function AdminPage() {
       showToast("Грешка при ажурирање", false);
     }
     setEditSaving(false);
+  };
+
+  const exportOrders = async () => {
+    const pw = getPw();
+    if (!pw) return;
+    const params = new URLSearchParams();
+    if (ordersMonth) params.set("month", ordersMonth);
+    try {
+      const res = await fetch(`/api/admin/orders/export?${params}`, {
+        headers: { "x-admin-password": pw },
+      });
+      if (!res.ok) {
+        showToast("Грешка при експорт", false);
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `naracki-${ordersMonth || "site"}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast("Експортот е подготвен", true);
+    } catch {
+      showToast("Грешка при експорт", false);
+    }
   };
 
   const deleteOrder = async (id: number) => {
@@ -1203,6 +1231,15 @@ export default function AdminPage() {
                     </button>
                   ))}
                 </div>
+
+                {/* Export button */}
+                <button
+                  onClick={exportOrders}
+                  className="ml-auto flex items-center gap-2 rounded-xl border border-zinc-700 px-4 py-2 text-xs font-bold text-zinc-400 transition hover:border-green-600 hover:text-white"
+                  title="Експортирај ги нарачките за овој месец во Excel"
+                >
+                  <Download size={14} /> Експорт
+                </button>
               </div>
             </div>
           </div>
