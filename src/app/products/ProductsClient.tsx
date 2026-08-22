@@ -9,6 +9,7 @@ import Link from "next/link";
 import type { Product } from "../data/products";
 import type { Brand } from "../data/brands";
 import { useLanguage } from "../context/LanguageContext";
+import { matchesAllWords } from "@/lib/search";
 
 type Props = {
   initialProducts: Product[];
@@ -46,20 +47,12 @@ function ProductsContent({ initialProducts, brands }: Props) {
       const matchBrand  = activeBrand === "all" || p.brand === activeBrand;
       const matchModel  = activeCarModel === "all" || p.car_model === activeCarModel;
 
-      const haystack = [
-        p.title,
-        p.model,
-        p.car_model,
-        p.brand,
-        p.sku,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-
       const matchSearch =
         words.length === 0 ||
-        words.every((w) => haystack.includes(w));
+        matchesAllWords(
+          [p.title, p.model, p.car_model, p.brand, p.sku].filter(Boolean).join(" "),
+          localSearch
+        );
 
       return matchBrand && matchModel && matchSearch;
     });
