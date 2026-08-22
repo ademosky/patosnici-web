@@ -1501,6 +1501,22 @@ export default function AdminPage() {
                   className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-3 py-3 text-center text-sm text-white outline-none transition focus:border-red-600"
                 />
               </div>
+              {/* SKU lookup result */}
+              {invSkuResult && (
+                invSkuResult.found ? (
+                  <div className="flex items-center gap-2 rounded-xl border border-green-800 bg-green-950/20 px-3 py-2">
+                    <CheckCircle size={14} className="text-green-500" />
+                    <span className="truncate text-sm font-semibold text-green-400">{invSkuResult.title}</span>
+                    <span className="ml-auto shrink-0 font-mono text-xs text-zinc-500">({invSkuResult.sku})</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 rounded-xl border border-red-800 bg-red-950/20 px-3 py-2">
+                    <AlertCircle size={14} className="text-red-500" />
+                    <span className="text-sm font-semibold text-red-400">Производот не е пронајден</span>
+                  </div>
+                )
+              )}
+
               {/* Row 2: Name + Submit */}
               <div className="grid grid-cols-[1fr_auto] gap-2">
                 <input
