@@ -136,6 +136,7 @@ export default function AdminPage() {
   const [inventory, setInventory]       = useState<InvItem[]>([]);
   const [invLoading, setInvLoading]     = useState(false);
   const [invForm, setInvForm]           = useState({ sku: "", name: "", quantity: "1" });
+  const [invSkuResult, setInvSkuResult] = useState<null | { found: boolean; title?: string; sku?: string }>(null);
   const [invError, setInvError]         = useState("");
   const [invAdding, setInvAdding]       = useState(false);
   const [invSearch, setInvSearch]       = useState("");
@@ -311,6 +312,25 @@ export default function AdminPage() {
       setInvError(d.error || "Грешка");
     }
     setInvAdding(false);
+  };
+
+  // Auto-search product by SKU as the admin types
+  const lookupInvSku = (sku: string) => {
+    const s = sku.trim().toLowerCase();
+    if (!s) {
+      setInvSkuResult(null);
+      return;
+    }
+    const found = products.find(
+      (p) => p.sku && p.sku.toLowerCase() === s
+    );
+    if (found) {
+      setInvSkuResult({ found: true, title: found.title, sku: found.sku });
+      // Auto-fill name field with the product title
+      setInvForm((prev) => ({ ...prev, name: found.title }));
+    } else {
+      setInvSkuResult({ found: false });
+    }
   };
 
   const deleteInvItem = async (id: number) => {
@@ -1466,7 +1486,10 @@ export default function AdminPage() {
                   required
                   placeholder="SKU број *"
                   value={invForm.sku}
-                  onChange={(e) => setInvForm((p) => ({ ...p, sku: e.target.value }))}
+                  onChange={(e) => {
+                    setInvForm((p) => ({ ...p, sku: e.target.value }));
+                    lookupInvSku(e.target.value);
+                  }}
                   className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600"
                 />
                 <input
