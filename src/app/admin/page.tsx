@@ -1189,7 +1189,7 @@ export default function AdminPage() {
                     { v: "sent",       label: "✅ Испратени" },
                   ].map(({ v, label }) => (
                     <button key={v}
-                      onClick={() => { setOrdersStatus(v); fetchOrders(ordersMonth, v); }}
+                      onClick={() => setOrdersStatus(v)}
                       className={`rounded-lg px-2.5 py-1.5 text-xs font-bold uppercase transition ${
                         ordersStatus === v
                           ? "bg-red-600 text-white"
@@ -1239,6 +1239,7 @@ export default function AdminPage() {
           ) : (
             <div className="space-y-4">
               {orders
+                .filter((order) => !ordersStatus || order.status === ordersStatus)
                 .filter((order) =>
                   !ordersSearch ||
                   `${order.name} ${order.surname}`.toLowerCase().includes(ordersSearch.toLowerCase()) ||
