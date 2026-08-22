@@ -1145,7 +1145,7 @@ export default function AdminPage() {
                       const [y,m] = ordersMonth.split("-").map(Number);
                       const d = new Date(y, m-2, 1);
                       const nm = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
-                      setOrdersMonth(nm); fetchOrders(nm, ordersStatus);
+                      setOrdersMonth(nm); setOrdersStatus(""); fetchOrders(nm);
                     }}
                     className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white"
                     title="Претходен месец"
@@ -1161,7 +1161,7 @@ export default function AdminPage() {
                       const [y,m] = ordersMonth.split("-").map(Number);
                       const d = new Date(y, m, 1);
                       const nm = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
-                      setOrdersMonth(nm); fetchOrders(nm, ordersStatus);
+                      setOrdersMonth(nm); setOrdersStatus(""); fetchOrders(nm);
                     }}
                     className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white"
                     title="Следен месец"
