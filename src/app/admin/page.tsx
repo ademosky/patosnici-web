@@ -118,6 +118,8 @@ export default function AdminPage() {
   const [ordersMonth, setOrdersMonth] = useState(() => new Date().toISOString().slice(0,7));
   const [ordersStatus, setOrdersStatus] = useState("");
   const [ordersSearch, setOrdersSearch] = useState("");
+  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
+  const [editSaving, setEditSaving] = useState(false);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [showManualForm, setShowManualForm] = useState(false);
   const [manualForm, setManualForm] = useState({
@@ -195,6 +197,39 @@ export default function AdminPage() {
       body: JSON.stringify({ status }),
     });
     if (res.ok) fetchOrders();
+  };
+
+  const openEditOrder = (order: Order) => {
+    setEditingOrder({ ...order, items: order.items ? order.items.map((i) => ({ ...i })) : undefined });
+  };
+
+  const closeEditOrder = () => setEditingOrder(null);
+
+  const updateEditingItem = (idx: number, key: string, value: string | number) => {
+    setEditingOrder((prev) => {
+      if (!prev || !prev.items) return prev;
+      const items = prev.items.map((it, i) => (i === idx ? { ...it, [key]: value } : it));
+      return { ...prev, items };
+    });
+  };
+
+  const saveOrderEdit = async () => {
+    if (!editingOrder) return;
+    setEditSaving(true);
+    const res = await fetch(`/api/admin/orders/${editingOrder.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", "x-admin-password": getPw() },
+      body: JSON.stringify(editingOrder),
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setOrders((prev) => prev.map((o) => (o.id === updated.id ? updated : o)));
+      setEditingOrder(null);
+      showToast("Нарачката е ажурирана", true);
+    } else {
+      showToast("Грешка при ажурирање", false);
+    }
+    setEditSaving(false);
   };
 
   const deleteOrder = async (id: number) => {
@@ -1234,7 +1269,7 @@ export default function AdminPage() {
                     </div>
 
                     {/* Status buttons */}
-                    <div className="grid grid-cols-3 gap-2 sm:flex sm:gap-2">
+                    <div className="grid grid-cols-4 gap-2 sm:flex sm:gap-2">
                       <button
                         onClick={() => updateOrderStatus(order.id, "in_process")}
                         disabled={order.status === "in_process"}
@@ -1248,6 +1283,13 @@ export default function AdminPage() {
                         className="rounded-xl border border-green-700 px-3 py-2.5 sm:py-1.5 text-xs font-semibold text-green-400 transition hover:bg-green-600/20 disabled:opacity-40 active:bg-green-600/30"
                       >
                         ✅ Испратена
+                      </button>
+                      <button
+                        onClick={() => openEditOrder(order)}
+                        className="rounded-xl border border-zinc-600 px-3 py-2.5 sm:py-1.5 text-xs font-semibold text-zinc-300 transition hover:bg-zinc-700/40 active:bg-zinc-700"
+                        title="Уреди нарачка"
+                      >
+                        <Pencil size={13} className="inline" />
                       </button>
                       <button
                         onClick={() => deleteOrder(order.id)}
