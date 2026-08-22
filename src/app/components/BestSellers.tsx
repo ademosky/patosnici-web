@@ -11,7 +11,7 @@ export default function BestSellers() {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    fetch("/api/products?limit=4")
+    fetch("/api/best-sellers")
       .then((r) => r.json())
       .then((data) => setProducts(Array.isArray(data) ? data.slice(0, 4) : []))
       .catch(() => {});
