@@ -1352,6 +1352,94 @@ export default function AdminPage() {
         </div>
       )}
 
+      {/* ── ЕДИТ НАРАЧКА МОДАЛ ── */}
+      {editingOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={closeEditOrder}>
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-zinc-700 bg-[#111] p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-5 flex items-center justify-between">
+              <h3 className="text-lg font-black uppercase text-white">
+                <Pencil size={16} className="mr-2 inline text-red-500" />
+                Уреди нарачка #{editingOrder.id}
+              </h3>
+              <button onClick={closeEditOrder} className="flex h-8 w-8 items-center justify-center rounded-xl border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white">
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Customer info */}
+            <p className="mb-2 text-xs font-bold uppercase tracking-wider text-zinc-500">Купувач</p>
+            <div className="grid grid-cols-2 gap-2">
+              <input value={editingOrder.name} onChange={(e) => setEditingOrder((p) => p ? { ...p, name: e.target.value } : p)}
+                placeholder="Ime" className={inputClass} />
+              <input value={editingOrder.surname} onChange={(e) => setEditingOrder((p) => p ? { ...p, surname: e.target.value } : p)}
+                placeholder="Prezime" className={inputClass} />
+              <input value={editingOrder.address} onChange={(e) => setEditingOrder((p) => p ? { ...p, address: e.target.value } : p)}
+                placeholder="Adresa" className={inputClass} />
+              <input value={editingOrder.city} onChange={(e) => setEditingOrder((p) => p ? { ...p, city: e.target.value } : p)}
+                placeholder="Grad" className={inputClass} />
+              <input value={editingOrder.phone} onChange={(e) => setEditingOrder((p) => p ? { ...p, phone: e.target.value } : p)}
+                placeholder="Telefon" className={inputClass} />
+              <input value={editingOrder.email || ""} onChange={(e) => setEditingOrder((p) => p ? { ...p, email: e.target.value } : p)}
+                placeholder="Email" className={inputClass} />
+            </div>
+
+            {/* Products — cart order vs single product */}
+            <p className="mb-2 mt-5 text-xs font-bold uppercase tracking-wider text-zinc-500">Производи</p>
+            {editingOrder.items && editingOrder.items.length > 0 ? (
+              <div className="space-y-2">
+                {editingOrder.items.map((item, idx) => (
+                  <div key={idx} className="grid grid-cols-[1fr_90px_70px] gap-2">
+                    <input value={item.title} onChange={(e) => updateEditingItem(idx, "title", e.target.value)}
+                      className={inputClass} placeholder="Назив" />
+                    <input value={item.price} onChange={(e) => updateEditingItem(idx, "price", e.target.value)}
+                      className={inputClass} placeholder="Цена" />
+                    <input type="number" value={item.quantity} onChange={(e) => updateEditingItem(idx, "quantity", parseInt(e.target.value) || 0)}
+                      className={inputClass} placeholder="Кол." />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-[1fr_120px] gap-2">
+                <input value={editingOrder.product_title || ""} onChange={(e) => setEditingOrder((p) => p ? { ...p, product_title: e.target.value } : p)}
+                  className={inputClass} placeholder="Назив на производот" />
+                <input value={editingOrder.product_price || ""} onChange={(e) => setEditingOrder((p) => p ? { ...p, product_price: e.target.value } : p)}
+                  className={inputClass} placeholder="Цена" />
+              </div>
+            )}
+
+            {/* Note + Status */}
+            <div className="mt-5 grid gap-2 sm:grid-cols-2">
+              <div>
+                <label className={labelClass}>Напомена</label>
+                <textarea value={editingOrder.note || ""} onChange={(e) => setEditingOrder((p) => p ? { ...p, note: e.target.value } : p)}
+                  rows={2} className="w-full resize-none rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2 text-sm text-white outline-none transition focus:border-red-600" />
+              </div>
+              <div>
+                <label className={labelClass}>Статус</label>
+                <select value={editingOrder.status} onChange={(e) => setEditingOrder((p) => p ? { ...p, status: e.target.value as Order["status"] } : p)}
+                  className={inputClass}>
+                  <option value="new">🆕 Нова</option>
+                  <option value="in_process">⚙️ Во процес</option>
+                  <option value="sent">✅ Испратена</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Save / Cancel */}
+            <div className="mt-6 flex gap-2">
+              <button onClick={saveOrderEdit} disabled={editSaving}
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-bold text-white transition hover:bg-red-700 disabled:opacity-60">
+                {editSaving ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
+                Зачувај
+              </button>
+              <button onClick={closeEditOrder}
+                className="rounded-xl border border-zinc-700 px-5 py-3 text-sm text-zinc-400 transition hover:border-red-600 hover:text-white">
+                Откажи
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── ЗАЛИХА ТАБ ── */}
       {activeTab === "inventory" && (
