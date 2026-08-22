@@ -6,8 +6,6 @@ export async function GET(req: NextRequest) {
   const q     = req.nextUrl.searchParams.get("q")     || "";
   const brand = req.nextUrl.searchParams.get("brand") || "";
 
-  // Split the query into words so "mercedes c" matches
-  // "MERCEDES (W204) C-KLASSE" (each word is matched independently).
   const words = normalizeSearchWords(q);
 
   let query = supabase
@@ -19,26 +17,16 @@ export async function GET(req: NextRequest) {
     query = query.eq("brand", brand);
   }
 
-  // Broad OR match on ANY word (Supabase) — we narrow to ALL words in JS below.
-  if (words.length > 0) {
-    query = query.or(
-      words
-        .map((w) =>
-          `title.ilike.%${w}%,model.ilike.%${w}%,car_model.ilike.%${w}%,brand.ilike.%${w}%,sku.ilike.%${w}%`
-        )
-        .join(",")
-    );
-  }
-
   const limitParam = parseInt(req.nextUrl.searchParams.get("limit") || "20");
-  // Fetch a larger candidate set, then narrow — ensures multi-word results
-  // aren't lost before the JS AND-filter.
-  const { data, error } = await query.limit(Math.max(limitParam, 100));
+
+  // Fetch ALL products (table is small, ~570 rows). Filtering entirely in JS
+  // avoids Supabase's broad OR-match problem where a short word like "5"
+  // matches hundreds of products and pushes the real match past .limit().
+  const { data, error } = await query.limit(1000);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // JS AND-filter: every search word must appear in at least one field.
-  // Normalizes hyphens/parens so "C-KLASSE" matches "c klasse", etc.
+  // Multi-word AND filter: every search word must appear in at least one field.
   let results = data ?? [];
   if (words.length > 0) {
     results = results.filter((p) => {
