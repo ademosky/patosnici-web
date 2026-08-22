@@ -177,13 +177,12 @@ export default function AdminPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchProducts]);
 
-  const fetchOrders = async (month = ordersMonth, status = ordersStatus) => {
+  const fetchOrders = async (month = ordersMonth) => {
     const pw = getPw();
     if (!pw) return;
     setOrdersLoading(true);
     const params = new URLSearchParams();
     if (month) params.set("month", month);
-    if (status) params.set("status", status);
     const res = await fetch(`/api/admin/orders?${params}`, {
       headers: { "x-admin-password": pw },
     });
