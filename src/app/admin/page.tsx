@@ -1328,18 +1328,8 @@ export default function AdminPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {orders
+              {dayFilteredOrders
                 .filter((order) => !ordersStatus || order.status === ordersStatus)
-                .filter((order) => {
-                  if (!ordersDay) return true;
-                  if (!order.created_at) return false;
-                  return skopjeDate(order.created_at) === ordersDay;
-                })
-                .filter((order) => {
-                  if (!ordersCurrency) return true;
-                  const cur = order.currency || "MKD";
-                  return cur === ordersCurrency;
-                })
                 .filter((order) =>
                   !ordersSearch ||
                   `${order.name} ${order.surname}`.toLowerCase().includes(ordersSearch.toLowerCase()) ||
