@@ -1299,19 +1299,19 @@ export default function AdminPage() {
           </div>
 
           {/* ── Summary card ── */}
-          {!ordersLoading && orders.length > 0 && (
+          {!ordersLoading && dayFilteredOrders.length > 0 && (
             <div className="mb-4 grid gap-2 sm:grid-cols-3">
               <div className="rounded-xl border border-zinc-800 bg-[#111] px-4 py-3 text-center">
                 <p className="text-xs text-zinc-500 uppercase tracking-wider">Вкупно нарачки</p>
-                <p className="mt-1 text-2xl font-black text-white">{orders.length}</p>
+                <p className="mt-1 text-2xl font-black text-white">{dayFilteredOrders.length}</p>
               </div>
               <div className="rounded-xl border border-zinc-800 bg-[#111] px-4 py-3 text-center">
                 <p className="text-xs text-zinc-500 uppercase tracking-wider">Нови</p>
-                <p className="mt-1 text-2xl font-black text-yellow-400">{orders.filter(o => o.status === "new").length}</p>
+                <p className="mt-1 text-2xl font-black text-yellow-400">{dayFilteredOrders.filter(o => o.status === "new").length}</p>
               </div>
               <div className="rounded-xl border border-zinc-800 bg-[#111] px-4 py-3 text-center">
                 <p className="text-xs text-zinc-500 uppercase tracking-wider">Испратени</p>
-                <p className="mt-1 text-2xl font-black text-green-400">{orders.filter(o => o.status === "sent").length}</p>
+                <p className="mt-1 text-2xl font-black text-green-400">{dayFilteredOrders.filter(o => o.status === "sent").length}</p>
               </div>
             </div>
           )}
