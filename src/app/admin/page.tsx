@@ -1286,6 +1286,17 @@ export default function AdminPage() {
                   ))}
                 </div>
 
+                {/* Reset all filters */}
+                {(ordersDay || ordersCurrency || ordersStatus || ordersSearch) && (
+                  <button
+                    onClick={() => { setOrdersDay(""); setOrdersCurrency(""); setOrdersStatus(""); setOrdersSearch(""); }}
+                    className="flex items-center gap-1.5 rounded-lg border border-red-700/60 px-3 py-1.5 text-xs font-bold text-red-400 transition hover:bg-red-600/20 hover:text-white"
+                    title="Врати се на сите нарачки"
+                  >
+                    <X size={12} /> Врати на сите
+                  </button>
+                )}
+
                 {/* Export button */}
                 <button
                   onClick={exportOrders}
