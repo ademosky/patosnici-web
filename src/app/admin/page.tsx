@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { brands } from "../data/brands";
@@ -131,6 +131,20 @@ export default function AdminPage() {
   const [ordersStatus, setOrdersStatus] = useState("");
   const [ordersDay, setOrdersDay] = useState("");
   const [ordersCurrency, setOrdersCurrency] = useState("");
+
+  // Orders filtered by day + currency. Status and search are applied on top
+  // of this in the list; the status counters + summary card use this so they
+  // always reflect only the selected day/currency, not the whole month.
+  const dayFilteredOrders = useMemo(() => {
+    return orders.filter((order) => {
+      if (ordersDay && (!order.created_at || skopjeDate(order.created_at) !== ordersDay)) return false;
+      if (ordersCurrency) {
+        const cur = order.currency || "MKD";
+        if (cur !== ordersCurrency) return false;
+      }
+      return true;
+    });
+  }, [orders, ordersDay, ordersCurrency]);
   const [ordersSearch, setOrdersSearch] = useState("");
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [editSaving, setEditSaving] = useState(false);
