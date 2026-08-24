@@ -1286,26 +1286,6 @@ export default function AdminPage() {
                   ))}
                 </div>
 
-                {/* Reset all filters — always rendered (reserves space) so it
-                    never shifts the other filters when it becomes visible */}
-                {(() => {
-                  const active = !!(ordersDay || ordersCurrency || ordersStatus || ordersSearch);
-                  return (
-                    <button
-                      onClick={() => { setOrdersDay(""); setOrdersCurrency(""); setOrdersStatus(""); setOrdersSearch(""); }}
-                      disabled={!active}
-                      className={`flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold transition ${
-                        active
-                          ? "border-red-700/60 text-red-400 hover:bg-red-600/20 hover:text-white"
-                          : "invisible border-transparent"
-                      }`}
-                      title="Врати се на сите нарачки"
-                    >
-                      <X size={12} /> Врати на сите
-                    </button>
-                  );
-                })()}
-
                 {/* Export button */}
                 <button
                   onClick={exportOrders}
