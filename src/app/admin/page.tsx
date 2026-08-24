@@ -117,6 +117,8 @@ export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersMonth, setOrdersMonth] = useState(() => new Date().toISOString().slice(0,7));
   const [ordersStatus, setOrdersStatus] = useState("");
+  const [ordersDay, setOrdersDay] = useState("");
+  const [ordersCurrency, setOrdersCurrency] = useState("");
   const [ordersSearch, setOrdersSearch] = useState("");
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [editSaving, setEditSaving] = useState(false);
