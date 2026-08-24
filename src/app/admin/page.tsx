@@ -1192,6 +1192,17 @@ export default function AdminPage() {
                   <span className="rounded-full bg-zinc-800 px-3 py-0.5 text-xs text-zinc-400">
                     {orders.length}
                   </span>
+                  {/* Back to All Orders — lives here (title row), fully separate
+                      from the status/filter buttons below so it never shifts them */}
+                  {(ordersDay || ordersCurrency || ordersStatus || ordersSearch) && (
+                    <button
+                      onClick={() => { setOrdersDay(""); setOrdersCurrency(""); setOrdersStatus(""); setOrdersSearch(""); }}
+                      className="flex shrink-0 items-center gap-1.5 rounded-lg border border-red-700/60 px-3 py-1.5 text-xs font-bold text-red-400 transition hover:bg-red-600/20 hover:text-white"
+                      title="Врати се на сите нарачки"
+                    >
+                      <X size={12} /> Врати на сите
+                    </button>
+                  )}
                 </div>
 
                 {/* Month navigation — prev/next + current month */}
