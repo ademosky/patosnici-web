@@ -1251,11 +1251,9 @@ export default function AdminPage() {
                           : "border border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-white"
                       }`}>
                       {label}
-                      {v !== "" && (
-                        <span className="ml-1 opacity-60">
-                          ({orders.filter(o => o.status === v).length})
-                        </span>
-                      )}
+                      <span className={`ml-1 ${ordersStatus === v ? "" : "opacity-60"}`}>
+                        ({v === "" ? dayFilteredOrders.length : dayFilteredOrders.filter(o => o.status === v).length})
+                      </span>
                     </button>
                   ))}
                 </div>
