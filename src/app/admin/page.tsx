@@ -1306,6 +1306,16 @@ export default function AdminPage() {
             <div className="space-y-4">
               {orders
                 .filter((order) => !ordersStatus || order.status === ordersStatus)
+                .filter((order) => {
+                  if (!ordersDay) return true;
+                  const d = order.created_at ? String(order.created_at).slice(0, 10) : "";
+                  return d === ordersDay;
+                })
+                .filter((order) => {
+                  if (!ordersCurrency) return true;
+                  const cur = order.currency || "MKD";
+                  return cur === ordersCurrency;
+                })
                 .filter((order) =>
                   !ordersSearch ||
                   `${order.name} ${order.surname}`.toLowerCase().includes(ordersSearch.toLowerCase()) ||
