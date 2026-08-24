@@ -1234,6 +1234,34 @@ export default function AdminPage() {
                   ))}
                 </div>
 
+                {/* Day filter */}
+                <input
+                  type="date"
+                  value={ordersDay}
+                  onChange={(e) => setOrdersDay(e.target.value)}
+                  className="rounded-lg border border-zinc-700 bg-[#1a1a1a] px-2.5 py-1.5 text-sm text-white outline-none transition focus:border-red-600"
+                  title="Филтрирај по ден"
+                />
+
+                {/* Market/currency filter */}
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { v: "",    label: "🌐 Сите" },
+                    { v: "MKD", label: "🇲🇰 МКД" },
+                    { v: "EUR", label: "🇽🇰 ЕУР" },
+                  ].map(({ v, label }) => (
+                    <button key={v}
+                      onClick={() => setOrdersCurrency(v)}
+                      className={`rounded-lg px-2.5 py-1.5 text-xs font-bold uppercase transition ${
+                        ordersCurrency === v
+                          ? "bg-red-600 text-white"
+                          : "border border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-white"
+                      }`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
                 {/* Export button */}
                 <button
                   onClick={exportOrders}
