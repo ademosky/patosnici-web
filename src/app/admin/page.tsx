@@ -49,6 +49,18 @@ type Order = {
   currency?: string;
 };
 
+// Convert an ISO timestamp to the user's local calendar date (Europe/Skopje).
+// created_at is stored as UTC (+00:00); slicing the string gives the UTC date,
+// which is off by one day for evening orders. This returns the true local date.
+function skopjeDate(iso: string): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Skopje",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(iso));
+}
+
 const EMPTY_FORM = {
   title: "", brand: "", car_model: "", model: "", year: "",
   price: "", image: "", description: "", description_sq: "", sku: "", images: [] as string[], in_stock: true,
@@ -1308,8 +1320,8 @@ export default function AdminPage() {
                 .filter((order) => !ordersStatus || order.status === ordersStatus)
                 .filter((order) => {
                   if (!ordersDay) return true;
-                  const d = order.created_at ? String(order.created_at).slice(0, 10) : "";
-                  return d === ordersDay;
+                  if (!order.created_at) return false;
+                  return skopjeDate(order.created_at) === ordersDay;
                 })
                 .filter((order) => {
                   if (!ordersCurrency) return true;
