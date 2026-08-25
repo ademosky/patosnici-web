@@ -15,7 +15,7 @@ export async function PUT(
   const { id } = await params;
   const body = await req.json();
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin()
     .from("products")
     .update({
       title: body.title,
@@ -49,7 +49,7 @@ export async function DELETE(
 
   const { id } = await params;
 
-  const { error } = await supabase
+  const { error } = await supabaseAdmin()
     .from("products")
     .delete()
     .eq("id", parseInt(id));
