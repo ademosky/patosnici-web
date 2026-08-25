@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   if (!checkAuth(req))
     return NextResponse.json({ error: "Неовластен пристап" }, { status: 401 });
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin()
     .from("inventory")
     .select("*")
     .order("created_at", { ascending: false });
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   if (!sku || !name)
     return NextResponse.json({ error: "SKU и Име се задолжителни" }, { status: 400 });
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin()
     .from("inventory")
     .insert({ sku: sku.trim(), name: name.trim(), quantity: Number(quantity) || 1 })
     .select()
