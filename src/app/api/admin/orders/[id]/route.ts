@@ -28,7 +28,7 @@ export async function PATCH(
   }
   if (body.items !== undefined) update["items"] = body.items;
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin()
     .from("orders")
     .update(update)
     .eq("id", parseInt(id))
@@ -49,7 +49,7 @@ export async function DELETE(
 
   const { id } = await params;
 
-  const { error } = await supabase
+  const { error } = await supabaseAdmin()
     .from("orders")
     .delete()
     .eq("id", parseInt(id));
