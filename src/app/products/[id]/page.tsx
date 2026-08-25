@@ -68,7 +68,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // ── OG image — product image if absolute URL, else fallback to logo
   const ogImage = product.image?.startsWith("http")
     ? product.image
-    : `${SITE_URL}/images/logo.png`;
+    : `${SITE_URL}/images/logo.webp`;
 
   return {
     title,
