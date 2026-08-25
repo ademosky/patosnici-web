@@ -7,6 +7,8 @@ import { createClient } from "@supabase/supabase-js";
  * in admin API route handlers (which already require the x-admin-password
  * header). It is never imported by client components, and the key itself must
  * never be exposed to the browser (do NOT prefix it with NEXT_PUBLIC_).
+ *
+ * (Redeploy marker v2)
  */
 export const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
