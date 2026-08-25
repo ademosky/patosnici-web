@@ -499,6 +499,10 @@ export default function AdminPage() {
       sessionStorage.setItem("adminPw", password);
       setAuthed(true);
       setProducts(await res.json());
+      // Also load orders + inventory on first login (the mount effect only
+      // runs once, before sessionStorage has the password).
+      fetchOrders();
+      fetchInventory();
     } else {
       setAuthError("Погрешна лозинка!");
     }
