@@ -13,7 +13,7 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-6 py-16">
         <div className="grid gap-12 md:grid-cols-3">
           <div>
-            <Image src="/images/logo.png" alt="Original Patosnici" width={240} height={80} className="h-auto w-[190px]" />
+            <Image src="/images/logo.webp" alt="Original Patosnici" width={240} height={80} className="h-auto w-[190px]" />
             <p className="mt-5 text-sm leading-7 text-zinc-400">{t("footer_desc")}</p>
             <div className="mt-6 flex items-center gap-3">
               <a href="https://www.facebook.com/patosnici" target="_blank" rel="noopener noreferrer"
