@@ -21,7 +21,7 @@ const dmSans = DM_Sans({
 });
 
 const SITE_URL = "https://www.originalpatosnici.com";
-const OG_IMAGE = `${SITE_URL}/images/logo.png`;
+const OG_IMAGE = `${SITE_URL}/images/logo.webp`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
