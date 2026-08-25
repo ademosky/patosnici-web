@@ -33,7 +33,6 @@ export default function Hero() {
             priority
             fetchPriority="high"
             sizes="(max-width: 1024px) 100vw, 50vw"
-            unoptimized={false}
             className="object-cover object-center"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#0b0b0b] via-transparent to-transparent" />
