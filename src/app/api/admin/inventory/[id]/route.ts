@@ -13,7 +13,7 @@ export async function DELETE(
     return NextResponse.json({ error: "Неовластен пристап" }, { status: 401 });
 
   const { id } = await params;
-  const { error } = await supabase
+  const { error } = await supabaseAdmin()
     .from("inventory")
     .delete()
     .eq("id", parseInt(id));
@@ -32,7 +32,7 @@ export async function PATCH(
   const { id } = await params;
   const { quantity } = await req.json();
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin()
     .from("inventory")
     .update({ quantity: Number(quantity) })
     .eq("id", parseInt(id))
