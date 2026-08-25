@@ -15,7 +15,7 @@ export async function GET() {
     .select("product_sku, product_title, items")
     .eq("status", "sent");
 
-  if (error) return NextResponse.json([], { status: 500 });
+  if (error) return NextResponse.json({ error: error.message, code: error.code, hint: error.hint }, { status: 500 });
 
   // Count sales per product key (sku preferred, title fallback)
   const counts = new Map<string, number>();
@@ -44,7 +44,7 @@ export async function GET() {
     .from("products")
     .select("*");
 
-  if (prodErr) return NextResponse.json([], { status: 500 });
+  if (prodErr) return NextResponse.json({ error: prodErr.message, code: prodErr.code }, { status: 500 });
 
   const ordered = topKeys
     .map((key) =>
