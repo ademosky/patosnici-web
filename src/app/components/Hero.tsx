@@ -27,7 +27,7 @@ export default function Hero() {
         </div>
         <div className="relative h-[520px]">
           <Image
-            src="/images/hero-bg.png"
+            src="/images/hero-bg.webp"
             alt="Original Patosnici"
             fill
             priority
