@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   if (!checkAuth(req))
     return NextResponse.json({ error: "Неовластен пристап" }, { status: 401 });
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin()
     .from("products")
     .select("*")
     .order("created_at", { ascending: true });
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   .replace(/-+/g, "-");
 const slug = `${baseSlug}-${Date.now()}`;
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin()
     .from("products")
     .insert([{
       slug,
