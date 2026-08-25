@@ -17,7 +17,7 @@ export default function Header() {
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
 
         <Link href={localizedPath("/")} className="flex-shrink-0">
-          <Image src="/images/logo.png" alt="Original Patosnici" width={300} height={100} priority fetchPriority="high" unoptimized={false} className="h-auto w-[220px]" />
+          <Image src="/images/logo.webp" alt="Original Patosnici" width={300} height={100} priority fetchPriority="high" unoptimized={false} className="h-auto w-[220px]" />
         </Link>
 
         {/* Desktop nav */}
