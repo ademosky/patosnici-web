@@ -41,7 +41,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     <article className="group overflow-hidden rounded-2xl border border-zinc-800 bg-[#141414] transition-all duration-300 hover:-translate-y-2 hover:border-red-600 hover:shadow-[0_10px_35px_rgba(220,38,38,0.20)]">
       <Link href={localizedPath(`/products/${product.slug}`)} className="block">
         <div className="relative h-64 overflow-hidden bg-black">
-          <Image src={product.image} alt={product.title} fill priority className={`object-cover transition-transform duration-500 group-hover:scale-105 ${product.in_stock === false ? "opacity-50" : ""}`} />
+          <Image src={product.image} alt={product.title} fill sizes="(max-width: 768px) 50vw, 25vw" loading="lazy" className={`object-cover transition-transform duration-500 group-hover:scale-105 ${product.in_stock === false ? "opacity-50" : ""}`} />
           {product.in_stock === false && (
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="rounded-xl bg-zinc-900/90 px-4 py-2 text-sm font-bold uppercase tracking-wide text-zinc-300 border border-zinc-600">{t("prod_no_stock")}</span>
