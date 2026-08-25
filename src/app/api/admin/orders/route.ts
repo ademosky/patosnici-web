@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
   if (!name || !surname || !phone)
     return NextResponse.json({ error: "Ime, Prezime и Telefon се задолжителни" }, { status: 400 });
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin()
     .from("orders")
     .insert({
       name, surname, address, city, phone,
