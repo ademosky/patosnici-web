@@ -84,9 +84,9 @@ export default function RootLayout({
           <FacebookFloat />
           <Script
             src="https://www.googletagmanager.com/gtag/js?id=G-MFLNMEQNSK"
-            strategy="afterInteractive"
+            strategy="lazyOnload"
           />
-          <Script id="ga-init" strategy="afterInteractive"
+          <Script id="ga-init" strategy="lazyOnload"
             dangerouslySetInnerHTML={{
               __html: "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-MFLNMEQNSK');"
             }}
