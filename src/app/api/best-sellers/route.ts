@@ -10,12 +10,14 @@ export const dynamic = "force-dynamic";
  * items (by SKU when present, falling back to title), then joins to products.
  */
 export async function GET() {
-  const { data: orders, error } = await supabase
+  const client = supabaseAdmin();
+
+  const { data: orders, error } = await client
     .from("orders")
     .select("product_sku, product_title, items")
     .eq("status", "sent");
 
-  if (error) return NextResponse.json({ error: error.message, code: error.code, hint: error.hint }, { status: 500 });
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   // Count sales per product key (sku preferred, title fallback)
   const counts = new Map<string, number>();
@@ -40,11 +42,11 @@ export async function GET() {
   if (topKeys.length === 0) return NextResponse.json([]);
 
   // Fetch all products (small table) and join + preserve popularity order
-  const { data: products, error: prodErr } = await supabase
+  const { data: products, error: prodErr } = await client
     .from("products")
     .select("*");
 
-  if (prodErr) return NextResponse.json({ error: prodErr.message, code: prodErr.code }, { status: 500 });
+  if (prodErr) return NextResponse.json({ error: prodErr.message }, { status: 500 });
 
   const ordered = topKeys
     .map((key) =>
@@ -57,7 +59,4 @@ export async function GET() {
     .filter(Boolean);
 
   return NextResponse.json(ordered);
-  } catch (e: any) {
-    return NextResponse.json({ fatal: String(e?.message || e) }, { status: 500 });
-  }
 }
