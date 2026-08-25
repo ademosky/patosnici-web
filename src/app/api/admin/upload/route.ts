@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
   const compressedKB = Math.round(compressed.length / 1024);
 
   // ── Upload компресирана слика во Supabase ──
-  const { error } = await supabase.storage
+  const { error } = await supabaseAdmin().storage
     .from("products")
     .upload(filename, compressed, {
       contentType: "image/webp",
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
   if (error)
     return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const { data } = supabase.storage
+  const { data } = supabaseAdmin().storage
     .from("products")
     .getPublicUrl(filename);
 
