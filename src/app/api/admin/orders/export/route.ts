@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 
   const month = req.nextUrl.searchParams.get("month") || "";
 
-  let query = supabase
+  let query = supabaseAdmin()
     .from("orders")
     .select("*")
     .order("created_at", { ascending: false });
