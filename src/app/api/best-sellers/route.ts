@@ -57,4 +57,7 @@ export async function GET() {
     .filter(Boolean);
 
   return NextResponse.json(ordered);
+  } catch (e: any) {
+    return NextResponse.json({ fatal: String(e?.message || e) }, { status: 500 });
+  }
 }
