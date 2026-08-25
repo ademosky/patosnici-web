@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const month = req.nextUrl.searchParams.get("month"); // "2026-07"
   const status = req.nextUrl.searchParams.get("status"); // "new"|"in_process"|"sent"
 
-  let query = supabase
+  let query = supabaseAdmin()
     .from("orders")
     .select("*")
     .order("created_at", { ascending: false })
