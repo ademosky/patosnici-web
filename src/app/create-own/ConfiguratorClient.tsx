@@ -16,6 +16,7 @@ import {
   type Vehicle,
 } from "./configData";
 import MatPreview from "./MatPreview";
+import MatSilhouette from "./MatSilhouette";
 
 type Config = {
   vehicle: Vehicle | null;
