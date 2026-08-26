@@ -32,11 +32,11 @@ type MatPreviewProps = {
 
 /** Passenger front — tall, diagonal cut at top-LEFT (shown on LEFT) */
 const FL =
-  "M412,205 L272,205 Q264,205 264,197 L264,74 L305,20 L412,20 Q428,20 428,35 L428,197 Q428,205 412,205 Z";
+  "M68,205 L208,205 Q216,205 216,197 L216,20 L105,20 L52,74 L52,197 Q52,205 68,205 Z";
 
 /** Driver front — tall, diagonal cut at top-RIGHT (shown on RIGHT) */
 const FR =
-  "M68,205 L208,205 Q216,205 216,197 L216,74 L175,20 L68,20 Q52,20 52,35 L52,197 Q52,205 68,205 Z";
+  "M412,205 L272,205 Q264,205 264,197 L264,20 L375,20 L428,74 L428,197 Q428,205 412,205 Z";
 
 /** Driver rear — short, center notch at top */
 const RL =
@@ -163,21 +163,7 @@ export default function MatPreview({
         {/* Background — lighter graphite radial gradient */}
         <rect width="480" height="420" fill="url(#bg)" />
 
-        {/* Passenger Front (left) */}
-        <Mat
-          d={FR}
-          bodyColorHex={bodyColorHex}
-          borderColorHex={borderColorHex}
-          withLogo={false}
-          logo=""
-          hasClips={true}
-          clipX1={316}
-          clipY1={188}
-          clipX2={378}
-          clipY2={188}
-        />
-
-        {/* Driver Front (right) */}
+        {/* Passenger Front (left) — with logo */}
         <Mat
           d={FL}
           bodyColorHex={bodyColorHex}
@@ -188,6 +174,20 @@ export default function MatPreview({
           clipX1={102}
           clipY1={188}
           clipX2={164}
+          clipY2={188}
+        />
+
+        {/* Driver Front (right) — no logo */}
+        <Mat
+          d={FR}
+          bodyColorHex={bodyColorHex}
+          borderColorHex={borderColorHex}
+          withLogo={false}
+          logo=""
+          hasClips={true}
+          clipX1={316}
+          clipY1={188}
+          clipX2={378}
           clipY2={188}
         />
 
