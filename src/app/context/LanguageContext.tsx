@@ -12,6 +12,7 @@ const mk = {
   nav_products: "Производи",
   nav_contact: "Контакт",
   nav_cart: "Корпа",
+  nav_custom: "Изработи Сам",
 
   // Hero
   hero_title: "Врвна заштита",
@@ -156,6 +157,7 @@ const sq: typeof mk = {
   nav_products: "Produktet",
   nav_contact: "Kontakt",
   nav_cart: "Shporta",
+  nav_custom: "Krijo Vetë",
 
   hero_title: "Mbrojtje maksimale",
   hero_subtitle: "për automjetin tuaj",
@@ -364,3 +366,5 @@ export function useLanguage() {
   if (!ctx) throw new Error("useLanguage must be used within LanguageProvider");
   return ctx;
 }
+
+

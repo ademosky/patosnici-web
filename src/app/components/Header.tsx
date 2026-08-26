@@ -24,6 +24,7 @@ export default function Header() {
         <nav className="hidden gap-10 text-sm font-semibold uppercase tracking-wide text-white md:flex">
           <Link href={localizedPath("/")} className="border-b-2 border-red-600 pb-1 text-white">{t("nav_home")}</Link>
           <Link href={localizedPath("/products")} className="transition hover:text-red-500">{t("nav_products")}</Link>
+          <Link href={localizedPath("/create-own")} className="transition hover:text-red-500">{t("nav_custom")}</Link>
           <Link href={localizedPath("/contact")} className="transition hover:text-red-500">{t("nav_contact")}</Link>
         </nav>
 
@@ -70,6 +71,7 @@ export default function Header() {
           <nav className="flex flex-col gap-5 text-sm font-semibold uppercase tracking-wide text-white">
             <Link href={localizedPath("/")} onClick={() => setMobileOpen(false)}>{t("nav_home")}</Link>
             <Link href={localizedPath("/products")} onClick={() => setMobileOpen(false)} className="hover:text-red-500">{t("nav_products")}</Link>
+            <Link href={localizedPath("/create-own")} onClick={() => setMobileOpen(false)} className="hover:text-red-500">{t("nav_custom")}</Link>
             <Link href={localizedPath("/contact")} onClick={() => setMobileOpen(false)} className="hover:text-red-500">{t("nav_contact")}</Link>
             <Link href={localizedPath("/cart")} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 hover:text-red-500">
               {t("nav_cart")} {total > 0 && <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs">{total}</span>}
@@ -87,3 +89,7 @@ export default function Header() {
     </header>
   );
 }
+
+
+
+
