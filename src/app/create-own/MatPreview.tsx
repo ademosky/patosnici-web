@@ -163,21 +163,7 @@ export default function MatPreview({
         {/* Background — lighter graphite radial gradient */}
         <rect width="480" height="420" fill="url(#bg)" />
 
-        {/* Driver Front */}
-        <Mat
-          d={FL}
-          bodyColorHex={bodyColorHex}
-          borderColorHex={borderColorHex}
-          withLogo={withLogo}
-          logo={logo}
-          hasClips={true}
-          clipX1={102}
-          clipY1={188}
-          clipX2={164}
-          clipY2={188}
-        />
-
-        {/* Passenger Front */}
+        {/* Passenger Front (left) */}
         <Mat
           d={FR}
           bodyColorHex={bodyColorHex}
@@ -188,6 +174,20 @@ export default function MatPreview({
           clipX1={316}
           clipY1={188}
           clipX2={378}
+          clipY2={188}
+        />
+
+        {/* Driver Front (right) */}
+        <Mat
+          d={FL}
+          bodyColorHex={bodyColorHex}
+          borderColorHex={borderColorHex}
+          withLogo={withLogo}
+          logo={logo}
+          hasClips={true}
+          clipX1={102}
+          clipY1={188}
+          clipX2={164}
           clipY2={188}
         />
 
