@@ -86,8 +86,7 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
   const selectBody = (c: BodyColor) => { setConfig((p) => ({ ...p, bodyColor: c })); setStep("border"); };
   const selectBorder = (c: BorderColor) => { setConfig((p) => ({ ...p, borderColor: c })); setStep("logo"); };
   const toggleLogo = (on: boolean) => setConfig((p) => ({ ...p, withLogo: on }));
-  const resetBrand = () => { setSelectedBrandId(null); setSelectedModel(null); setConfig((p) => ({ ...p, vehicle: null })); };
-  const resetModel = () => setSelectedModel(null);
+  const resetBrand = () => { setSelectedBrandId(null); setConfig((p) => ({ ...p, vehicle: null })); };
 
   const priceMkd = CONFIG_BASE_PRICE_MKD;
   const priceDisplay = currency === "EUR" ? `${getEurValue(`${priceMkd} ден`)} €` : `${priceMkd.toLocaleString("mk-MK")} ден`;
