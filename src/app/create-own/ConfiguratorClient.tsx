@@ -30,6 +30,10 @@ function brandName(brandId: string) {
   return brands.find((b) => b.id === brandId)?.name ?? brandId;
 }
 
+function brandLogo(brandId: string) {
+  return brands.find((b) => b.id === brandId)?.logo ?? "";
+}
+
 function StepDot({ n, active }: { n: number; active: boolean }) {
   return (
     <span
