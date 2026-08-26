@@ -141,7 +141,7 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
               <h2 className="mb-5 flex items-center gap-3 text-lg font-black uppercase text-white"><StepDot n={1} active={step === "vehicle"} />{stepLabels.vehicle}</h2>
               {config.vehicle ? (
                 <div className="flex items-center justify-between rounded-xl border border-red-600/30 bg-[#1a1a1a] p-4">
-                  <div><p className="font-bold text-white">{brandName(config.vehicle.brandId)} {config.vehicle.model}</p><p className="text-sm text-zinc-400">{config.vehicle.generation}</p></div>
+                  <div><p className="font-bold text-white">{brandName(config.vehicle.brandId)} {config.vehicle.generation}</p></div>
                   <button onClick={resetBrand} className="text-xs text-zinc-500 hover:text-red-500">{lang === "sq" ? "Ndrysho" : "Промени"}</button>
                 </div>
               ) : (
@@ -149,26 +149,16 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
                   {!selectedBrandId && (
                     <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                       {uniqueBrands.map((b) => (
-                        <button key={b.id} onClick={() => { setSelectedBrandId(b.id); setSelectedModel(null); }} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-3 py-3 text-center text-sm font-semibold text-white transition hover:border-red-600 hover:bg-black">{b.name}</button>
+                        <button key={b.id} onClick={() => setSelectedBrandId(b.id)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-3 py-3 text-center text-sm font-semibold text-white transition hover:border-red-600 hover:bg-black">{b.name}</button>
                       ))}
                     </div>
                   )}
-                  {selectedBrandId && !selectedModel && (
+                  {selectedBrandId && (
                     <>
                       <button onClick={resetBrand} className="mb-3 text-xs text-zinc-500 hover:text-white">&larr; {lang === "sq" ? "Të gjitha markat" : "Сите марки"}</button>
-                      <div className="grid grid-cols-2 gap-2">
-                        {modelsForBrand.map((m) => (
-                          <button key={m} onClick={() => setSelectedModel(m)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-center text-sm font-semibold text-white transition hover:border-red-600 hover:bg-black">{m}</button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                  {selectedModel && (
-                    <>
-                      <button onClick={resetModel} className="mb-3 text-xs text-zinc-500 hover:text-white">&larr; {lang === "sq" ? "Modelet" : "Модели"}</button>
-                      <div className="space-y-2">
-                        {generationsForModel.map((v) => (
-                          <button key={v.generation} onClick={() => selectVehicle(v)} className="w-full rounded-xl border border-zinc-700 bg-[#1a1a1a] p-4 text-left text-white transition hover:border-red-600 hover:bg-black"><p className="font-semibold">{brandName(v.brandId)} {v.model}</p><p className="text-sm text-zinc-400">{v.generation}</p></button>
+                      <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                        {generationsForBrand.map((v) => (
+                          <button key={v.generation} onClick={() => selectVehicle(v)} className="w-full rounded-xl border border-zinc-700 bg-[#1a1a1a] p-4 text-left text-white transition hover:border-red-600 hover:bg-black"><p className="font-semibold">{brandName(v.brandId)} {v.generation}</p></button>
                         ))}
                       </div>
                     </>
@@ -222,7 +212,7 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
                 <div className="mt-6 space-y-3">
                   <p className="text-xs font-bold uppercase tracking-[0.25em] text-red-600">{lang === "sq" ? "Konfigurimi yt" : "Твојата конфигурација"}</p>
                   <div className="space-y-2 rounded-xl border border-zinc-800 bg-[#1a1a1a] p-4">
-                    <div className="flex justify-between text-sm"><span className="text-zinc-400">{lang === "sq" ? "Automjeti" : "Возило"}</span><span className="font-semibold text-white">{brandName(config.vehicle.brandId)} {config.vehicle.model} {config.vehicle.generation}</span></div>
+                    <div className="flex justify-between text-sm"><span className="text-zinc-400">{lang === "sq" ? "Automjeti" : "Возило"}</span><span className="font-semibold text-white">{brandName(config.vehicle.brandId)} {config.vehicle.generation}</span></div>
                     <div className="flex items-center justify-between text-sm"><span className="text-zinc-400">{lang === "sq" ? "Ngjyra" : "Боја"}</span><span className="flex items-center gap-2 font-semibold text-white"><span className="inline-block h-4 w-4 rounded border border-zinc-600" style={{ backgroundColor: config.bodyColor.hex }} />{lang === "sq" ? config.bodyColor.label_sq : config.bodyColor.label_mk}</span></div>
                     <div className="flex items-center justify-between text-sm"><span className="text-zinc-400">{lang === "sq" ? "Bordurë" : "Раб"}</span><span className="flex items-center gap-2 font-semibold text-white"><span className="inline-block h-4 w-4 rounded border border-zinc-600" style={{ backgroundColor: config.borderColor.hex }} />{lang === "sq" ? config.borderColor.label_sq : config.borderColor.label_mk}</span></div>
                     <div className="flex justify-between text-sm"><span className="text-zinc-400">Лого</span><span className="font-semibold text-white">{config.withLogo ? `${lang === "sq" ? "Me logo" : "Со лого"} — ${brandName(config.vehicle.brandId)}` : lang === "sq" ? "Pa logo" : "Без лого"}</span></div>
