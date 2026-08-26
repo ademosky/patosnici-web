@@ -72,15 +72,10 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
   }, [initialVehicles]);
 
   const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
-  const modelsForBrand = useMemo(() => {
+  const generationsForBrand = useMemo(() => {
     if (!selectedBrandId) return [];
-    return [...new Set(initialVehicles.filter((v) => v.brandId === selectedBrandId).map((v) => v.model))];
+    return initialVehicles.filter((v) => v.brandId === selectedBrandId);
   }, [selectedBrandId, initialVehicles]);
-  const [selectedModel, setSelectedModel] = useState<string | null>(null);
-  const generationsForModel = useMemo(() => {
-    if (!selectedBrandId || !selectedModel) return [];
-    return initialVehicles.filter((v) => v.brandId === selectedBrandId && v.model === selectedModel);
-  }, [selectedBrandId, selectedModel, initialVehicles]);
 
   const selectVehicle = (v: Vehicle) => { setConfig((p) => ({ ...p, vehicle: v, withLogo: false })); setStep("body"); };
   const selectBody = (c: BodyColor) => { setConfig((p) => ({ ...p, bodyColor: c })); setStep("border"); };
