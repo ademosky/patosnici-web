@@ -49,7 +49,7 @@ export default async function IzrabotiSamPage() {
     .map((p) => ({
       brandId: p.brand,
       model: p.car_model as string,
-      generation: (p.model || p.car_model) as string,
+      generation: (p.title || p.model || p.car_model) as string,
     }));
 
   return (
