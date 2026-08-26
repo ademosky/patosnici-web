@@ -9,7 +9,6 @@ import { Send, CheckCircle, Loader2, ShoppingCart, Check } from "lucide-react";
 import {
   BODY_COLORS,
   BORDER_COLORS,
-  VEHICLES,
   CONFIG_BASE_PRICE_MKD,
   type BodyColor,
   type BorderColor,
@@ -43,7 +42,7 @@ function StepDot({ n, active }: { n: number; active: boolean }) {
   );
 }
 
-export default function ConfiguratorClient() {
+export default function ConfiguratorClient({ initialVehicles }: { initialVehicles: Vehicle[] }) {
   const { t, lang, currency } = useLanguage();
   const { addItem } = useCart();
 
@@ -76,8 +75,8 @@ export default function ConfiguratorClient() {
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const generationsForModel = useMemo(() => {
     if (!selectedBrandId || !selectedModel) return [];
-    return VEHICLES.filter((v) => v.brandId === selectedBrandId && v.model === selectedModel);
-  }, [selectedBrandId, selectedModel]);
+    return initialVehicles.filter((v) => v.brandId === selectedBrandId && v.model === selectedModel);
+  }, [selectedBrandId, selectedModel, initialVehicles]);
 
   const selectVehicle = (v: Vehicle) => { setConfig((p) => ({ ...p, vehicle: v, withLogo: false })); setStep("body"); };
   const selectBody = (c: BodyColor) => { setConfig((p) => ({ ...p, bodyColor: c })); setStep("border"); };
