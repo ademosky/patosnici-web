@@ -63,15 +63,15 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
   const updateField = (field: string, value: string) => setForm((p) => ({ ...p, [field]: value }));
 
   const uniqueBrands = useMemo(() => {
-    const ids = [...new Set(VEHICLES.map((v) => v.brandId))];
-    return ids.map((id) => ({ id, name: brandName(id) }));
-  }, []);
+    const ids = [...new Set(initialVehicles.map((v) => v.brandId))];
+    return ids.map((id) => ({ id, name: brandName(id), logo: brandLogo(id) }));
+  }, [initialVehicles]);
 
   const [selectedBrandId, setSelectedBrandId] = useState<string | null>(null);
   const modelsForBrand = useMemo(() => {
     if (!selectedBrandId) return [];
-    return [...new Set(VEHICLES.filter((v) => v.brandId === selectedBrandId).map((v) => v.model))];
-  }, [selectedBrandId]);
+    return [...new Set(initialVehicles.filter((v) => v.brandId === selectedBrandId).map((v) => v.model))];
+  }, [selectedBrandId, initialVehicles]);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const generationsForModel = useMemo(() => {
     if (!selectedBrandId || !selectedModel) return [];
