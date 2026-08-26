@@ -30,13 +30,13 @@ type MatPreviewProps = {
 // ── Shape paths (viewBox 0 0 480 400) ─────────────────────────────────────
 // Realistic mat shapes: wider bottom, narrower top, diagonal cuts, rounded corners.
 
-/** Driver front — tall, diagonal cut at top-RIGHT */
+/** Passenger front — tall, diagonal cut at top-LEFT (shown on LEFT) */
 const FL =
-  "M68,205 L208,205 Q216,205 216,197 L216,74 L175,20 L68,20 Q52,20 52,35 L52,197 Q52,205 68,205 Z";
-
-/** Passenger front — tall, diagonal cut at top-LEFT */
-const FR =
   "M412,205 L272,205 Q264,205 264,197 L264,74 L305,20 L412,20 Q428,20 428,35 L428,197 Q428,205 412,205 Z";
+
+/** Driver front — tall, diagonal cut at top-RIGHT (shown on RIGHT) */
+const FR =
+  "M68,205 L208,205 Q216,205 216,197 L216,74 L175,20 L68,20 Q52,20 52,35 L52,197 Q52,205 68,205 Z";
 
 /** Driver rear — short, center notch at top */
 const RL =
