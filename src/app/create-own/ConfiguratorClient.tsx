@@ -174,7 +174,7 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
                   )}
                   {selectedModel && (
                     <>
-                      <button onClick={resetModel} className="mb-3 text-xs text-zinc-500 hover:text-white">&larr; {lang === "sq" ? "VITI" : "ГОДИНИ"}</button>
+                      <button onClick={resetModel} className="mb-3 text-xs text-zinc-500 hover:text-white">&larr; {lang === "sq" ? "NAZIV" : "НАЗИВ"}</button>
                       <div className="space-y-2">
                         {generationsForModel.map((v) => (
                           <button key={v.generation} onClick={() => selectVehicle(v)} className="w-full rounded-xl border border-zinc-700 bg-[#1a1a1a] p-4 text-left text-white transition hover:border-red-600 hover:bg-black"><p className="font-semibold">{brandName(v.brandId)} {v.model} {v.generation}</p></button>
