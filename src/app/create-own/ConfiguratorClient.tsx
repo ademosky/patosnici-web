@@ -92,9 +92,9 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
   const priceMkd = CONFIG_BASE_PRICE_MKD;
   const priceDisplay = currency === "EUR" ? `${getEurValue(`${priceMkd} ден`)} €` : `${priceMkd.toLocaleString("mk-MK")} ден`;
   const configSummary = config.vehicle
-    ? `${brandName(config.vehicle.brandId)} ${config.vehicle.model} ${config.vehicle.generation} | ${config.bodyColor.label_mk} | ${config.borderColor.label_mk} | ${config.withLogo ? "Со лого" : "Без лого"}`
+    ? `${brandName(config.vehicle.brandId)} ${config.vehicle.generation} | ${config.bodyColor.label_mk} | ${config.borderColor.label_mk} | ${config.withLogo ? "Со лого" : "Без лого"}`
     : "";
-  const productTitle = `Платнени патосници — Изработи сам (${config.vehicle ? `${brandName(config.vehicle.brandId)} ${config.vehicle.model}` : ""})`;
+  const productTitle = `Платнени патосници — Изработи сам (${config.vehicle ? `${brandName(config.vehicle.brandId)} ${config.vehicle.generation}` : ""})`;
 
   const handleOrder = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true); setError("");
