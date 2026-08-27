@@ -93,18 +93,18 @@ function Mat({
           <ellipse cx={clipX2} cy={clipY2} rx="3.5" ry="2.5" fill="rgba(0,0,0,0.45)" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
         </>
       )}
-      {/* Brand logo */}
+      {/* Brand logo — bottom-left, above mounting holes (reference position) */}
       {withLogo && logo && (
         <>
-          <rect x="98" y="66" width="70" height="24" rx="4" fill="rgba(0,0,0,0.55)" />
+          <rect x="65" y="152" width="48" height="14" rx="3" fill="rgba(0,0,0,0.45)" />
           <image
             href={logo}
-            x="101"
-            y="69"
-            width="64"
-            height="18"
+            x="67"
+            y="154"
+            width="44"
+            height="10"
             preserveAspectRatio="xMidYMid meet"
-            style={{ filter: "invert(1)" }}
+            style={{ filter: "invert(1) opacity(0.85)" }}
           />
         </>
       )}
