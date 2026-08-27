@@ -1729,6 +1729,119 @@ export default function AdminPage() {
         </div>
       )}
 
+        {/* ── SHOWCASE tab (Платнени) ── */}
+        {activeTab === "showcase" && (
+          <div className="mx-auto max-w-4xl px-3 py-4 sm:px-6 sm:py-8">
+
+            <div className="mb-4 rounded-2xl border border-zinc-800 bg-[#111] p-4">
+              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-zinc-500">
+                <ImageIcon size={12} className="mr-1 inline text-red-600" />
+                {showcaseEditId ? "Измени галерија ставка" : "Додај во галерија"}
+              </p>
+              <form onSubmit={handleShowcaseSave} className="flex flex-col gap-2">
+                <div className="grid grid-cols-[1fr_auto] gap-2">
+                  <input
+                    required
+                    placeholder="URL на слика *"
+                    value={showcaseForm.image}
+                    onChange={(e) => setShowcaseForm((p) => ({ ...p, image: e.target.value }))}
+                    className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600"
+                  />
+                  <label className="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-red-700 active:scale-95">
+                    <Upload size={16} />
+                    <span className="hidden sm:inline">Upload</span>
+                    <input type="file" accept="image/*" onChange={handleShowcaseUpload} className="hidden" />
+                  </label>
+                </div>
+                {showcaseForm.image && (
+                  <div className="mt-1 rounded-xl border border-zinc-700 bg-[#1a1a1a] p-3">
+                    <Image src={showcaseForm.image} alt="Preview" width={200} height={150} className="max-h-32 rounded-lg object-cover" unoptimized />
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    required
+                    placeholder="Марка *"
+                    value={showcaseForm.brand}
+                    onChange={(e) => setShowcaseForm((p) => ({ ...p, brand: e.target.value }))}
+                    className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600"
+                  />
+                  <input
+                    required
+                    placeholder="Модел *"
+                    value={showcaseForm.model}
+                    onChange={(e) => setShowcaseForm((p) => ({ ...p, model: e.target.value }))}
+                    className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button type="submit" disabled={showcaseLoading}
+                    className="flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-red-700 active:scale-95 disabled:opacity-60">
+                    {showcaseLoading ? <Loader2 size={16} className="animate-spin" /> : showcaseEditId ? <CheckCircle size={16} /> : <Plus size={16} />}
+                    {showcaseEditId ? "Зачувај" : "Додај"}
+                  </button>
+                  {showcaseEditId && (
+                    <button type="button" onClick={() => { setShowcaseEditId(null); setShowcaseForm({ image: "", brand: "", model: "" }); }}
+                      className="rounded-xl border border-zinc-700 px-5 py-3 text-sm text-zinc-400 transition hover:border-red-600 hover:text-white">
+                      Откажи
+                    </button>
+                  )}
+                </div>
+              </form>
+            </div>
+
+            {showcaseLoading ? (
+              <div className="flex justify-center py-16">
+                <Loader2 size={28} className="animate-spin text-red-600" />
+              </div>
+            ) : showcaseItems.length === 0 ? (
+              <div className="py-16 text-center text-zinc-600">
+                <ImageIcon size={48} className="mx-auto mb-4 opacity-30" />
+                <p>Нема ставки во галерија</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {showcaseItems.map((item, idx) => (
+                  <div key={item.id} className="flex items-center gap-3 rounded-2xl border border-zinc-800 bg-[#111] px-4 py-3">
+                    <Image src={item.image} alt={item.brand} width={64} height={48} className="h-12 w-16 shrink-0 rounded-lg object-cover" unoptimized />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold text-white">{item.brand}</p>
+                      <p className="text-xs text-zinc-400">{item.model}</p>
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <button type="button"
+                        onClick={() => handleShowcaseMoveUp(item.id)}
+                        disabled={idx === 0}
+                        className="flex h-6 w-6 items-center justify-center rounded-lg border border-zinc-700 text-zinc-500 transition hover:border-red-600 hover:text-red-500 disabled:opacity-30">
+                        <ChevronUp size={14} />
+                      </button>
+                      <button type="button"
+                        onClick={() => handleShowcaseMoveDown(item.id)}
+                        disabled={idx === showcaseItems.length - 1}
+                        className="flex h-6 w-6 items-center justify-center rounded-lg border border-zinc-700 text-zinc-500 transition hover:border-red-600 hover:text-red-500 disabled:opacity-30">
+                        <ChevronDown size={14} />
+                      </button>
+                    </div>
+                    <button type="button"
+                      onClick={() => handleShowcaseEdit(item)}
+                      className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-700 text-zinc-500 transition hover:border-red-600 hover:text-red-500">
+                      <Pencil size={15} />
+                    </button>
+                    <button type="button"
+                      onClick={() => handleShowcaseDelete(item.id)}
+                      className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-700 text-zinc-500 transition hover:border-red-600 hover:text-red-500">
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                ))}
+                <div className="rounded-2xl border border-zinc-700 bg-[#111] px-4 py-3 text-center">
+                  <span className="text-xs text-zinc-500">{showcaseItems.length} ставки во галерија</span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
     </div>
   );
 }
