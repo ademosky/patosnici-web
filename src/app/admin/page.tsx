@@ -585,13 +585,43 @@ export default function AdminPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setShowcaseLoading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    const pw = getPw();
-    const res = await fetch("/api/admin/upload", { method: "POST", headers: { "x-admin-password": pw }, body: formData });
-    if (res.ok) {
-      const { path } = await res.json();
-      setShowcaseForm((p) => ({ ...p, image: path }));
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const safeName = file.name
+        .toLowerCase()
+        .replace(/\.[^.]+$/, "")
+        .replace(/[^a-z0-9-]/g, "-")
+        .slice(0, 40) || "slika";
+      let uploadBlob: Blob = file;
+      let filename = `${safeName}-${Date.now()}.${ext}`;
+      let contentType = file.type || `image/${ext}`;
+      const compressed = await compressImage(file);
+      if (compressed.size < file.size) {
+        uploadBlob = compressed;
+        filename = `${safeName}-${Date.now()}.webp`;
+        contentType = "image/webp";
+      }
+      const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+      const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+      const arrayBuffer = await uploadBlob.arrayBuffer();
+      const uploadRes = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/products/${filename}`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": contentType,
+            "x-upsert": "false",
+          },
+          body: arrayBuffer,
+        }
+      );
+      if (uploadRes.ok) {
+        const { data } = supabaseAdmin().storage.from("products").getPublicUrl(filename);
+        setShowcaseForm((p) => ({ ...p, image: data.publicUrl }));
+      }
+    } catch (err) {
+      console.error("Showcase upload error:", err);
     }
     setShowcaseLoading(false);
   };
