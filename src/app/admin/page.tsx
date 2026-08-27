@@ -170,6 +170,10 @@ export default function AdminPage() {
   const [invError, setInvError]         = useState("");
   const [invAdding, setInvAdding]       = useState(false);
   const [invSearch, setInvSearch]       = useState("");
+  const [showcaseItems, setShowcaseItems] = useState<Array<{ id: number; image: string; brand: string; model: string; sort_order: number }>>([]);
+  const [showcaseForm, setShowcaseForm]   = useState<{ image: string; brand: string; model: string }>({ image: "", brand: "", model: "" });
+  const [showcaseEditId, setShowcaseEditId] = useState<number | null>(null);
+  const [showcaseLoading, setShowcaseLoading] = useState(false);
 
   const showToast = (msg: string, ok = true) => {
     setToast({ msg, ok });
@@ -350,6 +354,15 @@ export default function AdminPage() {
     const res = await fetch("/api/admin/inventory", { headers: { "x-admin-password": pw } });
     if (res.ok) setInventory(await res.json());
     setInvLoading(false);
+  };
+
+  const fetchShowcase = async () => {
+    const pw = getPw();
+    if (!pw) return;
+    setShowcaseLoading(true);
+    const res = await fetch("/api/admin/showcase", { headers: { "x-admin-password": pw } });
+    if (res.ok) setShowcaseItems(await res.json());
+    setShowcaseLoading(false);
   };
 
   const addInvItem = async (e: React.FormEvent) => {
@@ -566,6 +579,83 @@ export default function AdminPage() {
       if (editId === id) cancelEdit();
       fetchProducts(getPw());
     }
+  };
+
+  const handleShowcaseUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setShowcaseLoading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    const pw = getPw();
+    const res = await fetch("/api/admin/upload", { method: "POST", headers: { "x-admin-password": pw }, body: formData });
+    if (res.ok) {
+      const { path } = await res.json();
+      setShowcaseForm((p) => ({ ...p, image: path }));
+    }
+    setShowcaseLoading(false);
+  };
+
+  const handleShowcaseSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const pw = getPw();
+    const isEdit = showcaseEditId !== null;
+    setShowcaseLoading(true);
+    const res = await fetch(
+      isEdit ? `/api/admin/showcase/${showcaseEditId}` : "/api/admin/showcase",
+      {
+        method: isEdit ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": pw },
+        body: JSON.stringify(showcaseForm),
+      }
+    );
+    if (res.ok) {
+      setShowcaseForm({ image: "", brand: "", model: "" });
+      setShowcaseEditId(null);
+      fetchShowcase();
+    }
+    setShowcaseLoading(false);
+  };
+
+  const handleShowcaseEdit = (item: { id: number; image: string; brand: string; model: string }) => {
+    setShowcaseEditId(item.id);
+    setShowcaseForm({ image: item.image, brand: item.brand, model: item.model });
+  };
+
+  const handleShowcaseDelete = async (id: number) => {
+    if (!confirm("Избриши ставка?")) return;
+    const pw = getPw();
+    await fetch(`/api/admin/showcase/${id}`, { method: "DELETE", headers: { "x-admin-password": pw } });
+    if (showcaseEditId === id) { setShowcaseEditId(null); setShowcaseForm({ image: "", brand: "", model: "" }); }
+    fetchShowcase();
+  };
+
+  const handleShowcaseMoveUp = async (id: number) => {
+    const idx = showcaseItems.findIndex((item) => item.id === id);
+    if (idx <= 0) return;
+    const newOrder = [...showcaseItems];
+    [newOrder[idx - 1], newOrder[idx]] = [newOrder[idx], newOrder[idx - 1]];
+    const pw = getPw();
+    await fetch("/api/admin/showcase/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-password": pw },
+      body: JSON.stringify({ orderedIds: newOrder.map((item) => item.id) }),
+    });
+    fetchShowcase();
+  };
+
+  const handleShowcaseMoveDown = async (id: number) => {
+    const idx = showcaseItems.findIndex((item) => item.id === id);
+    if (idx < 0 || idx >= showcaseItems.length - 1) return;
+    const newOrder = [...showcaseItems];
+    [newOrder[idx], newOrder[idx + 1]] = [newOrder[idx + 1], newOrder[idx]];
+    const pw = getPw();
+    await fetch("/api/admin/showcase/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-password": pw },
+      body: JSON.stringify({ orderedIds: newOrder.map((item) => item.id) }),
+    });
+    fetchShowcase();
   };
 
   const handleLogout = () => {
