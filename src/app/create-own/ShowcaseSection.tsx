@@ -44,42 +44,66 @@ export default function ShowcaseSection() {
         </p>
       </div>
 
-      {/* Desktop grid — 5 asymmetrical cards */}
-      <div className="hidden gap-5 sm:grid sm:grid-cols-5">
-        {SHOWCASE_ITEMS.map((item, i) => (
+      {/* Desktop — balanced 3-column grid, 2 rows (3+2) */}
+      <div className="hidden gap-4 sm:grid sm:grid-cols-3">
+        {/* Row 1: first 3 items */}
+        {SHOWCASE_ITEMS.slice(0, 3).map((item, i) => (
           <div
             key={i}
-            className={`group relative overflow-hidden rounded-2xl border border-zinc-800/60 bg-[#111] transition-all duration-500 hover:border-red-600/30 ${
-              i === 0 || i === 4 ? "sm:col-span-2" : "sm:col-span-1"
-            }`}
+            className="group relative overflow-hidden rounded-2xl border border-zinc-800/60 bg-[#111] transition-all duration-500 hover:border-red-600/30"
           >
-            <div className="aspect-[3/4] relative overflow-hidden">
+            <div className="aspect-[4/3] relative overflow-hidden">
               <Image
                 src={item.image}
                 alt={`${item.brand} ${item.model}`}
                 fill
-                sizes={i === 0 || i === 4 ? "(max-width: 640px) 100vw, 40vw" : "(max-width: 640px) 100vw, 20vw"}
+                sizes="(max-width: 640px) 100vw, 33vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                 unoptimized
               />
-              {/* Subtle gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             </div>
-            {/* Label */}
             <div className="absolute bottom-0 left-0 right-0 p-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-red-500">
-                {item.brand}
-              </p>
+              <p className="text-xs font-bold uppercase tracking-wider text-red-500">{item.brand}</p>
               <p className="text-sm font-semibold text-white">{item.model}</p>
             </div>
           </div>
         ))}
+
+        {/* Row 2: last 2 items, centered in columns 2-3 */}
+        {SHOWCASE_ITEMS.slice(3).map((item, i) => {
+          const isFirst = i === 0;
+          return (
+            <div
+              key={i + 3}
+              className={`group relative overflow-hidden rounded-2xl border border-zinc-800/60 bg-[#111] transition-all duration-500 hover:border-red-600/30 ${
+                isFirst ? "sm:col-start-2" : ""
+              }`}
+            >
+              <div className="aspect-[4/3] relative overflow-hidden">
+                <Image
+                  src={item.image}
+                  alt={`${item.brand} ${item.model}`}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  unoptimized
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-red-500">{item.brand}</p>
+                <p className="text-sm font-semibold text-white">{item.model}</p>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Mobile carousel */}
       <div className="relative sm:hidden">
         <div className="overflow-hidden rounded-2xl">
-          <div className="aspect-[3/4] relative">
+          <div className="aspect-[4/3] relative">
             <Image
               src={SHOWCASE_ITEMS[activeIndex].image}
               alt={SHOWCASE_ITEMS[activeIndex].brand}
@@ -100,7 +124,6 @@ export default function ShowcaseSection() {
           </div>
         </div>
 
-        {/* Controls */}
         <div className="mt-4 flex items-center justify-center gap-4">
           <button
             type="button"
@@ -110,7 +133,6 @@ export default function ShowcaseSection() {
             <ChevronLeft size={18} />
           </button>
 
-          {/* Dots */}
           <div className="flex gap-2">
             {SHOWCASE_ITEMS.map((_, i) => (
               <button
