@@ -114,6 +114,7 @@ async function compressImage(file: File): Promise<Blob> {
 
 export default function AdminPage() {
   const [password, setPassword]   = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
   const [authed, setAuthed]       = useState(false);
   const [authError, setAuthError] = useState("");
   const [products, setProducts]   = useState<Product[]>([]);
@@ -186,7 +187,7 @@ export default function AdminPage() {
   }, [stockFilter, products]);
 
   const getPw = () =>
-    typeof window !== "undefined" ? sessionStorage.getItem("adminPw") ?? "" : "";
+    typeof window !== "undefined" ? (localStorage.getItem("adminPw") ?? sessionStorage.getItem("adminPw") ?? "") : "";
 
   const fetchProducts = useCallback(async (pw: string) => {
     const res = await fetch("/api/admin/products", {
@@ -201,6 +202,7 @@ export default function AdminPage() {
       setAuthed(true);
       fetchProducts(pw);
       fetchOrders();
+      fetchInventory();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchProducts]);
@@ -496,11 +498,13 @@ export default function AdminPage() {
     });
     setLoading(false);
     if (res.ok) {
-      sessionStorage.setItem("adminPw", password);
+      if (rememberMe) {
+        localStorage.setItem("adminPw", password);
+      } else {
+        sessionStorage.setItem("adminPw", password);
+      }
       setAuthed(true);
       setProducts(await res.json());
-      // Also load orders + inventory on first login (the mount effect only
-      // runs once, before sessionStorage has the password).
       fetchOrders();
       fetchInventory();
     } else {
@@ -564,6 +568,7 @@ export default function AdminPage() {
   };
 
   const handleLogout = () => {
+    localStorage.removeItem("adminPw");
     sessionStorage.removeItem("adminPw");
     setAuthed(false);
     setPassword("");
@@ -619,6 +624,15 @@ export default function AdminPage() {
               className={inputClass}
             />
             {authError && <p className="mt-3 text-sm text-red-500">{authError}</p>}
+            <label className="mt-4 flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-red-600 focus:ring-red-600"
+              />
+              <span className="text-sm text-zinc-400">Запомни ме</span>
+            </label>
             <button type="submit" disabled={loading}
               className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-red-700 disabled:opacity-60"
             >
