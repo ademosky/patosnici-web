@@ -16,6 +16,7 @@ import {
 } from "./configData";
 import MatPreview from "./MatPreview";
 import MatSilhouette from "./MatSilhouette";
+import ShowcaseSection from "./ShowcaseSection";
 
 type Config = {
   vehicle: Vehicle | null;
@@ -271,6 +272,9 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
           </div>
         )}
       </div>
+
+      {/* Showcase gallery — real completed mats */}
+      <ShowcaseSection />
     </main>
   );
 }
