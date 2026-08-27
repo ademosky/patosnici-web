@@ -563,5 +563,5 @@ export const VEHICLES: Vehicle[] = [
 // ── Pricing layer (placeholder) ──
 // Edit this single value to change the base price. The configurator reads it
 // here so pricing stays in one place for future per-config pricing.
-export const CONFIG_BASE_PRICE_MKD = 2990;
+export const CONFIG_BASE_PRICE_MKD = 1990;
 
