@@ -14,6 +14,16 @@ function isLightLogo(brandId: string) {
   return getBrand(brandId)?.lightLogo === true;
 }
 
+/** Returns true if the hex color is dark (luminance < 0.35) */
+function isDarkMat(hex: string): boolean {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  // Relative luminance (sRGB)
+  const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return lum < 0.35;
+}
+
 // ── MatPreview ──────────────────────────────────────────────────────────────
 //
 // Premium Apple-style product showcase. 4-mat layout viewed from above.
@@ -103,39 +113,70 @@ function Mat({
           <ellipse cx={clipX2} cy={clipY2} rx="3.5" ry="2.5" fill="rgba(0,0,0,0.45)" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
         </>
       )}
-      {/* Premium embroidered brand badge */}
+      {/* Premium embroidered brand badge — adaptive contrast */}
       {withLogo && logo && (
         <g>
-          {/* Outer border — subtle contrast ring visible on all mat colors */}
-          <rect
-            x="78" y="138" width="36" height="36" rx="6"
-            fill="none"
-            stroke="rgba(255,255,255,0.25)"
-            strokeWidth="1.2"
-          />
-          {/* Inner border — stitched effect */}
-          <rect
-            x="80" y="140" width="32" height="32" rx="5"
-            fill="none"
-            stroke="rgba(255,255,255,0.12)"
-            strokeWidth="0.8"
-            strokeDasharray="2 2"
-          />
-          {/* Badge background — subtle, works on all mat colors */}
-          <rect
-            x="80" y="140" width="32" height="32" rx="5"
-            fill={isLightLogo(brandId) ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.35)"}
-          />
-          {/* Brand logo SVG — centered, proportional */}
-          <image
-            href={logo}
-            x="83"
-            y="143"
-            width="26"
-            height="26"
-            preserveAspectRatio="xMidYMid meet"
-            style={isLightLogo(brandId) ? {} : { filter: "invert(1)" }}
-          />
+          {isDarkMat(bodyColorHex) ? (
+            <>
+              {/* DARK MAT (black, charcoal) — light badge with strong contrast */}
+              <rect
+                x="78" y="138" width="36" height="36" rx="6"
+                fill="none"
+                stroke="rgba(255,255,255,0.5)"
+                strokeWidth="1.5"
+              />
+              <rect
+                x="80" y="140" width="32" height="32" rx="5"
+                fill="none"
+                stroke="rgba(255,255,255,0.2)"
+                strokeWidth="0.8"
+                strokeDasharray="2 2"
+              />
+              <rect
+                x="80" y="140" width="32" height="32" rx="5"
+                fill="rgba(255,255,255,0.18)"
+              />
+              <image
+                href={logo}
+                x="83"
+                y="143"
+                width="26"
+                height="26"
+                preserveAspectRatio="xMidYMid meet"
+                style={{ filter: isLightLogo(brandId) ? "none" : "invert(1)" }}
+              />
+            </>
+          ) : (
+            <>
+              {/* LIGHT MAT (grey, cream) — dark badge with subtle contrast */}
+              <rect
+                x="78" y="138" width="36" height="36" rx="6"
+                fill="none"
+                stroke="rgba(0,0,0,0.3)"
+                strokeWidth="1.2"
+              />
+              <rect
+                x="80" y="140" width="32" height="32" rx="5"
+                fill="none"
+                stroke="rgba(0,0,0,0.12)"
+                strokeWidth="0.8"
+                strokeDasharray="2 2"
+              />
+              <rect
+                x="80" y="140" width="32" height="32" rx="5"
+                fill="rgba(0,0,0,0.15)"
+              />
+              <image
+                href={logo}
+                x="83"
+                y="143"
+                width="26"
+                height="26"
+                preserveAspectRatio="xMidYMid meet"
+                style={isLightLogo(brandId) ? {} : { filter: "invert(1)" }}
+              />
+            </>
+          )}
         </g>
       )}
     </g>
