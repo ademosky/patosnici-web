@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 
 interface ShowcaseItem {
@@ -17,6 +17,7 @@ export default function ShowcaseSection() {
   const { lang } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
   const [items, setItems] = useState<ShowcaseItem[]>([]);
+  const [lightbox, setLightbox] = useState<ShowcaseItem | null>(null);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -27,7 +28,7 @@ export default function ShowcaseSection() {
           setItems(data);
         }
       } catch {
-        // Silent — gallery stays empty until data loads
+        // Silent
       }
     };
     fetchItems();
@@ -38,141 +39,207 @@ export default function ShowcaseSection() {
   const prev = () => setActiveIndex((p) => (p === 0 ? items.length - 1 : p - 1));
   const next = () => setActiveIndex((p) => (p === items.length - 1 ? 0 : p + 1));
 
+  const openLightbox = (item: ShowcaseItem) => setLightbox(item);
+  const closeLightbox = () => setLightbox(null);
+
   return (
-    <section className="relative mx-auto max-w-7xl px-6 py-20 sm:py-28">
-      {/* Section header */}
-      <div className="mb-12 text-center">
-        <p className="text-xs font-bold uppercase tracking-[0.25em] text-red-600">
-          {lang === "sq" ? "Galeria" : "Галерија"}
-        </p>
-        <h2 className="mt-3 text-4xl font-black uppercase tracking-tight text-white sm:text-5xl">
-          {lang === "sq" ? "Punime të realizuara" : "Изработени патосници"}
-        </h2>
-        <p className="mx-auto mt-4 max-w-xl text-zinc-400">
-          {lang === "sq"
-            ? "Shiko cilësinë e tapeteve tona të punuara me dorë. Çdo porosi është unike."
-            : "Погледни го квалитетот на нашите рачно изработени патосници. Секоја нарачка е уникатна."
-          }
-        </p>
-      </div>
+    <>
+      <section className="relative mx-auto max-w-7xl px-6 py-20 sm:py-28">
+        {/* Section header */}
+        <div className="mb-12 text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.25em] text-red-600">
+            {lang === "sq" ? "Galeria" : "Галерија"}
+          </p>
+          <h2 className="mt-3 text-4xl font-black uppercase tracking-tight text-white sm:text-5xl">
+            {lang === "sq" ? "Punime të realizuara" : "Изработени патосници"}
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-zinc-400">
+            {lang === "sq"
+              ? "Shiko cilësinë e tapeteve tona të punuara me dorë. Çdo porosi është unike."
+              : "Погледни го квалитетот на нашите рачно изработени патосници. Секоја нарачка е уникатна."
+            }
+          </p>
+        </div>
 
-      {/* Desktop — balanced grid, 3 columns */}
-      <div className="hidden gap-4 sm:grid sm:grid-cols-3">
-        {items.slice(0, 3).map((item) => (
-          <div
-            key={item.id}
-            className="group relative overflow-hidden rounded-2xl border border-zinc-800/60 bg-[#111] transition-all duration-500 hover:border-red-600/30"
+        {/* Desktop — balanced grid, 3 columns */}
+        <div className="hidden gap-4 sm:grid sm:grid-cols-3">
+          {items.slice(0, 3).map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => openLightbox(item)}
+              className="group relative overflow-hidden rounded-2xl border border-zinc-800/60 bg-[#111] text-left transition-all duration-500 hover:border-red-600/30"
+            >
+              <div className="aspect-[4/3] relative overflow-hidden">
+                <Image
+                  src={item.image}
+                  alt={`${item.brand} ${item.model}`}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  unoptimized
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                {/* Click indicator */}
+                <div className="absolute right-3 top-3 rounded-full bg-black/50 p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                  </svg>
+                </div>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-red-500">{item.brand}</p>
+                <p className="text-sm font-semibold text-white">{item.model}</p>
+              </div>
+            </button>
+          ))}
+
+          {items.slice(3).map((item, i) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => openLightbox(item)}
+              className={`group relative overflow-hidden rounded-2xl border border-zinc-800/60 bg-[#111] text-left transition-all duration-500 hover:border-red-600/30 ${
+                i === 0 ? "sm:col-start-2" : ""
+              }`}
+            >
+              <div className="aspect-[4/3] relative overflow-hidden">
+                <Image
+                  src={item.image}
+                  alt={`${item.brand} ${item.model}`}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  unoptimized
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute right-3 top-3 rounded-full bg-black/50 p-1.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                  </svg>
+                </div>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-red-500">{item.brand}</p>
+                <p className="text-sm font-semibold text-white">{item.model}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Mobile carousel */}
+        <div className="relative sm:hidden">
+          <button
+            type="button"
+            onClick={() => openLightbox(items[activeIndex])}
+            className="block w-full overflow-hidden rounded-2xl"
           >
-            <div className="aspect-[4/3] relative overflow-hidden">
+            <div className="aspect-[4/3] relative">
               <Image
-                src={item.image}
-                alt={`${item.brand} ${item.model}`}
+                src={items[activeIndex].image}
+                alt={items[activeIndex].brand}
                 fill
-                sizes="(max-width: 640px) 100vw, 33vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                sizes="100vw"
+                className="object-cover"
                 unoptimized
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              {/* Click indicator */}
+              <div className="absolute right-3 top-3 rounded-full bg-black/50 p-1.5">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                </svg>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-5">
+                <p className="text-xs font-bold uppercase tracking-wider text-red-500">
+                  {items[activeIndex].brand}
+                </p>
+                <p className="text-lg font-semibold text-white">
+                  {items[activeIndex].model}
+                </p>
+              </div>
             </div>
-            <div className="absolute bottom-0 left-0 right-0 p-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-red-500">{item.brand}</p>
-              <p className="text-sm font-semibold text-white">{item.model}</p>
-            </div>
-          </div>
-        ))}
+          </button>
 
-        {/* Remaining items — centered */}
-        {items.slice(3).map((item, i) => (
-          <div
-            key={item.id}
-            className={`group relative overflow-hidden rounded-2xl border border-zinc-800/60 bg-[#111] transition-all duration-500 hover:border-red-600/30 ${
-              i === 0 ? "sm:col-start-2" : ""
-            }`}
+          <div className="mt-4 flex items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={prev}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-700 bg-[#1a1a1a] text-zinc-400 transition hover:border-red-600 hover:text-red-500"
+            >
+              <ChevronLeft size={18} />
+            </button>
+
+            <div className="flex gap-2">
+              {items.map((item, i) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setActiveIndex(i)}
+                  className={`h-2 rounded-full transition-all ${
+                    i === activeIndex ? "w-6 bg-red-600" : "w-2 bg-zinc-600"
+                  }`}
+                />
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={next}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-700 bg-[#1a1a1a] text-zinc-400 transition hover:border-red-600 hover:text-red-500"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="mt-10 text-center">
+          <p className="text-sm text-zinc-500">
+            {lang === "sq"
+              ? "Çdo palë tapete është punuar me dorë sipas porosisë tuaj."
+              : "Секој пар патосници е рачно изработен според твојата нарачка."
+            }
+          </p>
+        </div>
+      </section>
+
+      {/* ── Lightbox overlay ── */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+          onClick={closeLightbox}
+        >
+          {/* Close button */}
+          <button
+            type="button"
+            onClick={closeLightbox}
+            className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-zinc-700 bg-black/60 text-zinc-400 transition hover:border-red-600 hover:text-white sm:right-6 sm:top-6"
           >
-            <div className="aspect-[4/3] relative overflow-hidden">
-              <Image
-                src={item.image}
-                alt={`${item.brand} ${item.model}`}
-                fill
-                sizes="(max-width: 640px) 100vw, 33vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                unoptimized
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 p-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-red-500">{item.brand}</p>
-              <p className="text-sm font-semibold text-white">{item.model}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+            <X size={20} />
+          </button>
 
-      {/* Mobile carousel */}
-      <div className="relative sm:hidden">
-        <div className="overflow-hidden rounded-2xl">
-          <div className="aspect-[4/3] relative">
+          {/* Image */}
+          <div
+            className="relative max-h-[85vh] max-w-[90vw]"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Image
-              src={items[activeIndex].image}
-              alt={items[activeIndex].brand}
-              fill
-              sizes="100vw"
-              className="object-cover"
+              src={lightbox.image}
+              alt={`${lightbox.brand} ${lightbox.model}`}
+              width={1200}
+              height={900}
+              className="max-h-[85vh] w-auto rounded-xl object-contain"
               unoptimized
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-5">
-              <p className="text-xs font-bold uppercase tracking-wider text-red-500">
-                {items[activeIndex].brand}
-              </p>
-              <p className="text-lg font-semibold text-white">
-                {items[activeIndex].model}
-              </p>
+            {/* Info bar */}
+            <div className="absolute bottom-0 left-0 right-0 rounded-b-xl bg-gradient-to-t from-black/80 to-transparent p-4 sm:p-6">
+              <p className="text-xs font-bold uppercase tracking-wider text-red-500">{lightbox.brand}</p>
+              <p className="text-sm font-semibold text-white">{lightbox.model}</p>
             </div>
           </div>
         </div>
-
-        <div className="mt-4 flex items-center justify-center gap-4">
-          <button
-            type="button"
-            onClick={prev}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-700 bg-[#1a1a1a] text-zinc-400 transition hover:border-red-600 hover:text-red-500"
-          >
-            <ChevronLeft size={18} />
-          </button>
-
-          <div className="flex gap-2">
-            {items.map((item, i) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setActiveIndex(i)}
-                className={`h-2 rounded-full transition-all ${
-                  i === activeIndex ? "w-6 bg-red-600" : "w-2 bg-zinc-600"
-                }`}
-              />
-            ))}
-          </div>
-
-          <button
-            type="button"
-            onClick={next}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-700 bg-[#1a1a1a] text-zinc-400 transition hover:border-red-600 hover:text-red-500"
-          >
-            <ChevronRight size={18} />
-          </button>
-        </div>
-      </div>
-
-      {/* CTA */}
-      <div className="mt-10 text-center">
-        <p className="text-sm text-zinc-500">
-          {lang === "sq"
-            ? "Çdo palë tapete është punuar me dorë sipas porosisë tuaj."
-            : "Секој пар патосници е рачно изработен според твојата нарачка."
-          }
-        </p>
-      </div>
-    </section>
+      )}
+    </>
   );
 }
