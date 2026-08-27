@@ -729,6 +729,13 @@ export default function AdminPage() {
           >
             <Warehouse size={14} /> Залиха
           </button>
+          <div className="w-px bg-zinc-800" />
+          <button
+            onClick={() => { setActiveTab("showcase"); fetchShowcase(); }}
+            className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs font-bold uppercase transition ${activeTab === "showcase" ? "bg-red-600 text-white" : "text-zinc-400"}`}
+          >
+            <ImageIcon size={14} /> Платнени
+          </button>
         </div>
       </header>
 
