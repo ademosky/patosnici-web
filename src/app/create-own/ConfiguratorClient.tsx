@@ -38,7 +38,7 @@ function brandLogo(brandId: string) {
 function StepDot({ n, active }: { n: number; active: boolean }) {
   return (
     <span
-      className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition ${
+      className={`inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full text-xs sm:text-sm font-bold transition ${
         active ? "bg-red-600 text-white" : "bg-zinc-800 text-zinc-500"
       }`}
     >
@@ -126,29 +126,29 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
 
   return (
     <main className="min-h-screen bg-[#0b0b0b] pt-28">
-      <section className="py-14 text-center">
+      <section className="py-8 sm:py-14 text-center">
         <p className="text-xs font-bold uppercase tracking-[0.25em] text-red-600">{lang === "sq" ? "Krijo Vetë" : "Изработи сам"}</p>
-        <h1 className="mt-3 text-5xl font-black uppercase leading-tight text-white">{lang === "sq" ? "Tapetet e tua. Zgjedhja jote." : "Твоите патосници. Твој избор."}</h1>
+        <h1 className="mt-3 text-3xl sm:text-5xl font-black uppercase leading-tight text-white">{lang === "sq" ? "Tapetet e tua. Zgjedhja jote." : "Твоите патосници. Твој избор."}</h1>
         <p className="mt-4 text-zinc-400">{lang === "sq" ? "Zgjidh automjetin, ngjyrën, bordurën dhe logon." : "Избери возило, боја, раб и лого."}</p>
       </section>
 
-      <div className="mx-auto mb-12 flex max-w-xl items-center justify-center gap-2 px-6">
+      <div className="mx-auto mb-8 sm:mb-12 flex max-w-xl items-center justify-center gap-1 sm:gap-2 px-4 sm:px-6">
         {steps.map((s, i) => (
           <div key={s} className="flex items-center gap-2">
             <StepDot n={i + 1} active={steps.indexOf(step) >= i} />
-            {i < 3 && <div className="h-px w-8 bg-zinc-800" />}
+            {i < 3 && <div className="h-px w-5 sm:w-8 bg-zinc-800" />}
           </div>
         ))}
       </div>
 
-      <div className="mx-auto max-w-6xl px-6">
+      <div className="mx-auto max-w-6xl px-3 sm:px-6">
         <div className="grid gap-10 lg:grid-cols-2">
 
           {/* LEFT: Steps */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Vehicle */}
-            <div className={`rounded-2xl border p-6 ${step === "vehicle" ? "border-red-600/40 bg-[#111]" : "border-zinc-800 bg-[#0d0d0d]"}`}>
-              <h2 className="mb-5 flex items-center gap-3 text-lg font-black uppercase text-white"><StepDot n={1} active={step === "vehicle"} />{stepLabels.vehicle}</h2>
+            <div className={`rounded-2xl border p-4 sm:p-6 ${step === "vehicle" ? "border-red-600/40 bg-[#111]" : "border-zinc-800 bg-[#0d0d0d]"}`}>
+              <h2 className="mb-4 sm:mb-5 flex items-center gap-2 sm:gap-3 text-base sm:text-lg font-black uppercase text-white"><StepDot n={1} active={step === "vehicle"} />{stepLabels.vehicle}</h2>
               {config.vehicle ? (
                 <div className="flex items-center justify-between rounded-xl border border-red-600/30 bg-[#1a1a1a] p-4">
                   <div><p className="font-bold text-white">{config.vehicle.generation}</p></div>
@@ -157,7 +157,7 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
               ) : (
                 <>
                   {!selectedBrandId && (
-                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
                       {uniqueBrands.map((b) => (
                         <button type="button" key={b.id} onClick={() => { setSelectedBrandId(b.id); setSelectedModel(null); }} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-3 py-3 text-center text-sm font-semibold text-white transition hover:border-red-600 hover:bg-black">{b.name}</button>
                       ))}
@@ -166,7 +166,7 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
                   {selectedBrandId && !selectedModel && (
                     <>
                       <button type="button" onClick={resetBrand} className="mb-3 text-xs text-zinc-500 hover:text-white">&larr; {lang === "sq" ? "MODEL" : "МОДЕЛ"}</button>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
                         {modelsForBrand.map((m) => (
                           <button type="button" key={m} onClick={() => setSelectedModel(m)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-center text-sm font-semibold text-white transition hover:border-red-600 hover:bg-black">{brandName(selectedBrandId!)} {m}</button>
                         ))}
@@ -188,44 +188,44 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
             </div>
 
             {/* Body color */}
-            <div className={`rounded-2xl border p-6 ${step === "body" ? "border-red-600/40 bg-[#111]" : "border-zinc-800 bg-[#0d0d0d]"}`}>
-              <h2 className="mb-5 flex items-center gap-3 text-lg font-black uppercase text-white"><StepDot n={2} active={step === "body"} />{stepLabels.body}</h2>
-              <div className="grid grid-cols-3 gap-4">
+            <div className={`rounded-2xl border p-4 sm:p-6 ${step === "body" ? "border-red-600/40 bg-[#111]" : "border-zinc-800 bg-[#0d0d0d]"}`}>
+              <h2 className="mb-4 sm:mb-5 flex items-center gap-2 sm:gap-3 text-base sm:text-lg font-black uppercase text-white"><StepDot n={2} active={step === "body"} />{stepLabels.body}</h2>
+              <div className="grid grid-cols-3 gap-3 sm:gap-4">
                 {BODY_COLORS.map((c) => (
                   <button type="button" key={c.id} onClick={() => selectBody(c)} className={`rounded-xl border p-4 text-center transition ${config.bodyColor.id === c.id ? "border-red-600 bg-black ring-1 ring-red-600/30" : "border-zinc-700 bg-[#1a1a1a] hover:border-red-600/50"}`}>
-                    <div className="mx-auto mb-3 h-20 w-full rounded-lg border border-zinc-600" style={{ backgroundColor: c.hex }} />
-                    <span className="text-sm font-semibold text-white">{lang === "sq" ? c.label_sq : c.label_mk}</span>
+                    <div className="mx-auto mb-2 sm:mb-3 h-16 sm:h-20 w-full rounded-lg border border-zinc-600" style={{ backgroundColor: c.hex }} />
+                    <span className="text-xs sm:text-sm font-semibold text-white">{lang === "sq" ? c.label_sq : c.label_mk}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Border color */}
-            <div className={`rounded-2xl border p-6 ${step === "border" ? "border-red-600/40 bg-[#111]" : "border-zinc-800 bg-[#0d0d0d]"}`}>
-              <h2 className="mb-5 flex items-center gap-3 text-lg font-black uppercase text-white"><StepDot n={3} active={step === "border"} />{stepLabels.border}</h2>
-              <div className="grid grid-cols-4 gap-4">
+            <div className={`rounded-2xl border p-4 sm:p-6 ${step === "border" ? "border-red-600/40 bg-[#111]" : "border-zinc-800 bg-[#0d0d0d]"}`}>
+              <h2 className="mb-4 sm:mb-5 flex items-center gap-2 sm:gap-3 text-base sm:text-lg font-black uppercase text-white"><StepDot n={3} active={step === "border"} />{stepLabels.border}</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                 {BORDER_COLORS.map((c) => (
                   <button type="button" key={c.id} onClick={() => selectBorder(c)} className={`rounded-xl border p-4 text-center transition ${config.borderColor.id === c.id ? "border-red-600 bg-black ring-1 ring-red-600/30" : "border-zinc-700 bg-[#1a1a1a] hover:border-red-600/50"}`}>
-                    <div className="mx-auto mb-3 h-14 w-full rounded-lg border border-zinc-600" style={{ backgroundColor: c.hex }} />
-                    <span className="text-sm font-semibold text-white">{lang === "sq" ? c.label_sq : c.label_mk}</span>
+                    <div className="mx-auto mb-2 sm:mb-3 h-10 sm:h-14 w-full rounded-lg border border-zinc-600" style={{ backgroundColor: c.hex }} />
+                    <span className="text-xs sm:text-sm font-semibold text-white">{lang === "sq" ? c.label_sq : c.label_mk}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Logo */}
-            <div className={`rounded-2xl border p-6 ${step === "logo" ? "border-red-600/40 bg-[#111]" : "border-zinc-800 bg-[#0d0d0d]"}`}>
-              <h2 className="mb-5 flex items-center gap-3 text-lg font-black uppercase text-white"><StepDot n={4} active={step === "logo"} />{stepLabels.logo}</h2>
+            <div className={`rounded-2xl border p-4 sm:p-6 ${step === "logo" ? "border-red-600/40 bg-[#111]" : "border-zinc-800 bg-[#0d0d0d]"}`}>
+              <h2 className="mb-4 sm:mb-5 flex items-center gap-2 sm:gap-3 text-base sm:text-lg font-black uppercase text-white"><StepDot n={4} active={step === "logo"} />{stepLabels.logo}</h2>
               <div className="flex gap-4">
-                <button type="button" onClick={() => toggleLogo(false)} className={`flex-1 rounded-xl border p-4 text-center transition ${!config.withLogo ? "border-red-600 bg-black ring-1 ring-red-600/30" : "border-zinc-700 bg-[#1a1a1a] hover:border-red-600/50"}`}><span className="text-sm font-semibold text-white">{lang === "sq" ? "Pa logo" : "Без лого"}</span></button>
-                <button type="button" onClick={() => toggleLogo(true)} className={`flex-1 rounded-xl border p-4 text-center transition ${config.withLogo ? "border-red-600 bg-black ring-1 ring-red-600/30" : "border-zinc-700 bg-[#1a1a1a] hover:border-red-600/50"}`}><span className="text-sm font-semibold text-white">{lang === "sq" ? "Me logo" : "Со лого"}</span>{config.vehicle && <p className="mt-1 text-xs text-zinc-500">{brandName(config.vehicle.brandId)}</p>}</button>
+                <button type="button" onClick={() => toggleLogo(false)} className={`flex-1 rounded-xl border p-4 text-center transition ${!config.withLogo ? "border-red-600 bg-black ring-1 ring-red-600/30" : "border-zinc-700 bg-[#1a1a1a] hover:border-red-600/50"}`}><span className="text-xs sm:text-sm font-semibold text-white">{lang === "sq" ? "Pa logo" : "Без лого"}</span></button>
+                <button type="button" onClick={() => toggleLogo(true)} className={`flex-1 rounded-xl border p-4 text-center transition ${config.withLogo ? "border-red-600 bg-black ring-1 ring-red-600/30" : "border-zinc-700 bg-[#1a1a1a] hover:border-red-600/50"}`}><span className="text-xs sm:text-sm font-semibold text-white">{lang === "sq" ? "Me logo" : "Со лого"}</span>{config.vehicle && <p className="mt-1 text-xs text-zinc-500">{brandName(config.vehicle.brandId)}</p>}</button>
               </div>
             </div>
           </div>
 
           {/* RIGHT: Preview */}
           <div className="lg:sticky lg:top-28 lg:self-start">
-            <div className="rounded-2xl border border-zinc-800 bg-[#111] p-6">
+            <div className="rounded-2xl border border-zinc-800 bg-[#111] p-4 sm:p-6">
               <h3 className="mb-5 text-sm font-bold uppercase tracking-widest text-zinc-500">{lang === "sq" ? "Pamja paraprake" : "Преглед"}</h3>
               <MatPreview bodyColorHex={config.bodyColor.hex} borderColorHex={config.borderColor.hex} withLogo={config.withLogo} brandId={config.vehicle?.brandId ?? null} />
               {config.vehicle && (
@@ -264,7 +264,7 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
                   </div>
                   {error && <p className="mt-4 rounded-xl border border-red-800 bg-red-950/30 px-4 py-3 text-sm text-red-400">{error}</p>}
                   <div className="mt-5 rounded-xl border border-amber-800/40 bg-amber-950/20 p-4"><p className="mb-1 text-xs font-bold uppercase tracking-wider text-amber-600/80">{lang === "sq" ? "Konfigurimi" : "Конфигурација"}</p><p className="text-sm text-amber-200">{configSummary}</p></div>
-                  <div className="mt-6"><p className="mb-2 text-xs font-bold uppercase tracking-wider text-zinc-400">{t("payment_method")}</p><div className="flex items-center gap-3 rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3.5"><div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 border-red-600 bg-red-600"><div className="h-2 w-2 rounded-full bg-white" /></div><span className="text-sm font-semibold text-white">{t("payment_cod")}</span><span className="ml-auto text-xs text-zinc-500">{t("payment_delivery")}</span></div></div>
+                  <div className="mt-6"><p className="mb-2 text-xs font-bold uppercase tracking-wider text-zinc-400">{t("payment_method")}</p><div className="flex items-center gap-3 rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3.5"><div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 border-red-600 bg-red-600"><div className="h-2 w-2 rounded-full bg-white" /></div><span className="text-xs sm:text-sm font-semibold text-white">{t("payment_cod")}</span><span className="ml-auto text-xs text-zinc-500">{t("payment_delivery")}</span></div></div>
                   <button type="submit" disabled={loading} className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl bg-red-600 py-4 text-base font-bold uppercase tracking-widest text-white transition hover:bg-red-700 active:scale-[0.98] disabled:opacity-60">{loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}{loading ? t("order_sending") : t("order_submit")}</button>
                 </form>
               )}
