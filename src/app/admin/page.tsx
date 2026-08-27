@@ -11,6 +11,7 @@ import {
   Lock, Plus, Trash2, LogOut, Package, ShoppingCart, Warehouse,
   CheckCircle, AlertCircle, Loader2, Pencil,
   X, Upload, ImageIcon, Phone, Mail as MailIcon, Clock, Minus, Download,
+  ChevronUp, ChevronDown,
 } from "lucide-react";
 
 type Product = {
@@ -126,7 +127,7 @@ export default function AdminPage() {
   const [listSearch, setListSearch] = useState("");
   const [stockFilter, setStockFilter] = useState<"all" | "out_of_stock">("all");
   const [expandedBrands, setExpandedBrands] = useState<Record<string,boolean>>({});
-  const [activeTab, setActiveTab] = useState<"products" | "orders" | "inventory">("orders");
+  const [activeTab, setActiveTab] = useState<"products" | "orders" | "inventory" | "showcase">("orders");
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersMonth, setOrdersMonth] = useState(() => new Date().toISOString().slice(0,7));
   const [ordersStatus, setOrdersStatus] = useState("");
