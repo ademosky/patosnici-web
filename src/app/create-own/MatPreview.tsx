@@ -103,16 +103,36 @@ function Mat({
           <ellipse cx={clipX2} cy={clipY2} rx="3.5" ry="2.5" fill="rgba(0,0,0,0.45)" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
         </>
       )}
-      {/* Brand logo — bottom-left, above mounting holes (reference position) */}
+      {/* Premium embroidered brand badge */}
       {withLogo && logo && (
-        <g opacity="0.85">
-          <rect x="65" y="152" width="48" height="14" rx="3" fill={isLightLogo(brandId) ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.45)"} />
+        <g>
+          {/* Outer border — subtle contrast ring visible on all mat colors */}
+          <rect
+            x="78" y="138" width="36" height="36" rx="6"
+            fill="none"
+            stroke="rgba(255,255,255,0.25)"
+            strokeWidth="1.2"
+          />
+          {/* Inner border — stitched effect */}
+          <rect
+            x="80" y="140" width="32" height="32" rx="5"
+            fill="none"
+            stroke="rgba(255,255,255,0.12)"
+            strokeWidth="0.8"
+            strokeDasharray="2 2"
+          />
+          {/* Badge background — subtle, works on all mat colors */}
+          <rect
+            x="80" y="140" width="32" height="32" rx="5"
+            fill={isLightLogo(brandId) ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.35)"}
+          />
+          {/* Brand logo SVG — centered, proportional */}
           <image
             href={logo}
-            x="67"
-            y="154"
-            width="44"
-            height="10"
+            x="83"
+            y="143"
+            width="26"
+            height="26"
             preserveAspectRatio="xMidYMid meet"
             style={isLightLogo(brandId) ? {} : { filter: "invert(1)" }}
           />
