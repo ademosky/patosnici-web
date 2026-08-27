@@ -617,8 +617,8 @@ export default function AdminPage() {
         }
       );
       if (uploadRes.ok) {
-        const { data } = supabaseAdmin().storage.from("products").getPublicUrl(filename);
-        setShowcaseForm((p) => ({ ...p, image: data.publicUrl }));
+        const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${filename}`;
+        setShowcaseForm((p) => ({ ...p, image: publicUrl }));
       }
     } catch (err) {
       console.error("Showcase upload error:", err);
