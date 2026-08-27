@@ -1,9 +1,17 @@
 "use client";
 
-import { brands } from "../data/brands";
+import { brands, type Brand } from "../data/brands";
+
+function getBrand(brandId: string): Brand | undefined {
+  return brands.find((b) => b.id === brandId);
+}
 
 function brandLogo(brandId: string) {
-  return brands.find((b) => b.id === brandId)?.logo ?? "";
+  return getBrand(brandId)?.logo ?? "";
+}
+
+function isLightLogo(brandId: string) {
+  return getBrand(brandId)?.lightLogo === true;
 }
 
 // ── MatPreview ──────────────────────────────────────────────────────────────
@@ -58,6 +66,7 @@ function Mat({
   clipY1,
   clipX2,
   clipY2,
+  brandId,
 }: {
   d: string;
   bodyColorHex: string;
@@ -69,6 +78,7 @@ function Mat({
   clipY1: number;
   clipX2: number;
   clipY2: number;
+  brandId?: string | null;
 }) {
   return (
     <g filter="url(#sh)">
@@ -95,8 +105,8 @@ function Mat({
       )}
       {/* Brand logo — bottom-left, above mounting holes (reference position) */}
       {withLogo && logo && (
-        <>
-          <rect x="65" y="152" width="48" height="14" rx="3" fill="rgba(0,0,0,0.45)" />
+        <g opacity="0.85">
+          <rect x="65" y="152" width="48" height="14" rx="3" fill={isLightLogo(brandId) ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.45)"} />
           <image
             href={logo}
             x="67"
@@ -104,9 +114,9 @@ function Mat({
             width="44"
             height="10"
             preserveAspectRatio="xMidYMid meet"
-            style={{ filter: "invert(1) opacity(0.85)" }}
+            style={isLightLogo(brandId) ? {} : { filter: "invert(1)" }}
           />
-        </>
+        </g>
       )}
     </g>
   );
@@ -175,6 +185,7 @@ export default function MatPreview({
           clipY1={188}
           clipX2={164}
           clipY2={188}
+          brandId={brandId}
         />
 
         {/* Driver Front (right) — no logo */}
