@@ -151,33 +151,33 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
               {config.vehicle ? (
                 <div className="flex items-center justify-between rounded-xl border border-red-600/30 bg-[#1a1a1a] p-4">
                   <div><p className="font-bold text-white">{config.vehicle.generation}</p></div>
-                  <button onClick={resetBrand} className="text-xs text-zinc-500 hover:text-red-500">{lang === "sq" ? "Ndrysho" : "Промени"}</button>
+                  <button type="button" onClick={resetBrand} className="text-xs text-zinc-500 hover:text-red-500">{lang === "sq" ? "Ndrysho" : "Промени"}</button>
                 </div>
               ) : (
                 <>
                   {!selectedBrandId && (
                     <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                       {uniqueBrands.map((b) => (
-                        <button key={b.id} onClick={() => { setSelectedBrandId(b.id); setSelectedModel(null); }} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-3 py-3 text-center text-sm font-semibold text-white transition hover:border-red-600 hover:bg-black">{b.name}</button>
+                        <button type="button" key={b.id} onClick={() => { setSelectedBrandId(b.id); setSelectedModel(null); }} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-3 py-3 text-center text-sm font-semibold text-white transition hover:border-red-600 hover:bg-black">{b.name}</button>
                       ))}
                     </div>
                   )}
                   {selectedBrandId && !selectedModel && (
                     <>
-                      <button onClick={resetBrand} className="mb-3 text-xs text-zinc-500 hover:text-white">&larr; {lang === "sq" ? "MODEL" : "МОДЕЛ"}</button>
+                      <button type="button" onClick={resetBrand} className="mb-3 text-xs text-zinc-500 hover:text-white">&larr; {lang === "sq" ? "MODEL" : "МОДЕЛ"}</button>
                       <div className="grid grid-cols-2 gap-2">
                         {modelsForBrand.map((m) => (
-                          <button key={m} onClick={() => setSelectedModel(m)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-center text-sm font-semibold text-white transition hover:border-red-600 hover:bg-black">{brandName(selectedBrandId!)} {m}</button>
+                          <button type="button" key={m} onClick={() => setSelectedModel(m)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-center text-sm font-semibold text-white transition hover:border-red-600 hover:bg-black">{brandName(selectedBrandId!)} {m}</button>
                         ))}
                       </div>
                     </>
                   )}
                   {selectedModel && (
                     <>
-                      <button onClick={resetModel} className="mb-3 text-xs text-zinc-500 hover:text-white">&larr; {lang === "sq" ? "VITI" : "Година"}</button>
+                      <button type="button" onClick={resetModel} className="mb-3 text-xs text-zinc-500 hover:text-white">&larr; {lang === "sq" ? "VITI" : "Година"}</button>
                       <div className="space-y-2">
                         {generationsForModel.map((v) => (
-                          <button key={v.generation} onClick={() => selectVehicle(v)} className="w-full rounded-xl border border-zinc-700 bg-[#1a1a1a] p-4 text-left text-white transition hover:border-red-600 hover:bg-black"><p className="font-semibold">{v.generation}</p></button>
+                          <button type="button" key={v.generation} onClick={() => selectVehicle(v)} className="w-full rounded-xl border border-zinc-700 bg-[#1a1a1a] p-4 text-left text-white transition hover:border-red-600 hover:bg-black"><p className="font-semibold">{v.generation}</p></button>
                         ))}
                       </div>
                     </>
@@ -191,7 +191,7 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
               <h2 className="mb-5 flex items-center gap-3 text-lg font-black uppercase text-white"><StepDot n={2} active={step === "body"} />{stepLabels.body}</h2>
               <div className="grid grid-cols-3 gap-4">
                 {BODY_COLORS.map((c) => (
-                  <button key={c.id} onClick={() => selectBody(c)} className={`rounded-xl border p-4 text-center transition ${config.bodyColor.id === c.id ? "border-red-600 bg-black ring-1 ring-red-600/30" : "border-zinc-700 bg-[#1a1a1a] hover:border-red-600/50"}`}>
+                  <button type="button" key={c.id} onClick={() => selectBody(c)} className={`rounded-xl border p-4 text-center transition ${config.bodyColor.id === c.id ? "border-red-600 bg-black ring-1 ring-red-600/30" : "border-zinc-700 bg-[#1a1a1a] hover:border-red-600/50"}`}>
                     <div className="mx-auto mb-3 h-20 w-full rounded-lg border border-zinc-600" style={{ backgroundColor: c.hex }} />
                     <span className="text-sm font-semibold text-white">{lang === "sq" ? c.label_sq : c.label_mk}</span>
                   </button>
@@ -204,7 +204,7 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
               <h2 className="mb-5 flex items-center gap-3 text-lg font-black uppercase text-white"><StepDot n={3} active={step === "border"} />{stepLabels.border}</h2>
               <div className="grid grid-cols-4 gap-4">
                 {BORDER_COLORS.map((c) => (
-                  <button key={c.id} onClick={() => selectBorder(c)} className={`rounded-xl border p-4 text-center transition ${config.borderColor.id === c.id ? "border-red-600 bg-black ring-1 ring-red-600/30" : "border-zinc-700 bg-[#1a1a1a] hover:border-red-600/50"}`}>
+                  <button type="button" key={c.id} onClick={() => selectBorder(c)} className={`rounded-xl border p-4 text-center transition ${config.borderColor.id === c.id ? "border-red-600 bg-black ring-1 ring-red-600/30" : "border-zinc-700 bg-[#1a1a1a] hover:border-red-600/50"}`}>
                     <div className="mx-auto mb-3 h-14 w-full rounded-lg border border-zinc-600" style={{ backgroundColor: c.hex }} />
                     <span className="text-sm font-semibold text-white">{lang === "sq" ? c.label_sq : c.label_mk}</span>
                   </button>
@@ -216,8 +216,8 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
             <div className={`rounded-2xl border p-6 ${step === "logo" ? "border-red-600/40 bg-[#111]" : "border-zinc-800 bg-[#0d0d0d]"}`}>
               <h2 className="mb-5 flex items-center gap-3 text-lg font-black uppercase text-white"><StepDot n={4} active={step === "logo"} />{stepLabels.logo}</h2>
               <div className="flex gap-4">
-                <button onClick={() => toggleLogo(false)} className={`flex-1 rounded-xl border p-4 text-center transition ${!config.withLogo ? "border-red-600 bg-black ring-1 ring-red-600/30" : "border-zinc-700 bg-[#1a1a1a] hover:border-red-600/50"}`}><span className="text-sm font-semibold text-white">{lang === "sq" ? "Pa logo" : "Без лого"}</span></button>
-                <button onClick={() => toggleLogo(true)} className={`flex-1 rounded-xl border p-4 text-center transition ${config.withLogo ? "border-red-600 bg-black ring-1 ring-red-600/30" : "border-zinc-700 bg-[#1a1a1a] hover:border-red-600/50"}`}><span className="text-sm font-semibold text-white">{lang === "sq" ? "Me logo" : "Со лого"}</span>{config.vehicle && <p className="mt-1 text-xs text-zinc-500">{brandName(config.vehicle.brandId)}</p>}</button>
+                <button type="button" onClick={() => toggleLogo(false)} className={`flex-1 rounded-xl border p-4 text-center transition ${!config.withLogo ? "border-red-600 bg-black ring-1 ring-red-600/30" : "border-zinc-700 bg-[#1a1a1a] hover:border-red-600/50"}`}><span className="text-sm font-semibold text-white">{lang === "sq" ? "Pa logo" : "Без лого"}</span></button>
+                <button type="button" onClick={() => toggleLogo(true)} className={`flex-1 rounded-xl border p-4 text-center transition ${config.withLogo ? "border-red-600 bg-black ring-1 ring-red-600/30" : "border-zinc-700 bg-[#1a1a1a] hover:border-red-600/50"}`}><span className="text-sm font-semibold text-white">{lang === "sq" ? "Me logo" : "Со лого"}</span>{config.vehicle && <p className="mt-1 text-xs text-zinc-500">{brandName(config.vehicle.brandId)}</p>}</button>
               </div>
             </div>
           </div>
@@ -237,7 +237,7 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
                     <div className="flex justify-between text-sm"><span className="text-zinc-400">Лого</span><span className="font-semibold text-white">{config.withLogo ? `${lang === "sq" ? "Me logo" : "Со лого"} — ${brandName(config.vehicle.brandId)}` : lang === "sq" ? "Pa logo" : "Без лого"}</span></div>
                     <div className="mt-3 flex items-center justify-between border-t border-zinc-700 pt-3"><span className="text-sm font-semibold text-zinc-300">{lang === "sq" ? "Çmimi" : "Цена"}</span><span className="text-2xl font-extrabold text-red-500">{priceDisplay}</span></div>
                   </div>
-                  <button onClick={handleAddToCart} disabled={cartAdded} className={`w-full rounded-xl py-4 text-sm font-bold uppercase text-white transition ${cartAdded ? "bg-green-600" : "bg-red-600 hover:bg-red-700"}`}><span className="flex items-center justify-center gap-2">{cartAdded ? <CheckCircle size={18} /> : <ShoppingCart size={18} />}{cartAdded ? lang === "sq" ? "U shtua ✓" : "Додадено ✓" : lang === "sq" ? "Shto në shportë" : "Додај во корпа"}</span></button>
+                  <button type="button" onClick={handleAddToCart} disabled={cartAdded} className={`w-full rounded-xl py-4 text-sm font-bold uppercase text-white transition ${cartAdded ? "bg-green-600" : "bg-red-600 hover:bg-red-700"}`}><span className="flex items-center justify-center gap-2">{cartAdded ? <CheckCircle size={18} /> : <ShoppingCart size={18} />}{cartAdded ? lang === "sq" ? "U shtua ✓" : "Додадено ✓" : lang === "sq" ? "Shto në shportë" : "Додај во корпа"}</span></button>
                 </div>
               )}
             </div>
