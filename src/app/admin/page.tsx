@@ -686,6 +686,10 @@ export default function AdminPage() {
                 className={`px-4 py-2 text-xs font-bold uppercase transition ${activeTab === "inventory" ? "bg-red-600 text-white" : "text-zinc-400 hover:text-white"}`}>
                 <Warehouse size={13} className="mr-1 inline" /> Залиха
               </button>
+              <button onClick={() => { setActiveTab("showcase"); fetchShowcase(); }}
+                className={`px-4 py-2 text-xs font-bold uppercase transition ${activeTab === "showcase" ? "bg-red-600 text-white" : "text-zinc-400 hover:text-white"}`}>
+                <ImageIcon size={13} className="mr-1 inline" /> Платнени
+              </button>
             </div>
             <Link href="/" className="hidden sm:block text-sm text-zinc-400 transition hover:text-white">
               ← Кон сајтот
