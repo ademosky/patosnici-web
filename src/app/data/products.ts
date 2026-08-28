@@ -21,7 +21,7 @@ export async function getProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from("products")
     .select("*")
-    .order("created_at", { ascending: true });
+    .order("sort_order", { ascending: true }).order("created_at", { ascending: true });
 
   if (error) { console.error("getProducts error:", error); return []; }
   return data as Product[];
