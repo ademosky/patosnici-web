@@ -172,12 +172,12 @@ export default async function ProductPage({ params }: Props) {
         productName={product.title}
         productPrice={product.price}
       />
-      <main className="min-h-screen bg-[#0b0b0b] pt-28">
-        <div className="mx-auto max-w-6xl px-6 py-12">
+      <main className="min-h-screen bg-[#0b0b0b] pt-20 sm:pt-28">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-12">
 
           <BackLink />
 
-          <div className="grid gap-12 lg:grid-cols-2">
+          <div className="grid gap-8 sm:gap-12 lg:grid-cols-2">
 
             {/* Carousel */}
             <div className="relative">
@@ -201,12 +201,12 @@ export default async function ProductPage({ params }: Props) {
                 {product.brand.toUpperCase()} · {product.year}
               </p>
 
-              <h1 className="mt-3 text-4xl font-black uppercase leading-tight text-white">
+              <h1 className="mt-3 text-2xl sm:text-4xl font-black uppercase leading-tight text-white">
                 {product.title}
               </h1>
 
               {/* Модел + SKU */}
-              <div className="mt-4 flex flex-wrap items-center gap-3">
+              <div className="mt-3 sm:mt-4 flex flex-wrap items-center gap-2 sm:gap-3">
                 <span className="text-sm text-zinc-400">
                   {product.model} · {product.year}
                 </span>
@@ -222,7 +222,7 @@ export default async function ProductPage({ params }: Props) {
 
               <ProductDescription description_mk={product.description} description_sq={product.description_sq} />
 
-              <div className="mt-8 flex items-end gap-3">
+              <div className="mt-6 sm:mt-8 flex items-end gap-3">
                 <PriceDisplay price={product.price} priceEur={product.price_eur} className="text-5xl font-extrabold text-red-600" />
                 <PaymentNote />
               </div>
@@ -243,7 +243,7 @@ export default async function ProductPage({ params }: Props) {
           </div>
 
           {/* Order Form */}
-          <div id="naracaj" className="mt-20">
+          <div id="naracaj" className="mt-14 sm:mt-20">
             <OrderHeader productTitle={product.title} price={product.price} priceEur={product.price_eur} />
             <div className="mx-auto max-w-2xl">
               <OrderForm
