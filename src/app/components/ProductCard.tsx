@@ -40,7 +40,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <article className="group overflow-hidden rounded-2xl border border-zinc-800 bg-[#141414] transition-all duration-300 hover:-translate-y-2 hover:border-red-600 hover:shadow-[0_10px_35px_rgba(220,38,38,0.20)]">
       <Link href={localizedPath(`/products/${product.slug}`)} className="block">
-        <div className="relative h-64 overflow-hidden bg-black">
+        <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden bg-black">
           <Image src={product.image} alt={product.title} fill sizes="(max-width: 768px) 50vw, 25vw" loading="lazy" className={`object-cover transition-transform duration-500 group-hover:scale-105 ${product.in_stock === false ? "opacity-50" : ""}`} />
           {product.in_stock === false && (
             <div className="absolute inset-0 flex items-center justify-center">
@@ -49,16 +49,16 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
       </Link>
-      <div className="p-5">
-        <p className="text-xs font-bold uppercase tracking-widest text-red-600">{product.model} · {product.year}</p>
+      <div className="p-3.5 sm:p-5">
+        <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-red-600">{product.model} · {product.year}</p>
         <Link href={localizedPath(`/products/${product.slug}`)}>
-          <h3 className="mt-2 text-xl font-bold text-white hover:text-red-500 transition">{product.title}</h3>
+          <h3 className="mt-1.5 sm:mt-2 text-base sm:text-xl font-bold text-white hover:text-red-500 transition">{product.title}</h3>
         </Link>
-        <p className="mt-2 text-sm text-zinc-400">{t("prod_original")}</p>
-        <div className="mt-4"><span className="text-3xl font-extrabold text-red-600">{formatPrice(product.price, product.price_eur)}</span></div>
-        <div className="mt-5 flex gap-2">
+        <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-zinc-400">{t("prod_original")}</p>
+        <div className="mt-3 sm:mt-4"><span className="text-2xl sm:text-3xl font-extrabold text-red-600">{formatPrice(product.price, product.price_eur)}</span></div>
+        <div className="mt-4 sm:mt-5 flex gap-2">
           <Link href={localizedPath(`/products/${product.slug}`)}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-red-700">
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 py-2.5 sm:py-3 text-xs sm:text-sm font-bold uppercase tracking-wide text-white transition hover:bg-red-700">
             {t("prod_details")}
           </Link>
           {product.in_stock !== false ? (
