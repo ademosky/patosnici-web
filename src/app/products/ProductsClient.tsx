@@ -64,13 +64,13 @@ function ProductsContent({ initialProducts, brands }: Props) {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-[#0b0b0b] pt-28">
-        <div className="mx-auto max-w-7xl px-6 py-12">
+      <main className="min-h-screen bg-[#0b0b0b] pt-20 sm:pt-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 sm:py-12">
 
           {/* ── НАСЛОВ ── */}
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <p className="text-xs font-bold uppercase tracking-widest text-red-600">{t("prod_catalog")}</p>
-            <h1 className="mt-2 text-4xl font-black uppercase text-white">
+            <h1 className="mt-2 text-2xl sm:text-4xl font-black uppercase text-white">
               {isSearchMode
                 ? `${t("search_results_for")} „${localSearch}"`
                 : activeCarModel !== "all"
@@ -101,11 +101,11 @@ function ProductsContent({ initialProducts, brands }: Props) {
 
           {/* ── БРЕНД ИЗБОР (само кога нема активен бренд) ── */}
           {activeBrand === "all" && !isSearchMode && (
-            <div className="mb-6 flex flex-wrap gap-2">
+            <div className="mb-5 sm:mb-6 flex flex-wrap gap-1.5 sm:gap-2">
               {brands.map((b) => (
                 <button key={b.id}
                   onClick={() => router.push(localizedPath(`/products?brand=${b.id}`))}
-                  className="rounded-xl border border-zinc-700 px-4 py-2 text-xs font-bold uppercase tracking-wide text-zinc-400 transition hover:border-red-600 hover:text-white"
+                  className="rounded-xl border border-zinc-700 px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold uppercase tracking-wide text-zinc-400 transition hover:border-red-600 hover:text-white"
                 >
                   {b.name}
                 </button>
@@ -115,7 +115,7 @@ function ProductsContent({ initialProducts, brands }: Props) {
 
           {/* ── МОДЕЛИ (кога бренд е избран — prominentно!) ── */}
           {activeBrand !== "all" && !isSearchMode && carModels.length > 0 && (
-            <div className="mb-8">
+            <div className="mb-6 sm:mb-8">
               {/* Назад + бренд info */}
               <div className="mb-4 flex items-center gap-3">
                 <button onClick={() => router.push(localizedPath("/products"))}
@@ -170,7 +170,7 @@ function ProductsContent({ initialProducts, brands }: Props) {
 
           {/* ── ПРОИЗВОДИ GRID ── */}
           {filtered.length > 0 ? (
-            <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
               {filtered.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -190,12 +190,12 @@ function ProductsContent({ initialProducts, brands }: Props) {
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
                 <Link href={localizedPath("/contact")}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-8 py-4 text-sm font-bold uppercase text-white transition hover:bg-red-700">
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-6 sm:px-8 py-3 sm:py-4 text-sm font-bold uppercase text-white transition hover:bg-red-700">
                   <Mail size={16} /> {t("prod_contact")}
                 </Link>
                 {isSearchMode && (
                   <button onClick={() => { setLocalSearch(""); router.push(localizedPath("/products")); }}
-                    className="inline-flex items-center justify-center rounded-xl border border-zinc-700 px-8 py-4 text-sm font-semibold text-white transition hover:border-red-600">
+                    className="inline-flex items-center justify-center rounded-xl border border-zinc-700 px-6 sm:px-8 py-3 sm:py-4 text-sm font-semibold text-white transition hover:border-red-600">
                     ← {t("back_all_products")}
                   </button>
                 )}
