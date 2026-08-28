@@ -193,15 +193,7 @@ export default function MatPreview({
 
   return (
     <div className="relative mx-auto w-full max-w-md">
-      {/* Floating info notice */}
-      <div className="absolute left-0 right-0 top-0 z-10 flex justify-center px-3 pt-2">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700/50 bg-black/60 px-2.5 py-1 text-[10px] sm:text-xs text-zinc-500 backdrop-blur-sm">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 opacity-60"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          <span className="hidden sm:inline">Илустративен приказ — служи само за избор на боја, модел, раб и лого.</span>
-          <span className="sm:hidden">Илустративен приказ</span>
-        </span>
-      </div>
-      <svg
+<svg
         viewBox="0 0 480 420"
         className="h-auto w-full"
         xmlns="http://www.w3.org/2000/svg"
