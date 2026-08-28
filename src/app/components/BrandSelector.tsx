@@ -58,8 +58,8 @@ export default function BrandSelector() {
   };
 
   return (
-    <section className="bg-[#111111] py-20">
-      <div className="mx-auto max-w-7xl px-6">
+    <section className="bg-[#111111] py-12 sm:py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
 
         <div className="text-center">
           <p className="text-xs font-bold uppercase tracking-widest text-red-600">{t("cat_label")}</p>
@@ -128,7 +128,7 @@ export default function BrandSelector() {
         </div>
 
         {/* Brand Grid */}
-        <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
+        <div className="mt-8 sm:mt-12 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2.5 sm:gap-4">
           {filteredBrands.map((brand) => (
             <BrandCard key={brand.id} brand={brand} onClick={() => router.push(localizedPath(`/products?brand=${brand.id}`))} />
           ))}
