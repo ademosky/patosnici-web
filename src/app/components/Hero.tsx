@@ -8,24 +8,24 @@ export default function Hero() {
   const { t, localizedPath } = useLanguage();
 
   return (
-    <section className="relative bg-[#0b0b0b] pt-28">
-      <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 lg:grid-cols-2">
-        <div className="z-10 py-14">
-          <h1 className="text-5xl font-black uppercase leading-tight text-white lg:text-6xl">
+    <section className="relative bg-[#0b0b0b] pt-20 sm:pt-28">
+      <div className="mx-auto grid max-w-7xl items-center gap-6 sm:gap-10 px-4 sm:px-6 lg:grid-cols-2">
+        <div className="z-10 py-8 sm:py-14">
+          <h1 className="text-3xl sm:text-5xl font-black uppercase leading-tight text-white lg:text-6xl">
             {t("hero_title")}
             <br />
             <span className="text-red-600">{t("hero_subtitle")}</span>
           </h1>
-          <p className="mt-8 max-w-lg text-lg leading-8 text-gray-300">
+          <p className="mt-5 sm:mt-8 max-w-lg text-base sm:text-lg leading-7 sm:leading-8 text-gray-300">
             {t("hero_desc").split("\n").map((line, i) => (
               <span key={i}>{line}{i === 0 && <br />}</span>
             ))}
           </p>
-          <Link href={localizedPath("/products")} className="mt-10 inline-block rounded-md bg-red-600 px-8 py-4 text-sm font-bold uppercase tracking-wide transition hover:bg-red-700">
+          <Link href={localizedPath("/products")} className="mt-6 sm:mt-10 inline-block rounded-md bg-red-600 px-7 sm:px-8 py-3.5 sm:py-4 text-sm font-bold uppercase tracking-wide transition hover:bg-red-700">
             {t("hero_cta")}
           </Link>
         </div>
-        <div className="relative h-[520px]">
+        <div className="relative h-[300px] sm:h-[420px] lg:h-[520px]">
           <Image
             src="/images/hero-bg.webp"
             alt="Original Patosnici"
