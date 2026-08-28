@@ -77,6 +77,8 @@ function Mat({
   clipX2,
   clipY2,
   brandId,
+  heelPad,
+  footrest,
 }: {
   d: string;
   bodyColorHex: string;
@@ -89,6 +91,8 @@ function Mat({
   clipX2: number;
   clipY2: number;
   brandId?: string | null;
+  heelPad?: { x: number; y: number; w: number; h: number } | null;
+  footrest?: { x: number; y: number; w: number; h: number } | null;
 }) {
   return (
     <g filter="url(#sh)">
@@ -112,6 +116,26 @@ function Mat({
           <ellipse cx={clipX1} cy={clipY1} rx="3.5" ry="2.5" fill="rgba(0,0,0,0.45)" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
           <ellipse cx={clipX2} cy={clipY2} rx="3.5" ry="2.5" fill="rgba(0,0,0,0.45)" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
         </>
+      )}
+      {/* Heel pad — subtle embossed area where the heel rests */}
+      {heelPad && (
+        <rect
+          x={heelPad.x} y={heelPad.y} width={heelPad.w} height={heelPad.h}
+          rx="9"
+          fill="rgba(0,0,0,0.16)"
+          stroke="rgba(255,255,255,0.06)"
+          strokeWidth="0.8"
+        />
+      )}
+      {/* Dead pedal / footrest — elongated raised area on driver side */}
+      {footrest && (
+        <rect
+          x={footrest.x} y={footrest.y} width={footrest.w} height={footrest.h}
+          rx="7"
+          fill="rgba(0,0,0,0.14)"
+          stroke="rgba(255,255,255,0.06)"
+          strokeWidth="0.8"
+        />
       )}
       {/* Premium embroidered brand badge — adaptive contrast */}
       {withLogo && logo && (
@@ -247,6 +271,7 @@ export default function MatPreview({
           clipX2={164}
           clipY2={188}
           brandId={brandId}
+          heelPad={{ x: 96, y: 172, w: 82, h: 20 }}
         />
 
         {/* Driver Front (right) — no logo */}
@@ -261,6 +286,8 @@ export default function MatPreview({
           clipY1={188}
           clipX2={378}
           clipY2={188}
+          heelPad={{ x: 316, y: 172, w: 82, h: 20 }}
+          footrest={{ x: 292, y: 56, w: 30, h: 70 }}
         />
 
         {/* Driver Rear */}
