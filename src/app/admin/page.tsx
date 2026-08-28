@@ -991,6 +991,16 @@ export default function AdminPage() {
                           </div>
                         </div>
                         <span className="flex-shrink-0 text-sm font-bold text-red-500">{p.price}</span>
+                        <div className="flex flex-col gap-0.5">
+                          <button type="button" onClick={() => handleMoveProduct(p.id, "up")}
+                            className="flex h-5 w-5 items-center justify-center rounded border border-zinc-700 text-zinc-500 transition hover:border-red-600 hover:text-red-500">
+                            <ChevronUp size={12} />
+                          </button>
+                          <button type="button" onClick={() => handleMoveProduct(p.id, "down")}
+                            className="flex h-5 w-5 items-center justify-center rounded border border-zinc-700 text-zinc-500 transition hover:border-red-600 hover:text-red-500">
+                            <ChevronDown size={12} />
+                          </button>
+                        </div>
                         <button onClick={() => editId === p.id ? cancelEdit() : handleEditClick(p)}
                           className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border transition ${editId === p.id ? "border-red-600 bg-red-600/20 text-red-400" : "border-zinc-700 text-zinc-400 hover:border-blue-500 hover:text-blue-400"}`}
                         >
