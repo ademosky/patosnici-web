@@ -231,6 +231,14 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1.5 inline-block align-[-1px]"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 {lang === "sq" ? "Paraqitje ilustruese — shërben vetëm për zgjedhjen e ngjyrës, modelit, bordurës dhe logos." : "Илустративен приказ — служи само за избор на боја, модел, раб и лого."}
               </p>
+              <button
+                type="button"
+                onClick={() => document.getElementById("izraboteni")?.scrollIntoView({ behavior: "smooth" })}
+                className="mb-4 flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold uppercase tracking-wide text-red-500/90 transition hover:text-red-400"
+              >
+                {lang === "sq" ? "Shiko produktet e realizuara" : "Види ги изработените продукти"}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+              </button>
               <MatPreview bodyColorHex={config.bodyColor.hex} borderColorHex={config.borderColor.hex} withLogo={config.withLogo} brandId={config.vehicle?.brandId ?? null} />
               {config.vehicle && (
                 <div className="mt-6 space-y-3">
