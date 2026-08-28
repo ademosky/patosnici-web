@@ -50,19 +50,19 @@ type MatPreviewProps = {
 
 /** Passenger front — tall, diagonal cut at top-LEFT (shown on LEFT) */
 const FL =
-  "M 66,205 C 66,180 67,145 70,112 C 72,88 76,66 82,50 L 98,20 C 106,12 118,10 130,10 L 168,10 C 182,12 194,18 202,28 C 208,38 211,50 212,62 C 214,110 214,158 212,196 C 212,202 208,205 203,205 Z";
+  "M68,205 L208,205 Q216,205 216,197 L216,20 L105,20 L52,74 L52,197 Q52,205 68,205 Z";
 
 /** Driver front — tall, diagonal cut at top-RIGHT (shown on RIGHT) */
 const FR =
-  "M 262,205 C 262,180 262,150 264,118 C 266,96 272,76 284,60 C 292,50 304,44 318,42 L 348,40 C 356,40 364,42 370,48 L 398,84 C 402,92 403,102 403,112 C 404,140 402,170 400,196 C 400,204 396,205 392,205 Z";
+  "M412,205 L272,205 Q264,205 264,197 L264,20 L375,20 L428,74 L428,197 Q428,205 412,205 Z";
 
 /** Driver rear — short, center notch at top */
 const RL =
-  "M 68,392 C 66,380 67,362 70,346 C 73,330 80,318 90,310 C 100,302 112,298 124,296 C 132,294 138,292 142,288 C 148,282 150,274 150,266 C 150,258 144,254 136,254 C 128,254 120,258 120,266 C 120,274 122,282 128,288 C 132,292 138,294 146,296 C 158,298 170,302 180,310 C 190,318 197,330 200,346 C 203,362 202,380 200,392 Z";
+  "M68,392 L208,392 Q217,392 217,382 L217,294 Q217,279 201,279 L163,279 L163,261 Q163,251 150,251 L128,251 Q116,251 116,261 L116,279 L77,279 Q58,279 58,294 L58,382 Q58,392 68,392 Z";
 
 /** Passenger rear — short, center notch at top (mirror of RL) */
 const RR =
-  "M 412,392 C 414,380 413,362 410,346 C 407,330 400,318 390,310 C 380,302 368,298 356,296 C 348,294 342,292 338,288 C 332,282 330,274 330,266 C 330,258 336,254 344,254 C 352,254 360,258 360,266 C 360,274 358,282 352,288 C 348,292 342,294 334,296 C 322,298 310,302 300,310 C 290,318 283,330 280,346 C 277,362 278,380 280,392 Z";
+  "M412,392 L272,392 Q263,392 263,382 L263,294 Q263,279 279,279 L317,279 L317,261 Q317,251 330,251 L352,251 Q364,251 364,261 L364,279 L403,279 Q422,279 422,294 L422,382 Q422,392 412,392 Z";
 
 /** Single mat drawn at a given offset */
 function Mat({
@@ -77,8 +77,6 @@ function Mat({
   clipX2,
   clipY2,
   brandId,
-  heelPad,
-  footrest,
 }: {
   d: string;
   bodyColorHex: string;
@@ -91,8 +89,6 @@ function Mat({
   clipX2: number;
   clipY2: number;
   brandId?: string | null;
-  heelPad?: { x: number; y: number; w: number; h: number } | null;
-  footrest?: { x: number; y: number; w: number; h: number } | null;
 }) {
   return (
     <g filter="url(#sh)">
@@ -116,26 +112,6 @@ function Mat({
           <ellipse cx={clipX1} cy={clipY1} rx="3.5" ry="2.5" fill="rgba(0,0,0,0.45)" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
           <ellipse cx={clipX2} cy={clipY2} rx="3.5" ry="2.5" fill="rgba(0,0,0,0.45)" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
         </>
-      )}
-      {/* Heel pad — subtle embossed area where the heel rests */}
-      {heelPad && (
-        <rect
-          x={heelPad.x} y={heelPad.y} width={heelPad.w} height={heelPad.h}
-          rx="9"
-          fill="rgba(0,0,0,0.16)"
-          stroke="rgba(255,255,255,0.06)"
-          strokeWidth="0.8"
-        />
-      )}
-      {/* Dead pedal / footrest — elongated raised area on driver side */}
-      {footrest && (
-        <rect
-          x={footrest.x} y={footrest.y} width={footrest.w} height={footrest.h}
-          rx="7"
-          fill="rgba(0,0,0,0.14)"
-          stroke="rgba(255,255,255,0.06)"
-          strokeWidth="0.8"
-        />
       )}
       {/* Premium embroidered brand badge — adaptive contrast */}
       {withLogo && logo && (
@@ -271,7 +247,6 @@ export default function MatPreview({
           clipX2={164}
           clipY2={188}
           brandId={brandId}
-          heelPad={{ x: 96, y: 172, w: 82, h: 20 }}
         />
 
         {/* Driver Front (right) — no logo */}
@@ -286,8 +261,6 @@ export default function MatPreview({
           clipY1={188}
           clipX2={378}
           clipY2={188}
-          heelPad={{ x: 316, y: 172, w: 82, h: 20 }}
-          footrest={{ x: 292, y: 56, w: 30, h: 70 }}
         />
 
         {/* Driver Rear */}
