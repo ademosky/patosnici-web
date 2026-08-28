@@ -135,7 +135,18 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
       <div className="mx-auto mb-8 sm:mb-12 flex max-w-xl items-center justify-center gap-1 sm:gap-2 px-4 sm:px-6">
         {steps.map((s, i) => (
           <div key={s} className="flex items-center gap-2">
-            <StepDot n={i + 1} active={steps.indexOf(step) >= i} />
+            <button
+              type="button"
+              onClick={() => {
+                const curIdx = steps.indexOf(step);
+                if (i <= curIdx && s !== "vehicle") setStep(s);
+              }}
+              disabled={i > steps.indexOf(step) || s === "vehicle"}
+              aria-label={stepLabels[s]}
+              className={`transition ${i <= steps.indexOf(step) && s !== "vehicle" ? "hover:scale-110" : ""} ${i > steps.indexOf(step) ? "opacity-40" : ""}`}
+            >
+              <StepDot n={i + 1} active={steps.indexOf(step) >= i} />
+            </button>
             {i < 3 && <div className="h-px w-5 sm:w-8 bg-zinc-800" />}
           </div>
         ))}
@@ -145,7 +156,7 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
         <div className="grid gap-10 lg:grid-cols-2">
 
           {/* LEFT: Steps */}
-          <div className="space-y-4 sm:space-y-6">
+          <div className="order-2 space-y-4 sm:space-y-6 lg:order-1">
             {/* Vehicle */}
             <div className={`rounded-2xl border p-4 sm:p-6 ${step === "vehicle" ? "border-red-600/40 bg-[#111]" : "border-zinc-800 bg-[#0d0d0d]"}`}>
               <h2 className="mb-4 sm:mb-5 flex items-center gap-2 sm:gap-3 text-base sm:text-lg font-black uppercase text-white"><StepDot n={1} active={step === "vehicle"} />{stepLabels.vehicle}</h2>
@@ -224,7 +235,7 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
           </div>
 
           {/* RIGHT: Preview */}
-          <div className="lg:sticky lg:top-28 lg:self-start">
+          <div className="order-1 lg:order-2 lg:sticky lg:top-28 lg:self-start">
             <div className="rounded-2xl border border-zinc-800 bg-[#111] p-4 sm:p-6">
               <h3 className="mb-3 text-sm font-bold uppercase tracking-widest text-zinc-500">{lang === "sq" ? "Pamja paraprake" : "Преглед"}</h3>
               <p className="mb-4 inline-block rounded-lg border border-red-600/20 bg-red-600/10 px-3 py-2 text-[11px] sm:text-xs leading-relaxed text-red-300/90">
