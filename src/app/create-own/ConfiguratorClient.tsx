@@ -226,7 +226,11 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
           {/* RIGHT: Preview */}
           <div className="lg:sticky lg:top-28 lg:self-start">
             <div className="rounded-2xl border border-zinc-800 bg-[#111] p-4 sm:p-6">
-              <h3 className="mb-5 text-sm font-bold uppercase tracking-widest text-zinc-500">{lang === "sq" ? "Pamja paraprake" : "Преглед"}</h3>
+              <h3 className="mb-3 text-sm font-bold uppercase tracking-widest text-zinc-500">{lang === "sq" ? "Pamja paraprake" : "Преглед"}</h3>
+              <p className="mb-4 text-[11px] sm:text-xs leading-relaxed text-zinc-500">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1.5 inline-block opacity-50 align-[-1px]"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                {lang === "sq" ? "Paraqitje ilustruese — shërben vetëm për zgjedhjen e ngjyrës, modelit, bordurës dhe logos." : "Илустративен приказ — служи само за избор на боја, модел, раб и лого."}
+              </p>
               <MatPreview bodyColorHex={config.bodyColor.hex} borderColorHex={config.borderColor.hex} withLogo={config.withLogo} brandId={config.vehicle?.brandId ?? null} />
               {config.vehicle && (
                 <div className="mt-6 space-y-3">
