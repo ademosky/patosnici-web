@@ -44,7 +44,7 @@ export default function ShowcaseSection() {
 
   return (
     <>
-      <section className="relative mx-auto max-w-7xl px-6 py-20 sm:py-28">
+      <section id="izraboteni" className="relative mx-auto max-w-7xl px-6 py-20 sm:py-28 scroll-mt-24">
         {/* Section header */}
         <div className="mb-12 text-center">
           <p className="text-xs font-bold uppercase tracking-[0.25em] text-red-600">
