@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type TouchEvent } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
@@ -18,6 +18,7 @@ export default function ShowcaseSection() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [items, setItems] = useState<ShowcaseItem[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -33,8 +34,6 @@ export default function ShowcaseSection() {
     };
     fetchItems();
   }, []);
-
-  if (items.length === 0) return null;
 
   const prev = () => setActiveIndex((p) => (p === 0 ? items.length - 1 : p - 1));
   const next = () => setActiveIndex((p) => (p === items.length - 1 ? 0 : p + 1));
@@ -60,10 +59,8 @@ export default function ShowcaseSection() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lightboxIndex, items.length]);
 
-  // Touch swipe (mobile)
-  const touchStartX = useRef<number | null>(null);
-  const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handleTouchStart = (e: TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e: TouchEvent) => {
     if (touchStartX.current === null) return;
     const dx = e.changedTouches[0].clientX - touchStartX.current;
     if (Math.abs(dx) > 50) {
@@ -72,6 +69,8 @@ export default function ShowcaseSection() {
     }
     touchStartX.current = null;
   };
+
+  if (items.length === 0) return null;
 
   return (
     <>
