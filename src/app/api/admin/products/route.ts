@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   const { data, error } = await supabaseAdmin()
     .from("products")
     .select("*")
-    .order("created_at", { ascending: true });
+    .order("sort_order", { ascending: true }).order("created_at", { ascending: true });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
