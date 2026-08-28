@@ -737,7 +737,7 @@ export default function AdminPage() {
             <h1 className="text-2xl font-black uppercase text-white">Admin Панел</h1>
             <p className="mt-2 text-sm text-zinc-500">Original Patosnici</p>
           </div>
-          <form onSubmit={handleLogin} className="rounded-2xl border border-zinc-800 bg-[#111] p-7">
+          <form onSubmit={handleLogin} className="rounded-2xl border border-zinc-800 bg-[#111] p-5 sm:p-7">
             <label className={labelClass}>Лозинка</label>
             <input type="password" value={password} autoFocus required
               onChange={(e) => setPassword(e.target.value)}
@@ -770,7 +770,7 @@ export default function AdminPage() {
     <div className="min-h-screen bg-[#0b0b0b]">
 
       {toast && (
-        <div className={`fixed right-4 top-4 z-50 flex items-center gap-3 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-lg ${toast.ok ? "bg-green-700" : "bg-red-700"}`}>
+        <div className={`fixed right-2 left-2 sm:right-4 sm:left-auto top-3 sm:top-4 z-50 flex items-center justify-center sm:justify-start gap-3 rounded-xl px-4 sm:px-5 py-2.5 sm:py-3 text-sm font-semibold text-white shadow-lg ${toast.ok ? "bg-green-700" : "bg-red-700"}`}>
           {toast.ok ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
           {toast.msg}
         </div>
@@ -778,8 +778,8 @@ export default function AdminPage() {
 
       <header className="sticky top-0 z-40 border-b border-zinc-800 bg-black/90 backdrop-blur">
         {/* Main row */}
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:h-16 sm:px-6">
-          <div className="flex items-center gap-2 sm:gap-3">
+        <div className="mx-auto flex h-12 sm:h-16 max-w-6xl items-center justify-between px-3 sm:px-6">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             <Package size={20} className="text-red-600" />
             <span className="font-black uppercase tracking-wide text-white text-sm sm:text-base">Admin Панел</span>
             <span className="hidden sm:inline rounded-full bg-zinc-800 px-3 py-0.5 text-xs text-zinc-400">
@@ -826,14 +826,14 @@ export default function AdminPage() {
         <div className="flex border-t border-zinc-800 sm:hidden">
           <button
             onClick={() => setActiveTab("products")}
-            className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs font-bold uppercase transition ${activeTab === "products" ? "bg-red-600 text-white" : "text-zinc-400 active:bg-zinc-800"}`}
+            className={`flex flex-1 items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 text-[10px] sm:text-xs font-bold uppercase transition ${activeTab === "products" ? "bg-red-600 text-white" : "text-zinc-400 active:bg-zinc-800"}`}
           >
             <Package size={14} /> Производи
           </button>
           <div className="w-px bg-zinc-800" />
           <button
             onClick={() => { setActiveTab("orders"); fetchOrders(); }}
-            className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs font-bold uppercase transition ${activeTab === "orders" ? "bg-red-600 text-white" : "text-zinc-400 active:bg-zinc-800"}`}
+            className={`flex flex-1 items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 text-[10px] sm:text-xs font-bold uppercase transition ${activeTab === "orders" ? "bg-red-600 text-white" : "text-zinc-400 active:bg-zinc-800"}`}
           >
             <ShoppingCart size={14} /> Нарачки
             {orders.filter(o => o.status === "new").length > 0 && (
@@ -845,14 +845,14 @@ export default function AdminPage() {
           <div className="w-px bg-zinc-800" />
           <button
             onClick={() => { setActiveTab("inventory"); fetchInventory(); }}
-            className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs font-bold uppercase transition ${activeTab === "inventory" ? "bg-red-600 text-white" : "text-zinc-400 active:bg-zinc-800"}`}
+            className={`flex flex-1 items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 text-[10px] sm:text-xs font-bold uppercase transition ${activeTab === "inventory" ? "bg-red-600 text-white" : "text-zinc-400 active:bg-zinc-800"}`}
           >
             <Warehouse size={14} /> Залиха
           </button>
           <div className="w-px bg-zinc-800" />
           <button
             onClick={() => { setActiveTab("showcase"); fetchShowcase(); }}
-            className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs font-bold uppercase transition ${activeTab === "showcase" ? "bg-red-600 text-white" : "text-zinc-400"}`}
+            className={`flex flex-1 items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 text-[10px] sm:text-xs font-bold uppercase transition ${activeTab === "showcase" ? "bg-red-600 text-white" : "text-zinc-400"}`}
           >
             <ImageIcon size={14} /> Платнени
           </button>
@@ -860,8 +860,8 @@ export default function AdminPage() {
       </header>
 
       {activeTab === "products" && (
-      <div className="mx-auto max-w-6xl px-6 py-10">
-        <div className="grid gap-10 lg:grid-cols-[1fr_420px]">
+      <div className="mx-auto max-w-6xl px-3 sm:px-6 py-6 sm:py-10">
+        <div className="grid gap-6 sm:gap-10 lg:grid-cols-[1fr_420px]">
 
           {/* ЛИСТА — групирана по бренд */}
           <div>
@@ -1715,7 +1715,7 @@ export default function AdminPage() {
 
       {/* ── ЗАЛИХА ТАБ ── */}
       {activeTab === "inventory" && (
-        <div className="mx-auto max-w-4xl px-3 py-4 sm:px-6 sm:py-8">
+        <div className="mx-auto max-w-4xl px-3 py-3 sm:px-6 sm:py-8">
 
           {/* ── Search ── full width on mobile */}
           <input
@@ -1862,7 +1862,7 @@ export default function AdminPage() {
 
         {/* ── SHOWCASE tab (Платнени) ── */}
         {activeTab === "showcase" && (
-          <div className="mx-auto max-w-4xl px-3 py-4 sm:px-6 sm:py-8">
+          <div className="mx-auto max-w-4xl px-3 py-3 sm:px-6 sm:py-8">
 
             <div className="mb-4 rounded-2xl border border-zinc-800 bg-[#111] p-4">
               <p className="mb-3 text-xs font-bold uppercase tracking-wider text-zinc-500">
