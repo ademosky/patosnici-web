@@ -581,6 +581,23 @@ export default function AdminPage() {
     }
   };
 
+  const handleMoveProduct = async (id: number, direction: "up" | "down") => {
+    const idx = products.findIndex((p) => p.id === id);
+    if (idx < 0) return;
+    if (direction === "up" && idx === 0) return;
+    if (direction === "down" && idx === products.length - 1) return;
+    const newOrder = [...products];
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    [newOrder[idx], newOrder[swapIdx]] = [newOrder[swapIdx], newOrder[idx]];
+    const pw = getPw();
+    await fetch("/api/admin/products/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-password": pw },
+      body: JSON.stringify({ orderedIds: newOrder.map((p) => p.id) }),
+    });
+    fetchProducts(pw);
+  };
+
   const handleShowcaseUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
