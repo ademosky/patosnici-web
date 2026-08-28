@@ -590,12 +590,20 @@ export default function AdminPage() {
     const swapIdx = direction === "up" ? idx - 1 : idx + 1;
     [newOrder[idx], newOrder[swapIdx]] = [newOrder[swapIdx], newOrder[idx]];
     const pw = getPw();
-    await fetch("/api/admin/products/reorder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-admin-password": pw },
-      body: JSON.stringify({ orderedIds: newOrder.map((p) => p.id) }),
-    });
-    fetchProducts(pw);
+    try {
+      const res = await fetch("/api/admin/products/reorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": pw },
+        body: JSON.stringify({ orderedIds: newOrder.map((p) => p.id) }),
+      });
+      if (res.ok) {
+        setProducts(newOrder);
+      } else {
+        showToast("Грешка при поместување", false);
+      }
+    } catch {
+      showToast("Грешка при поместување", false);
+    }
   };
 
   const handleShowcaseUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
