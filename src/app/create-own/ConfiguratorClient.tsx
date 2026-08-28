@@ -139,7 +139,12 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
               type="button"
               onClick={() => {
                 const curIdx = steps.indexOf(step);
-                if (i <= curIdx && s !== "vehicle") setStep(s);
+                if (i <= curIdx && s !== "vehicle") {
+                  setStep(s);
+                  if (typeof window !== "undefined") {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }
+                }
               }}
               disabled={i > steps.indexOf(step) || s === "vehicle"}
               aria-label={stepLabels[s]}
