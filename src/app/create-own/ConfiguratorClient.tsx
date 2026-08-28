@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { brands } from "../data/brands";
 import { useLanguage } from "../context/LanguageContext";
 import { useCart } from "../context/CartContext";
@@ -65,6 +65,10 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
   const [error, setError] = useState("");
   const [cartAdded, setCartAdded] = useState(false);
 
+  // Meta Pixel — prevent duplicate events on re-render / double-submit
+  const initiateCheckoutFiredRef = useRef(false);
+  const purchaseFiredRef = useRef(false);
+
   const updateField = (field: string, value: string) => setForm((p) => ({ ...p, [field]: value }));
 
   const uniqueBrands = useMemo(() => {
@@ -102,9 +106,41 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
 
   const handleOrder = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true); setError("");
+
+    // ── Meta Pixel: InitiateCheckout ──
+    if (!initiateCheckoutFiredRef.current) {
+      initiateCheckoutFiredRef.current = true;
+      const win = window as Window & { fbq?: (...args: unknown[]) => void };
+      if (typeof win.fbq === "function") {
+        win.fbq("track", "InitiateCheckout", {
+          content_ids: ["99999"],
+          content_name: productTitle,
+          content_type: "product",
+          value: priceMkd,
+          currency: "MKD",
+        });
+      }
+    }
+
     try {
       const res = await fetch("/api/order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, productTitle, productPrice: `${priceMkd.toLocaleString("mk-MK")} ден`, productSku: "", note: configSummary, currency }) });
-      if (res.ok) { setSent(true); } else { setError(t("order_error")); }
+      if (res.ok) {
+        // ── Meta Pixel: Purchase ──
+        if (!purchaseFiredRef.current) {
+          purchaseFiredRef.current = true;
+          const win = window as Window & { fbq?: (...args: unknown[]) => void };
+          if (typeof win.fbq === "function") {
+            win.fbq("track", "Purchase", {
+              content_ids: ["99999"],
+              content_name: productTitle,
+              content_type: "product",
+              value: priceMkd,
+              currency: "MKD",
+            });
+          }
+        }
+        setSent(true);
+      } else { setError(t("order_error")); }
     } catch { setError(t("order_no_net")); }
     finally { setLoading(false); }
   };
@@ -112,6 +148,18 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
   const handleAddToCart = () => {
     addItem({ id: 99999, slug: "platneni-patosnici-create-own", title: `${productTitle} — ${configSummary}`, price: `${priceMkd.toLocaleString("mk-MK")} ден`, image: "/images/logo.webp", brand: config.vehicle?.brandId ?? "" });
     setCartAdded(true); setTimeout(() => setCartAdded(false), 2500);
+
+    // ── Meta Pixel: AddToCart ──
+    const win = window as Window & { fbq?: (...args: unknown[]) => void };
+    if (typeof win.fbq === "function") {
+      win.fbq("track", "AddToCart", {
+        content_ids: ["99999"],
+        content_name: productTitle,
+        content_type: "product",
+        value: priceMkd,
+        currency: "MKD",
+      });
+    }
   };
 
   const inputClass = "w-full rounded-xl border border-zinc-700 bg-[#1a1a1a] px-5 py-3 text-sm text-white outline-none transition focus:border-red-600";
