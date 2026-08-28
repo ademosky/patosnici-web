@@ -13,16 +13,16 @@ export default function Reviews() {
   ];
 
   return (
-    <section className="bg-[#111111] py-20">
-      <div className="mx-auto max-w-7xl px-6">
+    <section className="bg-[#111111] py-12 sm:py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="text-center">
           <p className="text-xs font-bold uppercase tracking-widest text-red-600">{t("rev_label")}</p>
-          <h2 className="mt-3 text-4xl font-black uppercase text-white">{t("rev_title")}</h2>
+          <h2 className="mt-3 text-3xl sm:text-4xl font-black uppercase text-white">{t("rev_title")}</h2>
           <p className="mt-4 text-zinc-400">{t("rev_count")}</p>
         </div>
-        <div className="mt-16 grid gap-8 md:grid-cols-3">
+        <div className="mt-10 sm:mt-16 grid gap-4 sm:gap-8 md:grid-cols-3">
           {reviews.map((review) => (
-            <div key={review.name} className="rounded-2xl border border-zinc-800 bg-[#141414] p-7 transition hover:border-zinc-700">
+            <div key={review.name} className="rounded-2xl border border-zinc-800 bg-[#141414] p-5 sm:p-7 transition hover:border-zinc-700">
               <div className="flex gap-1">
                 {Array.from({ length: review.rating }).map((_, i) => (
                   <Star key={i} size={16} className="fill-yellow-400 text-yellow-400" />
