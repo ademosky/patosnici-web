@@ -147,18 +147,18 @@ export default function CartPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-[#0b0b0b] pt-28">
-        <div className="mx-auto max-w-6xl px-6 py-12">
+      <main className="min-h-screen bg-[#0b0b0b] pt-20 sm:pt-28">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-12">
 
           <Link href={localizedPath("/products")}
-            className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white"
+            className="mb-6 sm:mb-8 inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white"
           >
             <ArrowLeft size={15} /> {t("cart_back")}
           </Link>
 
-          <h1 className="mb-8 text-4xl font-black uppercase text-white">
+          <h1 className="mb-6 sm:mb-8 text-2xl sm:text-4xl font-black uppercase text-white">
             {t("nav_cart")}
-            <span className="ml-3 text-xl font-normal text-zinc-500">({items.length} {t("prod_count_suffix")})</span>
+            <span className="ml-2 sm:ml-3 text-lg sm:text-xl font-normal text-zinc-500">({items.length} {t("prod_count_suffix")})</span>
           </h1>
 
           {items.length === 0 ? (
@@ -172,15 +172,15 @@ export default function CartPage() {
               </Link>
             </div>
           ) : (
-            <div className="grid gap-10 lg:grid-cols-[1fr_400px]">
+            <div className="grid gap-6 sm:gap-10 lg:grid-cols-[1fr_400px]">
 
               {/* Cart items */}
               <div className="space-y-4">
                 {items.map((item) => (
                   <div key={item.id}
-                    className="flex items-center gap-4 rounded-2xl border border-zinc-800 bg-[#111] p-5"
+                    className="flex items-center gap-3 sm:gap-4 rounded-2xl border border-zinc-800 bg-[#111] p-3.5 sm:p-5"
                   >
-                    <div className="relative h-20 w-24 flex-shrink-0 overflow-hidden rounded-xl bg-zinc-900">
+                    <div className="relative h-16 w-20 sm:h-20 sm:w-24 flex-shrink-0 overflow-hidden rounded-xl bg-zinc-900">
                       {item.image && (
                         <Image src={item.image} alt={item.title} fill className="object-cover" unoptimized />
                       )}
@@ -188,33 +188,33 @@ export default function CartPage() {
 
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-white">{item.title}</p>
-                      <p className="mt-1 text-lg font-bold text-red-500">{formatPrice(item.price, item.price_eur)}</p>
+                      <p className="mt-1 text-base sm:text-lg font-bold text-red-500">{formatPrice(item.price, item.price_eur)}</p>
                     </div>
 
                     {/* Quantity */}
                     <div className="flex items-center gap-2">
                       <button onClick={() => updateQty(item.id, item.quantity - 1)}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white"
+                        className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white"
                       >
                         <Minus size={14} />
                       </button>
-                      <span className="w-8 text-center font-bold text-white">{item.quantity}</span>
+                      <span className="w-6 sm:w-8 text-center text-sm sm:text-base font-bold text-white">{item.quantity}</span>
                       <button onClick={() => updateQty(item.id, item.quantity + 1)}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white"
+                        className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white"
                       >
                         <Plus size={14} />
                       </button>
                     </div>
 
                     <button onClick={() => removeItem(item.id)}
-                      className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border border-zinc-700 text-zinc-500 transition hover:border-red-600 hover:text-red-500"
+                      className="flex h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0 items-center justify-center rounded-xl border border-zinc-700 text-zinc-500 transition hover:border-red-600 hover:text-red-500"
                     >
                       <Trash2 size={15} />
                     </button>
                   </div>
                 ))}
 
-                <div className="rounded-2xl border border-zinc-800 bg-[#111] p-5">
+                <div className="rounded-2xl border border-zinc-800 bg-[#111] p-4 sm:p-5">
                   {/* Вкупно производи */}
                   <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
                     <span className="text-sm text-zinc-400">{t("cart_total_items")}:</span>
@@ -224,7 +224,7 @@ export default function CartPage() {
                   {/* Вкупна цена */}
                   <div className="mt-3 flex items-center justify-between">
                     <span className="text-sm font-semibold text-zinc-300">{t("cart_total_price")}:</span>
-                    <span className="text-2xl font-extrabold text-red-500">
+                    <span className="text-xl sm:text-2xl font-extrabold text-red-500">
                       {currency === "EUR"
                         ? `${items.reduce((sum, item) => sum + getEurValue(item.price, item.price_eur) * item.quantity, 0)} €`
                         : `${items.reduce((sum, item) => {
@@ -242,8 +242,8 @@ export default function CartPage() {
 
               {/* Order form */}
               <div>
-                <h2 className="mb-5 text-xl font-black uppercase text-white">{t("cart_order_details")}</h2>
-                <form onSubmit={handleOrder} className="space-y-4 rounded-2xl border border-zinc-800 bg-[#111] p-6">
+                <h2 className="mb-5 text-lg sm:text-xl font-black uppercase text-white">{t("cart_order_details")}</h2>
+                <form onSubmit={handleOrder} className="space-y-4 rounded-2xl border border-zinc-800 bg-[#111] p-4 sm:p-6">
 
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
