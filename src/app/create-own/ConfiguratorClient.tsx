@@ -161,7 +161,7 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
         <div className="grid gap-10 lg:grid-cols-2">
 
           {/* LEFT: Steps */}
-          <div className="order-2 space-y-4 sm:space-y-6 lg:order-1">
+          <div className="space-y-4 sm:space-y-6">
             {/* Vehicle */}
             <div className={`rounded-2xl border p-4 sm:p-6 ${step === "vehicle" ? "border-red-600/40 bg-[#111]" : "border-zinc-800 bg-[#0d0d0d]"}`}>
               <h2 className="mb-4 sm:mb-5 flex items-center gap-2 sm:gap-3 text-base sm:text-lg font-black uppercase text-white"><StepDot n={1} active={step === "vehicle"} />{stepLabels.vehicle}</h2>
@@ -240,7 +240,7 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
           </div>
 
           {/* RIGHT: Preview */}
-          <div className="order-1 lg:order-2 lg:sticky lg:top-28 lg:self-start">
+          <div className="lg:sticky lg:top-28 lg:self-start">
             <div className="rounded-2xl border border-zinc-800 bg-[#111] p-4 sm:p-6">
               <h3 className="mb-3 text-sm font-bold uppercase tracking-widest text-zinc-500">{lang === "sq" ? "Pamja paraprake" : "Преглед"}</h3>
               <p className="mb-4 inline-block rounded-lg border border-red-600/20 bg-red-600/10 px-3 py-2 text-[11px] sm:text-xs leading-relaxed text-red-300/90">
