@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
@@ -17,7 +17,7 @@ export default function ShowcaseSection() {
   const { lang } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
   const [items, setItems] = useState<ShowcaseItem[]>([]);
-  const [lightbox, setLightbox] = useState<ShowcaseItem | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -39,8 +39,39 @@ export default function ShowcaseSection() {
   const prev = () => setActiveIndex((p) => (p === 0 ? items.length - 1 : p - 1));
   const next = () => setActiveIndex((p) => (p === items.length - 1 ? 0 : p + 1));
 
-  const openLightbox = (item: ShowcaseItem) => setLightbox(item);
-  const closeLightbox = () => setLightbox(null);
+  const openLightbox = (item: ShowcaseItem) => {
+    const idx = items.findIndex((i) => i.id === item.id);
+    setLightboxIndex(idx >= 0 ? idx : 0);
+  };
+  const closeLightbox = () => setLightboxIndex(null);
+  const lightboxNext = () => setLightboxIndex((p) => (p === null ? p : (p + 1) % items.length));
+  const lightboxPrev = () => setLightboxIndex((p) => (p === null ? p : (p - 1 + items.length) % items.length));
+
+  // Keyboard navigation (left/right arrows + Escape)
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLightbox();
+      else if (e.key === "ArrowRight") lightboxNext();
+      else if (e.key === "ArrowLeft") lightboxPrev();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lightboxIndex, items.length]);
+
+  // Touch swipe (mobile)
+  const touchStartX = useRef<number | null>(null);
+  const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) lightboxNext();
+      else lightboxPrev();
+    }
+    touchStartX.current = null;
+  };
 
   return (
     <>
@@ -205,18 +236,41 @@ export default function ShowcaseSection() {
       </section>
 
       {/* ── Lightbox overlay ── */}
-      {lightbox && (
+      {lightboxIndex !== null && items[lightboxIndex] && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
           onClick={closeLightbox}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
           {/* Close button */}
           <button
             type="button"
             onClick={closeLightbox}
-            className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-zinc-700 bg-black/60 text-zinc-400 transition hover:border-red-600 hover:text-white sm:right-6 sm:top-6"
+            className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-zinc-700 bg-black/60 text-zinc-400 transition hover:border-red-600 hover:text-white sm:right-6 sm:top-6"
+            aria-label="Затвори"
           >
             <X size={20} />
+          </button>
+
+          {/* Prev arrow */}
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); lightboxPrev(); }}
+            className="absolute left-2 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-black/60 text-zinc-300 transition hover:border-red-600 hover:text-white sm:left-6"
+            aria-label="Претходна"
+          >
+            <ChevronLeft size={22} />
+          </button>
+
+          {/* Next arrow */}
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); lightboxNext(); }}
+            className="absolute right-2 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-700 bg-black/60 text-zinc-300 transition hover:border-red-600 hover:text-white sm:right-6"
+            aria-label="Следна"
+          >
+            <ChevronRight size={22} />
           </button>
 
           {/* Image */}
@@ -225,8 +279,8 @@ export default function ShowcaseSection() {
             onClick={(e) => e.stopPropagation()}
           >
             <Image
-              src={lightbox.image}
-              alt={`${lightbox.brand} ${lightbox.model}`}
+              src={items[lightboxIndex].image}
+              alt={`${items[lightboxIndex].brand} ${items[lightboxIndex].model}`}
               width={1200}
               height={900}
               className="max-h-[85vh] w-auto rounded-xl object-contain"
@@ -234,8 +288,10 @@ export default function ShowcaseSection() {
             />
             {/* Info bar */}
             <div className="absolute bottom-0 left-0 right-0 rounded-b-xl bg-gradient-to-t from-black/80 to-transparent p-4 sm:p-6">
-              <p className="text-xs font-bold uppercase tracking-wider text-red-500">{lightbox.brand}</p>
-              <p className="text-sm font-semibold text-white">{lightbox.model}</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-red-500">{items[lightboxIndex].brand}</p>
+              <p className="text-sm font-semibold text-white">{items[lightboxIndex].model}</p>
+              {/* Counter */}
+              <p className="mt-1 text-xs text-zinc-400">{lightboxIndex + 1} / {items.length}</p>
             </div>
           </div>
         </div>
