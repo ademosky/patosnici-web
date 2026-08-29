@@ -342,6 +342,19 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
                   <div className="mt-5 rounded-xl border border-amber-800/40 bg-amber-950/20 p-4"><p className="mb-1 text-xs font-bold uppercase tracking-wider text-amber-600/80">{lang === "sq" ? "Konfigurimi" : "Конфигурација"}</p><p className="text-sm text-amber-200">{configSummary}</p></div>
                   <div className="mt-6"><p className="mb-2 text-xs font-bold uppercase tracking-wider text-zinc-400">{t("payment_method")}</p><div className="flex items-center gap-3 rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3.5"><div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2 border-red-600 bg-red-600"><div className="h-2 w-2 rounded-full bg-white" /></div><span className="text-xs sm:text-sm font-semibold text-white">{t("payment_cod")}</span><span className="ml-auto text-xs text-zinc-500">{t("payment_delivery")}</span></div></div>
                   <button type="submit" disabled={loading} className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl bg-red-600 py-4 text-base font-bold uppercase tracking-widest text-white transition hover:bg-red-700 active:scale-[0.98] disabled:opacity-60">{loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}{loading ? t("order_sending") : t("order_submit")}</button>
+
+                  <a
+                    href="https://m.me/patosnici"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 flex w-full items-center justify-center gap-2.5 rounded-xl border border-[#0084FF]/40 bg-[#0084FF]/10 py-3.5 text-sm font-bold uppercase tracking-widest text-[#4aa8ff] transition hover:bg-[#0084FF]/20"
+                  >
+                    {/* Messenger icon */}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 0C5.373 0 0 4.975 0 11.111c0 3.497 1.744 6.616 4.469 8.654V24l4.083-2.24c1.085.3 2.24.462 3.448.462 6.627 0 12-4.975 12-11.111S18.627 0 12 0zm1.155 14.965l-3.06-3.265-5.964 3.265 6.558-6.965 3.133 3.265 5.89-3.265-6.557 6.965z"/>
+                    </svg>
+                    {lang === "sq" ? "Na pyet në Messenger" : "Прашај нè на Messenger"}
+                  </a>
                 </form>
               )}
             </div>
