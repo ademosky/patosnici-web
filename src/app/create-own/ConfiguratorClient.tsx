@@ -337,6 +337,10 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
                     <div><label className={labelClass}>{t("form_city")} *</label><input type="text" required value={form.city} onChange={(e) => updateField("city", e.target.value)} placeholder={t("form_city_ph")} className={inputClass} /></div>
                     <div className="sm:col-span-2"><label className={labelClass}>{t("form_phone")} *</label><input type="tel" required value={form.phone} onChange={(e) => updateField("phone", e.target.value)} placeholder={t("form_phone_ph")} className={inputClass} /></div>
                     <div className="sm:col-span-2"><label className={labelClass}>{t("form_email")} <span className="font-normal normal-case text-zinc-600">({t("order_email_opt")})</span></label><input type="email" value={form.email} onChange={(e) => updateField("email", e.target.value)} placeholder="email@email.com" className={inputClass} /></div>
+                    <div className="sm:col-span-2">
+                      <label className={labelClass}>{t("form_note")} <span className="font-normal normal-case text-zinc-600">({t("form_note_opt")})</span></label>
+                      <textarea value={form.note} onChange={(e) => updateField("note", e.target.value)} placeholder={t("form_note_ph")} maxLength={300} rows={3} className="w-full resize-none rounded-xl border border-zinc-700 bg-[#1a1a1a] px-5 py-3 text-sm text-white outline-none transition focus:border-red-600" />
+                    </div>
                   </div>
                   {error && <p className="mt-4 rounded-xl border border-red-800 bg-red-950/30 px-4 py-3 text-sm text-red-400">{error}</p>}
                   <div className="mt-5 rounded-xl border border-amber-800/40 bg-amber-950/20 p-4"><p className="mb-1 text-xs font-bold uppercase tracking-wider text-amber-600/80">{lang === "sq" ? "Konfigurimi" : "Конфигурација"}</p><p className="text-sm text-amber-200">{configSummary}</p></div>
