@@ -183,6 +183,7 @@ export async function POST(req: NextRequest) {
           product_price: isCartOrder ? null : body.productPrice,
           product_sku: isCartOrder ? null : (body.productSku || null),
           currency: currency,
+          source: body.source || "web",
           status: "new",
         };
 
