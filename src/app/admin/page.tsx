@@ -1487,6 +1487,25 @@ export default function AdminPage() {
                   ))}
                 </div>
 
+                {/* Source filter — create-own vs others */}
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { v: "",           label: "📋 Сите" },
+                    { v: "create_own", label: "🎨 Платнени" },
+                    { v: "web",        label: "🌐 Веб" },
+                  ].map(({ v, label }) => (
+                    <button key={v}
+                      onClick={() => setOrdersSource(v)}
+                      className={`rounded-lg px-2.5 py-1.5 text-xs font-bold uppercase transition ${
+                        ordersSource === v
+                          ? "bg-red-600 text-white"
+                          : "border border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-white"
+                      }`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
                 <button
                   onClick={exportOrders}
                   className="flex items-center gap-1 rounded-lg border border-zinc-700 px-2 py-1 text-xs font-bold text-zinc-400 transition hover:border-red-600 hover:text-white"
