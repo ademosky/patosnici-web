@@ -1436,7 +1436,7 @@ export default function AdminPage() {
               </div>
 
               {/* Row 2: Status filter + Count */}
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
                 <div className="flex flex-wrap gap-1.5">
                   {[
                     { v: "",         label: "Сите" },
@@ -1492,7 +1492,6 @@ export default function AdminPage() {
                   {[
                     { v: "",           label: "📋 Сите" },
                     { v: "create_own", label: "🎨 Платнени" },
-                    { v: "web",        label: "🌐 Веб" },
                   ].map(({ v, label }) => (
                     <button key={v}
                       onClick={() => setOrdersSource(v)}
