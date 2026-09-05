@@ -1487,23 +1487,16 @@ export default function AdminPage() {
                   ))}
                 </div>
 
-                {/* Source filter — create-own vs others */}
-                <div className="flex flex-wrap gap-1.5">
-                  {[
-                    { v: "",           label: "📋 Сите" },
-                    { v: "create_own", label: "🎨 Платнени" },
-                  ].map(({ v, label }) => (
-                    <button key={v}
-                      onClick={() => setOrdersSource(v)}
-                      className={`rounded-lg px-2.5 py-1.5 text-xs font-bold uppercase transition ${
-                        ordersSource === v
-                          ? "bg-red-600 text-white"
-                          : "border border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-white"
-                      }`}>
-                      {label}
-                    </button>
-                  ))}
-                </div>
+                {/* Source filter — Платнени toggle */}
+                <button
+                  onClick={() => setOrdersSource(ordersSource === "create_own" ? "" : "create_own")}
+                  className={`rounded-lg px-2.5 py-1.5 text-xs font-bold uppercase transition ${
+                    ordersSource === "create_own"
+                      ? "bg-red-600 text-white"
+                      : "border border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-white"
+                  }`}>
+                  🎨 Платнени
+                </button>
 
                 <button
                   onClick={exportOrders}
