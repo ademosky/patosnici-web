@@ -123,7 +123,7 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
     }
 
     try {
-      const res = await fetch("/api/order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, productTitle, productPrice: `${priceMkd.toLocaleString("mk-MK")} ден`, productSku: "", note: configSummary, currency }) });
+      const res = await fetch("/api/order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, productTitle, productPrice: `${priceMkd.toLocaleString("mk-MK")} ден`, productSku: "", note: form.note && form.note.trim() ? `${form.note}\n\nКонфигурација: ${configSummary}` : configSummary, currency }) });
       if (res.ok) {
         // ── Meta Pixel: Purchase ──
         if (!purchaseFiredRef.current) {
