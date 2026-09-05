@@ -1654,7 +1654,7 @@ export default function AdminPage() {
                             <li key={i} className="text-sm text-zinc-300">
                               <span className="font-semibold">{item.quantity}×</span> {item.title}
                               <span className="ml-2 font-bold text-red-500">{order.currency === "EUR" ? `${getEurValue(item.price, item.price_eur)} €` : item.price}</span>
-                              {item.sku && <span className="ml-1 font-mono text-xs text-zinc-600">({item.sku})</span>}
+                              {item.sku && <span className="ml-1.5 inline-block rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-xs font-semibold text-zinc-300">SKU {item.sku}</span>}
                             </li>
                           ))}
                         </ul>
@@ -1662,7 +1662,7 @@ export default function AdminPage() {
                         <div className="text-sm text-zinc-300">
                           {order.product_title}
                           <span className="ml-2 font-bold text-red-500">{order.currency === "EUR" ? `${getEurValue(order.product_price || "")} €` : order.product_price}</span>
-                          {order.product_sku && <span className="ml-1 font-mono text-xs text-zinc-600">({order.product_sku})</span>}
+                          {order.product_sku && <span className="mt-1 inline-block rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-xs font-semibold text-zinc-300">SKU {order.product_sku}</span>}
                         </div>
                       )}
                     </div>
