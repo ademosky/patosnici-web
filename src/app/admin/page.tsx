@@ -133,6 +133,7 @@ export default function AdminPage() {
   const [ordersStatus, setOrdersStatus] = useState("");
   const [ordersDay, setOrdersDay] = useState("");
   const [ordersCurrency, setOrdersCurrency] = useState("");
+  const [ordersSource, setOrdersSource] = useState("");
 
   // Orders filtered by day + currency. Status and search are applied on top
   // of this in the list; the status counters + summary card use this so they
@@ -144,9 +145,13 @@ export default function AdminPage() {
         const cur = order.currency || "MKD";
         if (cur !== ordersCurrency) return false;
       }
+      if (ordersSource) {
+        const src = order.source || "web";
+        if (src !== ordersSource) return false;
+      }
       return true;
     });
-  }, [orders, ordersDay, ordersCurrency]);
+  }, [orders, ordersDay, ordersCurrency, ordersSource]);
   const [ordersSearch, setOrdersSearch] = useState("");
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [editSaving, setEditSaving] = useState(false);
