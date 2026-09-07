@@ -964,6 +964,10 @@ export default function AdminPage() {
                 className={`px-4 py-2 text-xs font-bold uppercase transition ${activeTab === "showcase" ? "bg-red-600 text-white" : "text-zinc-400 hover:text-white"}`}>
                 <ImageIcon size={13} className="mr-1 inline" /> Платнени
               </button>
+              <button onClick={() => setActiveTab("accessories")}
+                className={`px-4 py-2 text-xs font-bold uppercase transition ${activeTab === "accessories" ? "bg-red-600 text-white" : "text-zinc-400 hover:text-white"}`}>
+                <Package size={13} className="mr-1 inline" /> Додатоци
+              </button>
             </div>
             <Link href="/" className="hidden sm:block text-sm text-zinc-400 transition hover:text-white">
               ← Кон сајтот
@@ -1009,6 +1013,13 @@ export default function AdminPage() {
             className={`flex flex-1 items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 text-[10px] sm:text-xs font-bold uppercase transition ${activeTab === "showcase" ? "bg-red-600 text-white" : "text-zinc-400"}`}
           >
             <ImageIcon size={14} /> Платнени
+          </button>
+          <div className="w-px bg-zinc-800" />
+          <button
+            onClick={() => setActiveTab("accessories")}
+            className={`flex flex-1 items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 text-[10px] sm:text-xs font-bold uppercase transition ${activeTab === "accessories" ? "bg-red-600 text-white" : "text-zinc-400"}`}
+          >
+            <Package size={14} /> Додатоци
           </button>
         </div>
       </header>
