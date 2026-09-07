@@ -63,7 +63,7 @@ function skopjeDate(iso: string): string {
 }
 
 const EMPTY_FORM = {
-  title: "", brand: "", car_model: "", model: "", year: "",
+  title: "", brand: "", car_model: "", model: "", year: "", category: "rubber_mats",
   price: "", image: "", description: "", description_sq: "", sku: "", images: [] as string[], in_stock: true,
 };
 
@@ -534,7 +534,7 @@ export default function AdminPage() {
   const handleEditClick = (p: Product) => {
     setEditId(p.id);
     setForm({
-      title: p.title, brand: p.brand, car_model: p.car_model ?? "", model: p.model,
+      title: p.title, brand: p.brand, car_model: p.car_model ?? "", model: p.model, category: p.category ?? "rubber_mats",
       year: p.year, price: p.price, image: p.image,
       description: p.description, sku: p.sku ?? "",
       images: p.images && p.images.length > 0 ? p.images : (p.image ? [p.image] : []),
