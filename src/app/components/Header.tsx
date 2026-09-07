@@ -39,7 +39,8 @@ export default function Header() {
               </svg>
             </button>
             {productsOpen && (
-              <div className="absolute left-1/2 top-full z-50 mt-2 w-56 -translate-x-1/2 overflow-hidden rounded-xl border border-zinc-800 bg-[#111] py-2 shadow-2xl">
+              <div className="absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 pt-2">
+                <div className="overflow-hidden rounded-xl border border-zinc-800 bg-[#111] py-2 shadow-2xl">
                 <Link href={localizedPath("/products")} className="block px-5 py-2.5 text-sm font-semibold text-zinc-300 transition hover:bg-zinc-800 hover:text-white">
                   {t("nav_rubber")}
                 </Link>
@@ -49,6 +50,7 @@ export default function Header() {
                 <Link href={localizedPath("/auto-accessories")} className="block px-5 py-2.5 text-sm font-semibold text-zinc-300 transition hover:bg-zinc-800 hover:text-white">
                   {t("nav_accessories")}
                 </Link>
+                </div>
               </div>
             )}
           </div>
