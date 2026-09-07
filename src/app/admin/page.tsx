@@ -2057,6 +2057,104 @@ export default function AdminPage() {
         </div>
       )}
 
+        {/* ── ACCESSORIES tab (Додатоци) ── */}
+        {activeTab === "accessories" && (
+          <div className="mx-auto max-w-4xl px-3 py-3 sm:px-6 sm:py-8">
+
+            {/* Form */}
+            <div className="mb-4 rounded-2xl border border-zinc-800 bg-[#111] p-4">
+              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-zinc-500">
+                <Package size={12} className="mr-1 inline text-red-600" />
+                {accEditId ? "Измени додаток" : "Додај додаток"}
+              </p>
+              <form onSubmit={handleAccSave} className="flex flex-col gap-2">
+                <input required placeholder="Назив *" value={accForm.title} onChange={(e) => accUpdate("title", e.target.value)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
+                <input required placeholder="Бренд *" value={accForm.brand} onChange={(e) => accUpdate("brand", e.target.value)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
+                <div className="grid grid-cols-2 gap-2">
+                  <input required placeholder="Цена (денари) *" value={accForm.price} onChange={(e) => accUpdate("price", e.target.value)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
+                  <input placeholder="Цена EUR" value={accForm.price_eur} onChange={(e) => accUpdate("price_eur", e.target.value)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
+                </div>
+                <input placeholder="SKU" value={accForm.sku} onChange={(e) => accUpdate("sku", e.target.value)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
+                <textarea placeholder="Опис" rows={2} value={accForm.description} onChange={(e) => accUpdate("description", e.target.value)} className="w-full resize-none rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
+                <textarea placeholder="Опис на албански" rows={2} value={accForm.description_sq} onChange={(e) => accUpdate("description_sq", e.target.value)} className="w-full resize-none rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
+
+                {/* Upload */}
+                <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-zinc-700 px-4 py-3 text-sm text-zinc-400 transition hover:border-red-600 hover:text-white">
+                  <Upload size={16} />
+                  {accLoading ? "Прикачување..." : "Прикачи слики"}
+                  <input type="file" accept="image/*" multiple onChange={handleAccFileUpload} className="hidden" />
+                </label>
+
+                {/* Image previews */}
+                {accForm.images.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {accForm.images.map((img, idx) => (
+                      <div key={idx} className="relative">
+                        <Image src={img} alt={`slika ${idx + 1}`} width={64} height={48} className="h-14 w-20 rounded-lg object-cover" unoptimized />
+                        <button type="button" onClick={() => accRemoveImage(idx)} className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white">
+                          <X size={11} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <button type="submit" disabled={accLoading}
+                    className="flex items-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-red-700 active:scale-95 disabled:opacity-60">
+                    {accLoading ? <Loader2 size={16} className="animate-spin" /> : accEditId ? <CheckCircle size={16} /> : <Plus size={16} />}
+                    {accEditId ? "Зачувај" : "Додај"}
+                  </button>
+                  {accEditId && (
+                    <button type="button" onClick={() => { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "" }); }}
+                      className="rounded-xl border border-zinc-700 px-5 py-3 text-sm text-zinc-400 transition hover:border-red-600 hover:text-white">
+                      Откажи
+                    </button>
+                  )}
+                </div>
+              </form>
+            </div>
+
+            {/* List */}
+            {accessories.length === 0 ? (
+              <div className="py-16 text-center text-zinc-600">
+                <Package size={48} className="mx-auto mb-4 opacity-30" />
+                <p>Нема додатоци</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {accessories.map((p) => (
+                  <div key={p.id} className="flex items-center gap-3 rounded-2xl border border-zinc-800 bg-[#111] px-4 py-3">
+                    {p.image ? (
+                      <Image src={p.image} alt={p.title} width={64} height={48} className="h-12 w-16 shrink-0 rounded-lg object-cover" unoptimized />
+                    ) : (
+                      <div className="flex h-12 w-16 shrink-0 items-center justify-center rounded-lg bg-zinc-800">
+                        <Package size={18} className="text-zinc-600" />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-bold text-white">{p.title}</p>
+                      <p className="text-xs text-zinc-400">{p.brand}{p.sku ? ` · SKU ${p.sku}` : ""}</p>
+                      <p className="text-xs font-bold text-red-500">{p.price}</p>
+                    </div>
+                    <button type="button" onClick={() => handleAccEdit(p)}
+                      className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-700 text-zinc-500 transition hover:border-red-600 hover:text-red-500">
+                      <Pencil size={15} />
+                    </button>
+                    <button type="button" onClick={() => handleAccDelete(p.id, p.title)}
+                      className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-700 text-zinc-500 transition hover:border-red-600 hover:text-red-500">
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                ))}
+                <div className="rounded-2xl border border-zinc-700 bg-[#111] px-4 py-3 text-center">
+                  <span className="text-xs text-zinc-500">{accessories.length} додатоци</span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* ── SHOWCASE tab (Платнени) ── */}
         {activeTab === "showcase" && (
           <div className="mx-auto max-w-4xl px-3 py-3 sm:px-6 sm:py-8">
