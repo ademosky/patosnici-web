@@ -27,6 +27,7 @@ export async function PUT(
       image: body.image,
       description: body.description,
       sku: body.sku ?? "",
+      category: body.category ?? "rubber_mats",
       images: body.images || [],
       description_sq: body.description_sq ?? "",
       price_eur: body.price_eur ?? null,
