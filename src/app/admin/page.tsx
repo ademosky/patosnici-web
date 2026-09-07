@@ -29,6 +29,7 @@ type Product = {
   images?: string[];
   car_model?: string;
   in_stock?: boolean;
+  category?: string;
 };
 
 type Order = {
