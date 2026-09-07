@@ -41,13 +41,13 @@ export default function Header() {
             {productsOpen && (
               <div className="absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 pt-2">
                 <div className="overflow-hidden rounded-xl border border-zinc-800 bg-[#111] py-2 shadow-2xl">
-                <Link href={localizedPath("/products")} className="block px-5 py-2.5 text-sm font-semibold text-zinc-300 transition hover:bg-zinc-800 hover:text-white">
+                <Link href={localizedPath("/products")} className="block px-5 py-2.5 text-sm font-semibold uppercase tracking-wide text-zinc-300 transition hover:bg-zinc-800 hover:text-white">
                   {t("nav_rubber")}
                 </Link>
-                <Link href={localizedPath("/create-own")} className="block px-5 py-2.5 text-sm font-semibold text-zinc-300 transition hover:bg-zinc-800 hover:text-white">
+                <Link href={localizedPath("/create-own")} className="block px-5 py-2.5 text-sm font-semibold uppercase tracking-wide text-zinc-300 transition hover:bg-zinc-800 hover:text-white">
                   {t("nav_fabric")}
                 </Link>
-                <Link href={localizedPath("/auto-accessories")} className="block px-5 py-2.5 text-sm font-semibold text-zinc-300 transition hover:bg-zinc-800 hover:text-white">
+                <Link href={localizedPath("/auto-accessories")} className="block px-5 py-2.5 text-sm font-semibold uppercase tracking-wide text-zinc-300 transition hover:bg-zinc-800 hover:text-white">
                   {t("nav_accessories")}
                 </Link>
                 </div>
@@ -115,9 +115,9 @@ export default function Header() {
               </button>
               {mobileProductsOpen && (
                 <div className="mt-3 flex flex-col gap-3 border-l border-zinc-800 pl-4">
-                  <Link href={localizedPath("/products")} onClick={() => { setMobileOpen(false); setMobileProductsOpen(false); }} className="text-sm font-medium text-zinc-400 hover:text-red-500">{t("nav_rubber")}</Link>
-                  <Link href={localizedPath("/create-own")} onClick={() => { setMobileOpen(false); setMobileProductsOpen(false); }} className="text-sm font-medium text-zinc-400 hover:text-red-500">{t("nav_fabric")}</Link>
-                  <Link href={localizedPath("/auto-accessories")} onClick={() => { setMobileOpen(false); setMobileProductsOpen(false); }} className="text-sm font-medium text-zinc-400 hover:text-red-500">{t("nav_accessories")}</Link>
+                  <Link href={localizedPath("/products")} onClick={() => { setMobileOpen(false); setMobileProductsOpen(false); }} className="text-sm font-semibold uppercase tracking-wide text-zinc-400 hover:text-red-500">{t("nav_rubber")}</Link>
+                  <Link href={localizedPath("/create-own")} onClick={() => { setMobileOpen(false); setMobileProductsOpen(false); }} className="text-sm font-semibold uppercase tracking-wide text-zinc-400 hover:text-red-500">{t("nav_fabric")}</Link>
+                  <Link href={localizedPath("/auto-accessories")} onClick={() => { setMobileOpen(false); setMobileProductsOpen(false); }} className="text-sm font-semibold uppercase tracking-wide text-zinc-400 hover:text-red-500">{t("nav_accessories")}</Link>
                 </div>
               )}
             </div>
