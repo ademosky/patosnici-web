@@ -1072,6 +1072,18 @@ export default function AdminPage() {
                   ))}
                 </select>
               </div>
+
+              <div>
+                <label className={labelClass}>Категорија *</label>
+                <select required value={form.category || "rubber_mats"}
+                  onChange={(e) => update("category", e.target.value)}
+                  className={inputClass}
+                >
+                  <option value="rubber_mats">Гумени патосници</option>
+                  <option value="fabric_mats">Платнени патосници</option>
+                  <option value="auto_accessories">Авто додатоци</option>
+                </select>
+              </div>
               {/* Car Model */}
               <div>
                   <label className={labelClass}>Модел на возило *</label>
