@@ -128,7 +128,7 @@ export default function AdminPage() {
   const [listSearch, setListSearch] = useState("");
   const [stockFilter, setStockFilter] = useState<"all" | "out_of_stock">("all");
   const [expandedBrands, setExpandedBrands] = useState<Record<string,boolean>>({});
-  const [activeTab, setActiveTab] = useState<"products" | "orders" | "inventory" | "showcase">("orders");
+  const [activeTab, setActiveTab] = useState<"products" | "orders" | "inventory" | "showcase" | "accessories">("orders");
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersMonth, setOrdersMonth] = useState(() => new Date().toISOString().slice(0,7));
   const [ordersStatus, setOrdersStatus] = useState("");
@@ -180,6 +180,10 @@ export default function AdminPage() {
   const [showcaseForm, setShowcaseForm]   = useState<{ image: string; brand: string; model: string }>({ image: "", brand: "", model: "" });
   const [showcaseEditId, setShowcaseEditId] = useState<number | null>(null);
   const [showcaseLoading, setShowcaseLoading] = useState(false);
+
+  const [accForm, setAccForm] = useState({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [] as string[], image: "" });
+  const [accEditId, setAccEditId] = useState<number | null>(null);
+  const [accLoading, setAccLoading] = useState(false);
 
   const showToast = (msg: string, ok = true) => {
     setToast({ msg, ok });
