@@ -16,7 +16,10 @@ export type Product = {
   in_stock?: boolean;
   description_sq?: string;
   price_eur?: string;
+  category?: string;   // rubber_mats | fabric_mats | auto_accessories
 };
+
+export type ProductCategory = "rubber_mats" | "fabric_mats" | "auto_accessories";
 export async function getProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from("products")
@@ -24,6 +27,17 @@ export async function getProducts(): Promise<Product[]> {
     .order("sort_order", { ascending: true }).order("created_at", { ascending: true });
 
   if (error) { console.error("getProducts error:", error); return []; }
+  return data as Product[];
+}
+
+export async function getProductsByCategory(category: string): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("category", category)
+    .order("sort_order", { ascending: true }).order("created_at", { ascending: true });
+
+  if (error) { console.error("getProductsByCategory error:", error); return []; }
   return data as Product[];
 }
 
