@@ -227,7 +227,7 @@ export default async function ProductPage({ params }: Props) {
                 <PaymentNote />
               </div>
 
-              <ProductFeatures />
+              <ProductFeatures category={product.category} />
 
               <AddToCartButton product={{
                 id: product.id,
