@@ -13,6 +13,9 @@ const mk = {
   nav_contact: "Контакт",
   nav_cart: "Корпа",
   nav_custom: "Изработи Сам",
+  nav_rubber: "Гумени патосници",
+  nav_fabric: "Платнени патосници",
+  nav_accessories: "Авто додатоци",
 
   // Hero
   hero_title: "Врвна заштита",
@@ -158,6 +161,9 @@ const sq: typeof mk = {
   nav_contact: "Kontakt",
   nav_cart: "Shporta",
   nav_custom: "Krijo Vetë",
+  nav_rubber: "Tapete gome",
+  nav_fabric: "Tapete tekstili",
+  nav_accessories: "Aksesorë për auto",
 
   hero_title: "Mbrojtje maksimale",
   hero_subtitle: "për automjetin tuaj",
