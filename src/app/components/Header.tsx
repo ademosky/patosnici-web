@@ -30,7 +30,7 @@ export default function Header() {
           <div className="relative" onMouseEnter={() => setProductsOpen(true)} onMouseLeave={() => setProductsOpen(false)}>
             <button
               type="button"
-              className="flex items-center gap-1 transition hover:text-red-500"
+              className="flex items-center gap-1 uppercase tracking-wide transition hover:text-red-500"
               onClick={() => setProductsOpen(!productsOpen)}
             >
               {t("nav_products")}
@@ -106,7 +106,7 @@ export default function Header() {
               <button
                 type="button"
                 onClick={() => setMobileProductsOpen(!mobileProductsOpen)}
-                className="flex w-full items-center justify-between text-white"
+                className="flex w-full items-center justify-between uppercase tracking-wide text-white"
               >
                 {t("nav_products")}
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${mobileProductsOpen ? "rotate-180" : ""}`}>
