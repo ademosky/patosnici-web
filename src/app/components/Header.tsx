@@ -9,6 +9,8 @@ import { useLanguage } from "../context/LanguageContext";
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [productsOpen, setProductsOpen] = useState(false);
+  const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
   const { total } = useCart();
   const { lang, setLang, t, isKs, localizedPath } = useLanguage();
 
@@ -23,8 +25,34 @@ export default function Header() {
         {/* Desktop nav */}
         <nav className="hidden gap-10 text-sm font-semibold uppercase tracking-wide text-white md:flex">
           <Link href={localizedPath("/")} className="border-b-2 border-red-600 pb-1 text-white">{t("nav_home")}</Link>
-          <Link href={localizedPath("/products")} className="transition hover:text-red-500">{t("nav_products")}</Link>
-          <Link href={localizedPath("/create-own")} className="transition hover:text-red-500">{t("nav_custom")}</Link>
+
+          {/* Products dropdown */}
+          <div className="relative" onMouseEnter={() => setProductsOpen(true)} onMouseLeave={() => setProductsOpen(false)}>
+            <button
+              type="button"
+              className="flex items-center gap-1 transition hover:text-red-500"
+              onClick={() => setProductsOpen(!productsOpen)}
+            >
+              {t("nav_products")}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${productsOpen ? "rotate-180" : ""}`}>
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+            {productsOpen && (
+              <div className="absolute left-1/2 top-full z-50 mt-2 w-56 -translate-x-1/2 overflow-hidden rounded-xl border border-zinc-800 bg-[#111] py-2 shadow-2xl">
+                <Link href={localizedPath("/products")} className="block px-5 py-2.5 text-sm font-semibold text-zinc-300 transition hover:bg-zinc-800 hover:text-white">
+                  {t("nav_rubber")}
+                </Link>
+                <Link href={localizedPath("/create-own")} className="block px-5 py-2.5 text-sm font-semibold text-zinc-300 transition hover:bg-zinc-800 hover:text-white">
+                  {t("nav_fabric")}
+                </Link>
+                <Link href={localizedPath("/auto-accessories")} className="block px-5 py-2.5 text-sm font-semibold text-zinc-300 transition hover:bg-zinc-800 hover:text-white">
+                  {t("nav_accessories")}
+                </Link>
+              </div>
+            )}
+          </div>
+
           <Link href={localizedPath("/contact")} className="transition hover:text-red-500">{t("nav_contact")}</Link>
         </nav>
 
@@ -70,8 +98,28 @@ export default function Header() {
         <div className="border-t border-zinc-800 bg-black px-6 py-6 md:hidden">
           <nav className="flex flex-col gap-5 text-sm font-semibold uppercase tracking-wide text-white">
             <Link href={localizedPath("/")} onClick={() => setMobileOpen(false)}>{t("nav_home")}</Link>
-            <Link href={localizedPath("/products")} onClick={() => setMobileOpen(false)} className="hover:text-red-500">{t("nav_products")}</Link>
-            <Link href={localizedPath("/create-own")} onClick={() => setMobileOpen(false)} className="hover:text-red-500">{t("nav_custom")}</Link>
+
+            {/* Products accordion */}
+            <div>
+              <button
+                type="button"
+                onClick={() => setMobileProductsOpen(!mobileProductsOpen)}
+                className="flex w-full items-center justify-between text-white"
+              >
+                {t("nav_products")}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${mobileProductsOpen ? "rotate-180" : ""}`}>
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+              {mobileProductsOpen && (
+                <div className="mt-3 flex flex-col gap-3 border-l border-zinc-800 pl-4">
+                  <Link href={localizedPath("/products")} onClick={() => { setMobileOpen(false); setMobileProductsOpen(false); }} className="text-sm font-medium text-zinc-400 hover:text-red-500">{t("nav_rubber")}</Link>
+                  <Link href={localizedPath("/create-own")} onClick={() => { setMobileOpen(false); setMobileProductsOpen(false); }} className="text-sm font-medium text-zinc-400 hover:text-red-500">{t("nav_fabric")}</Link>
+                  <Link href={localizedPath("/auto-accessories")} onClick={() => { setMobileOpen(false); setMobileProductsOpen(false); }} className="text-sm font-medium text-zinc-400 hover:text-red-500">{t("nav_accessories")}</Link>
+                </div>
+              )}
+            </div>
+
             <Link href={localizedPath("/contact")} onClick={() => setMobileOpen(false)} className="hover:text-red-500">{t("nav_contact")}</Link>
             <Link href={localizedPath("/cart")} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 hover:text-red-500">
               {t("nav_cart")} {total > 0 && <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs">{total}</span>}
