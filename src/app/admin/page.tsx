@@ -723,6 +723,125 @@ export default function AdminPage() {
     fetchShowcase();
   };
 
+  // ── Додатоци (auto accessories) CRUD — reuses products table with category auto_accessories ──
+  const accessories = products.filter((p) => p.category === "auto_accessories");
+
+  const accUpdate = (k: string, v: string) => setAccForm((prev) => ({ ...prev, [k]: v }));
+
+  const accAddImage = (url: string) =>
+    setAccForm((prev) => ({
+      ...prev,
+      images: [...(prev.images || []), url],
+      image: prev.image || url,
+    }));
+
+  const accRemoveImage = (idx: number) =>
+    setAccForm((prev) => {
+      const imgs = (prev.images || []).filter((_, i) => i !== idx);
+      return { ...prev, images: imgs, image: imgs[0] || "" };
+    });
+
+  const handleAccFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAccLoading(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const safeName = file.name.toLowerCase().replace(/\.[^.]+$/, "").replace(/[^a-z0-9-]/g, "-").slice(0, 40) || "slika";
+      let uploadBlob: Blob = file;
+      let filename = `${safeName}-${Date.now()}.${ext}`;
+      let contentType = file.type || `image/${ext}`;
+      const compressed = await compressImage(file);
+      if (compressed.size < file.size) {
+        uploadBlob = compressed;
+        filename = `${safeName}-${Date.now()}.webp`;
+        contentType = "image/webp";
+      }
+      const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+      const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+      const arrayBuffer = await uploadBlob.arrayBuffer();
+      const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/products/${filename}`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": contentType, "x-upsert": "false" },
+        body: arrayBuffer,
+      });
+      if (!uploadRes.ok) throw new Error(await uploadRes.text());
+      const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${filename}`;
+      accAddImage(publicUrl);
+      showToast("Прикачено ✓");
+    } catch {
+      showToast("Грешка при прикачување", false);
+    }
+    setAccLoading(false);
+  };
+
+  const handleAccSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const pw = getPw();
+    const isEdit = accEditId !== null;
+    setAccLoading(true);
+    const res = await fetch(
+      isEdit ? `/api/admin/products/${accEditId}` : "/api/admin/products",
+      {
+        method: isEdit ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": pw },
+        body: JSON.stringify({
+          title: accForm.title,
+          brand: accForm.brand,
+          model: accForm.brand,
+          car_model: "",
+          year: "",
+          price: accForm.price,
+          price_eur: accForm.price_eur || null,
+          sku: accForm.sku || "",
+          image: accForm.image || "",
+          images: accForm.images || [],
+          description: accForm.description || "",
+          description_sq: accForm.description_sq || "",
+          category: "auto_accessories",
+        }),
+      }
+    );
+    if (res.ok) {
+      setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "" });
+      setAccEditId(null);
+      await fetchProducts(pw);
+      showToast(isEdit ? "Ажурирано! ✓" : "Додатокот е додаден! ✓");
+    } else {
+      showToast("Грешка — обиди се пак.", false);
+    }
+    setAccLoading(false);
+  };
+
+  const handleAccEdit = (p: Product) => {
+    setAccEditId(p.id);
+    setAccForm({
+      title: p.title,
+      brand: p.brand,
+      price: p.price,
+      price_eur: p.price_eur ?? "",
+      sku: p.sku ?? "",
+      description: p.description ?? "",
+      description_sq: (p as any).description_sq ?? "",
+      images: p.images || (p.image ? [p.image] : []),
+      image: p.image,
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleAccDelete = async (id: number, title: string) => {
+    if (!confirm(`Избриши "${title}"?`)) return;
+    const res = await fetch(`/api/admin/products/${id}`, {
+      method: "DELETE",
+      headers: { "x-admin-password": getPw() },
+    });
+    if (res.ok) {
+      showToast("Избришано.");
+      if (accEditId === id) { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "" }); }
+      fetchProducts(getPw());
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("adminPw");
     sessionStorage.removeItem("adminPw");
