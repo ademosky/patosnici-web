@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 import Header from "../../components/Header";
 import OrderForm from "../../components/OrderForm";
 import ImageCarousel from "../../components/ImageCarousel";
-import { getProducts, getProductBySlug, getRecommendedAccessories } from "../../data/products";
+import { getProductBySlug, getRecommendedAccessories } from "../../data/products";
 import { CheckCircle, ArrowLeft, Tag } from "lucide-react";
 import AddToCartButton from "../../components/AddToCartButton";
 import ProductDescription from "../../components/ProductDescription";
