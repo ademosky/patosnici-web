@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { brands } from "./brands";
 
 export type Product = {
   id: number;
@@ -77,9 +78,20 @@ export async function getRecommendedAccessories(brandId: string, limit = 4): Pro
   if (error) { console.error("getRecommendedAccessories error:", error); return []; }
   const items = (data || []) as Product[];
 
-  const target = norm(brandId);
-  const sameBrand = items.filter((p) => norm(p.brand) === target);
-  const others = items.filter((p) => norm(p.brand) !== target);
+  // Resolve brand id (slug like "volkswagen") to display name ("Volkswagen").
+  const brandName = brands.find((b) => b.id === brandId)?.name ?? brandId;
+  const target = norm(brandName);
+  // Also compare against the raw id (e.g. accessory stored as "volkswagen" directly).
+  const targetAlt = norm(brandId);
+
+  const sameBrand = items.filter((p) => {
+    const n = norm(p.brand);
+    return n === target || n === targetAlt;
+  });
+  const others = items.filter((p) => {
+    const n = norm(p.brand);
+    return n !== target && n !== targetAlt;
+  });
 
   return [...sameBrand, ...others].slice(0, limit);
 }
