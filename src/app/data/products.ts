@@ -57,6 +57,33 @@ export async function getProductsBySkus(skus: string[]): Promise<Product[]> {
     .filter(Boolean) as Product[];
 }
 
+/** Normalize a brand string for case-insensitive comparison. */
+function norm(str: string): string {
+  return (str || "").toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+/**
+ * Recommend auto-accessories for a given product's brand (brand id slug).
+ * - Exact brand match first (e.g. rubber "audi" → accessory brand "Audi"/"audi").
+ * - Fallback to any other accessories if no same-brand accessory exists.
+ */
+export async function getRecommendedAccessories(brandId: string, limit = 4): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, slug, title, brand, year, price, image, sku, price_eur, in_stock")
+    .eq("category", "auto_accessories")
+    .order("sort_order", { ascending: true }).order("created_at", { ascending: true });
+
+  if (error) { console.error("getRecommendedAccessories error:", error); return []; }
+  const items = (data || []) as Product[];
+
+  const target = norm(brandId);
+  const sameBrand = items.filter((p) => norm(p.brand) === target);
+  const others = items.filter((p) => norm(p.brand) !== target);
+
+  return [...sameBrand, ...others].slice(0, limit);
+}
+
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const { data, error } = await supabase
     .from("products")
