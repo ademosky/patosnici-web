@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 import Header from "../../components/Header";
 import OrderForm from "../../components/OrderForm";
 import ImageCarousel from "../../components/ImageCarousel";
-import { getProducts, getProductBySlug } from "../../data/products";
+import { getProducts, getProductBySlug, getRecommendedAccessories } from "../../data/products";
 import { CheckCircle, ArrowLeft, Tag } from "lucide-react";
 import AddToCartButton from "../../components/AddToCartButton";
 import ProductDescription from "../../components/ProductDescription";
@@ -17,6 +17,7 @@ import OrderHeader from "../../components/OrderHeader";
 import BackLink from "../../components/BackLink";
 import OriginalBadge from "../../components/OriginalBadge";
 import PaymentNote from "../../components/PaymentNote";
+import RecommendedProducts from "../../components/RecommendedProducts";
 
 export const dynamic = "force-dynamic";
 
@@ -116,6 +117,9 @@ export default async function ProductPage({ params }: Props) {
   const productUrl = ks
     ? `${SITE_URL}/ks/products/${product.slug}`
     : `${SITE_URL}/products/${product.slug}`;
+
+  // Recommended auto-accessories for this product's brand (dynamic).
+  const recommended = await getRecommendedAccessories(product.brand);
 
   return (
     <>
@@ -257,6 +261,9 @@ export default async function ProductPage({ params }: Props) {
           </div>
 
         </div>
+
+        {/* Recommended products */}
+        <RecommendedProducts products={recommended} />
       </main>
     </>
   );
