@@ -2160,7 +2160,7 @@ export default function AdminPage() {
                     )}
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-bold text-white">{p.title}</p>
-                      <p className="text-xs text-zinc-400">{p.brand}{p.sku ? ` · SKU ${p.sku}` : ""}</p>
+                      <p className="text-xs text-zinc-400">{p.brand === "all" ? "🌐 Универзално" : (brands.find((b) => b.id === p.brand)?.name ?? p.brand)}{p.sku ? ` · SKU ${p.sku}` : ""}</p>
                       <p className="text-xs font-bold text-red-500">{p.price}</p>
                     </div>
                     <button type="button" onClick={() => handleAccEdit(p)}
