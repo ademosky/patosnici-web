@@ -1,21 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import { useLanguage } from "../context/LanguageContext";
 import type { Product } from "../data/products";
 
-export default function BestSellers() {
-  const { t, localizedPath } = useLanguage();
-  const [products, setProducts] = useState<Product[]>([]);
+type Props = {
+  products: Product[];
+};
 
-  useEffect(() => {
-    fetch("/api/best-sellers")
-      .then((r) => r.json())
-      .then((data) => setProducts(Array.isArray(data) ? data.slice(0, 4) : []))
-      .catch(() => {});
-  }, []);
+export default function BestSellers({ products }: Props) {
+  const { t, localizedPath } = useLanguage();
 
   return (
     <section className="bg-[#0b0b0b] py-12 sm:py-20">
