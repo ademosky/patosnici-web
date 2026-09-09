@@ -1661,7 +1661,14 @@ export default function AdminPage() {
             <div className="mb-4 grid gap-2 sm:grid-cols-3">
               <div className="rounded-xl border border-zinc-800 bg-[#111] px-4 py-3 text-center">
                 <p className="text-xs text-zinc-500 uppercase tracking-wider">Вкупно нарачки</p>
-                <p className="mt-1 text-2xl font-black text-white">{dayFilteredOrders.length}</p>
+                <p className="mt-1 text-2xl font-black text-white">
+            {dayFilteredOrders.reduce((sum, o) => {
+              if (o.items && o.items.length > 0) {
+                return sum + o.items.reduce((s, it) => s + (it.quantity || 1), 0);
+              }
+              return sum + 1;
+            }, 0)}
+          </p>
               </div>
               <div className="rounded-xl border border-zinc-800 bg-[#111] px-4 py-3 text-center">
                 <p className="text-xs text-zinc-500 uppercase tracking-wider">Нови</p>
