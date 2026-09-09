@@ -1803,16 +1803,16 @@ export default function AdminPage() {
                     <div>
                       <p className="mb-2 text-xs font-bold uppercase tracking-wider text-zinc-500">Нарачано</p>
                       {order.items && order.items.length > 0 ? (
-                        <ul className="space-y-1">
-                          {order.items.map((item, i) => (
-                            <li key={i} className="text-sm text-zinc-300">
-                              <span className="font-semibold">{item.quantity}×</span> {item.title}
-                              <span className="ml-2 font-bold text-red-500">{order.currency === "EUR" ? `${getEurValue(item.price, item.price_eur)} €` : item.price}</span>
-                              {item.sku && <span className="ml-1.5 inline-block rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-xs font-semibold text-zinc-300">SKU {item.sku}</span>}
-                            </li>
-                          ))}
-                        </ul>
-                        {order.items && order.items.length > 0 && (
+                        <>
+                          <ul className="space-y-1">
+                            {order.items.map((item, i) => (
+                              <li key={i} className="text-sm text-zinc-300">
+                                <span className="font-semibold">{item.quantity}×</span> {item.title}
+                                <span className="ml-2 font-bold text-red-500">{order.currency === "EUR" ? `${getEurValue(item.price, item.price_eur)} €` : item.price}</span>
+                                {item.sku && <span className="ml-1.5 inline-block rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-xs font-semibold text-zinc-300">SKU {item.sku}</span>}
+                              </li>
+                            ))}
+                          </ul>
                           <div className="mt-2 flex items-center justify-between border-t border-zinc-800 pt-2">
                             <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Вкупно цена</span>
                             <span className="text-base font-extrabold text-red-500">
@@ -1824,7 +1824,7 @@ export default function AdminPage() {
                                   }, 0).toLocaleString("mk-MK")} ден`}
                             </span>
                           </div>
-                        )}
+                        </>
                       ) : (
                         <div className="text-sm text-zinc-300">
                           {order.product_title}
