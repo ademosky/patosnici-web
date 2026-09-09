@@ -84,16 +84,16 @@ export async function getRecommendedAccessories(brandId: string, limit = 4): Pro
   // Also compare against the raw id (e.g. accessory stored as "volkswagen" directly).
   const targetAlt = norm(brandId);
 
+  // Universal accessories (brand "all") show everywhere.
+  const universal = items.filter((p) => norm(p.brand) === "all");
+
+  // Same-brand accessories only (no arbitrary fallback).
   const sameBrand = items.filter((p) => {
     const n = norm(p.brand);
     return n === target || n === targetAlt;
   });
-  const others = items.filter((p) => {
-    const n = norm(p.brand);
-    return n !== target && n !== targetAlt;
-  });
 
-  return [...sameBrand, ...others].slice(0, limit);
+  return [...sameBrand, ...universal].slice(0, limit);
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
