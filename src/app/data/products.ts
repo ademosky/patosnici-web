@@ -41,6 +41,22 @@ export async function getProductsByCategory(category: string): Promise<Product[]
   return data as Product[];
 }
 
+export async function getProductsBySkus(skus: string[]): Promise<Product[]> {
+  if (!skus.length) return [];
+  // Lightweight: only the fields ProductCard needs (no images/description blobs).
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, slug, title, brand, model, car_model, year, price, image, sku, price_eur, in_stock")
+    .in("sku", skus);
+
+  if (error) { console.error("getProductsBySkus error:", error); return []; }
+
+  // Preserve the requested SKU order.
+  return skus
+    .map((sku) => (data || []).find((p) => p.sku === sku))
+    .filter(Boolean) as Product[];
+}
+
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const { data, error } = await supabase
     .from("products")
