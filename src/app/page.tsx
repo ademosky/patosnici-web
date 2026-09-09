@@ -7,7 +7,7 @@ import Reviews from "./components/Reviews";
 import TrustBar from "./components/TrustBar";
 import { getProductsBySkus } from "./data/products";
 
-const BEST_SELLER_SKUS = ["444806", "213648", "444894", "212807"];
+const BEST_SELLER_SKUS = ["444805", "213648", "444894", "212807"];
 
 export const revalidate = 300;
 
