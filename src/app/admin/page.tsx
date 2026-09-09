@@ -2089,7 +2089,13 @@ export default function AdminPage() {
               </p>
               <form onSubmit={handleAccSave} className="flex flex-col gap-2">
                 <input required placeholder="Назив *" value={accForm.title} onChange={(e) => accUpdate("title", e.target.value)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
-                <input required placeholder="Бренд *" value={accForm.brand} onChange={(e) => accUpdate("brand", e.target.value)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
+                <select required value={accForm.brand} onChange={(e) => accUpdate("brand", e.target.value)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600">
+                  <option value="">— Избери бренд —</option>
+                  <option value="all">🌐 Универзално (за сите)</option>
+                  {brands.map((b) => (
+                    <option key={b.id} value={b.id}>{b.name}</option>
+                  ))}
+                </select>
                 <div className="grid grid-cols-2 gap-2">
                   <input required placeholder="Цена (денари) *" value={accForm.price} onChange={(e) => accUpdate("price", e.target.value)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
                   <input placeholder="Цена EUR" value={accForm.price_eur} onChange={(e) => accUpdate("price_eur", e.target.value)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
