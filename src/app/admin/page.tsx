@@ -1812,6 +1812,19 @@ export default function AdminPage() {
                             </li>
                           ))}
                         </ul>
+                        {order.items && order.items.length > 0 && (
+                          <div className="mt-2 flex items-center justify-between border-t border-zinc-800 pt-2">
+                            <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Вкупно цена</span>
+                            <span className="text-base font-extrabold text-red-500">
+                              {order.currency === "EUR"
+                                ? `${order.items.reduce((sum, it) => sum + getEurValue(it.price, it.price_eur) * (it.quantity || 1), 0)} €`
+                                : `${order.items.reduce((sum, it) => {
+                                    const n = parseInt(it.price.replace(/\./g, "").replace(/[^\d]/g, ""), 10) || 0;
+                                    return sum + n * (it.quantity || 1);
+                                  }, 0).toLocaleString("mk-MK")} ден`}
+                            </span>
+                          </div>
+                        )}
                       ) : (
                         <div className="text-sm text-zinc-300">
                           {order.product_title}
