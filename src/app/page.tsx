@@ -5,8 +5,15 @@ import BestSellers from "./components/BestSellers";
 import Features from "./components/Features";
 import Reviews from "./components/Reviews";
 import TrustBar from "./components/TrustBar";
+import { getProductsBySkus } from "./data/products";
 
-export default function Home() {
+const BEST_SELLER_SKUS = ["444806", "213648", "444894", "212807"];
+
+export const revalidate = 300;
+
+export default async function Home() {
+  const bestSellers = await getProductsBySkus(BEST_SELLER_SKUS);
+
   return (
     <>
       <Header />
@@ -14,7 +21,7 @@ export default function Home() {
         <Hero />
         <BrandSelector />
         <Features />
-        <BestSellers />
+        <BestSellers products={bestSellers} />
         <Reviews />
         <TrustBar />
       </main>
