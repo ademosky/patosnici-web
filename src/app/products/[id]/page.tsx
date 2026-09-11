@@ -189,7 +189,7 @@ export default async function ProductPage({ params }: Props) {
                 images={product.images && product.images.length > 0 ? product.images : [product.image]}
                 alt={product.title}
               />
-              <OriginalBadge />
+              {product.category !== "auto_accessories" && <OriginalBadge />}
               {product.in_stock === false && (
                 <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60">
                   <span className="rounded-2xl border border-zinc-500 bg-zinc-900/95 px-8 py-4 text-xl font-black uppercase tracking-widest text-zinc-300">
