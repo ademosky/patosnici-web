@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
       { source: "/ks/products", destination: "/products" },
       { source: "/ks/products/:slug", destination: "/products/:slug" },
       { source: "/ks/cart", destination: "/cart" },
+      { source: "/ks/create-own", destination: "/create-own" },
+      { source: "/ks/auto-accessories", destination: "/auto-accessories" },
+      { source: "/ks/contact", destination: "/contact" },
     ];
   },
   images: {
