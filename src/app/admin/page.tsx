@@ -127,6 +127,16 @@ export default function AdminPage() {
   const [toast, setToast]         = useState<{ msg: string; ok: boolean } | null>(null);
   const [listSearch, setListSearch] = useState("");
   const [stockFilter, setStockFilter] = useState<"all" | "out_of_stock">("all");
+
+  // ── Најпродавани (best sellers) ──
+  type BestSellerRow = { rank: number; sku: string; title: string; brand: string; category: string; quantity: number; total: number };
+  const [showBestSellers, setShowBestSellers] = useState(false);
+  const [bsRows, setBsRows] = useState<BestSellerRow[]>([]);
+  const [bsLoading, setBsLoading] = useState(false);
+  const [bsPeriod, setBsPeriod] = useState<"all" | "range">("all");
+  const [bsFrom, setBsFrom] = useState("");
+  const [bsTo, setBsTo] = useState("");
+  const [bsExporting, setBsExporting] = useState(false);
   const [expandedBrands, setExpandedBrands] = useState<Record<string,boolean>>({});
   const [activeTab, setActiveTab] = useState<"products" | "orders" | "inventory" | "showcase" | "accessories">("orders");
   const [orders, setOrders] = useState<Order[]>([]);
