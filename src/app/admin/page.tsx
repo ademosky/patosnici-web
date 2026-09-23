@@ -339,7 +339,9 @@ export default function AdminPage() {
       if (bsFrom) p.set("from", bsFrom);
       if (bsTo) p.set("to", bsTo);
     }
-    if (bsSearch.trim()) p.set("q", bsSearch.trim());
+    // Only send the search term for the Excel export so the on-screen list
+    // always holds the full set (needed for accurate "X od Y" counts).
+    if (fmt && bsSearch.trim()) p.set("q", bsSearch.trim());
     if (fmt) p.set("format", fmt);
     return p;
   };
