@@ -339,6 +339,7 @@ export default function AdminPage() {
       if (bsFrom) p.set("from", bsFrom);
       if (bsTo) p.set("to", bsTo);
     }
+    if (bsSearch.trim()) p.set("q", bsSearch.trim());
     if (fmt) p.set("format", fmt);
     return p;
   };
