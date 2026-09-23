@@ -2380,6 +2380,130 @@ export default function AdminPage() {
           </div>
         )}
 
+      {/* ── НАЈПРОДАВАНИ МОДАЛ ── */}
+      {showBestSellers && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-3 sm:p-4" onClick={() => setShowBestSellers(false)}>
+          <div className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-2xl border border-zinc-700 bg-[#111] p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+
+            {/* Header */}
+            <div className="mb-4 flex items-start justify-between gap-3">
+              <div>
+                <h3 className="flex items-center gap-2 text-lg font-black uppercase text-white">
+                  <TrendingUp size={18} className="text-green-500" /> Export најпродавани
+                </h3>
+                <p className="mt-1 text-xs text-zinc-500">
+                  Сортирано од најпродаван кон најмалку продаван · пресметано од сите нарачани количини
+                </p>
+              </div>
+              <button onClick={() => setShowBestSellers(false)}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white">
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Period selector */}
+            <div className="mb-4 rounded-xl border border-zinc-800 bg-[#0d0d0d] p-3 sm:p-4">
+              <p className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <Calendar size={12} /> Период
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                <button type="button"
+                  onClick={() => setBsPeriod("all")}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-bold uppercase transition ${
+                    bsPeriod === "all" ? "bg-red-600 text-white" : "border border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-white"
+                  }`}>
+                  Цела продажба
+                </button>
+                <button type="button"
+                  onClick={() => setBsPeriod("range")}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-bold uppercase transition ${
+                    bsPeriod === "range" ? "bg-red-600 text-white" : "border border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-white"
+                  }`}>
+                  Одреден период
+                </button>
+              </div>
+
+              {bsPeriod === "range" && (
+                <div className="mt-3 grid grid-cols-2 gap-2 sm:max-w-md">
+                  <div>
+                    <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-zinc-500">Од датум</label>
+                    <input type="date" value={bsFrom} onChange={(e) => setBsFrom(e.target.value)}
+                      className="w-full rounded-lg border border-zinc-700 bg-[#1a1a1a] px-3 py-2 text-sm text-white outline-none transition focus:border-red-600" />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-zinc-500">До датум</label>
+                    <input type="date" value={bsTo} onChange={(e) => setBsTo(e.target.value)}
+                      className="w-full rounded-lg border border-zinc-700 bg-[#1a1a1a] px-3 py-2 text-sm text-white outline-none transition focus:border-red-600" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Export button */}
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <button type="button" onClick={exportBestSellers} disabled={bsExporting || bsRows.length === 0}
+                className="flex items-center gap-2 rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold uppercase text-white transition hover:bg-green-600 disabled:opacity-50">
+                {bsExporting ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
+                Export во Excel (.xlsx)
+              </button>
+              <span className="text-xs text-zinc-500">{bsRows.length} производи</span>
+            </div>
+
+            {/* Table */}
+            {bsLoading ? (
+              <div className="flex justify-center py-14">
+                <Loader2 size={26} className="animate-spin text-red-600" />
+              </div>
+            ) : bsRows.length === 0 ? (
+              <div className="py-14 text-center text-zinc-600">
+                <TrendingUp size={40} className="mx-auto mb-3 opacity-30" />
+                <p>Нема продажби за избраниот период</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto rounded-xl border border-zinc-800">
+                <table className="w-full min-w-[620px] text-left text-sm">
+                  <thead className="bg-[#0d0d0d] text-[10px] uppercase tracking-wider text-zinc-500">
+                    <tr>
+                      <th className="px-3 py-2.5 font-bold">Ранг</th>
+                      <th className="px-3 py-2.5 font-bold">SKU</th>
+                      <th className="px-3 py-2.5 font-bold">Назив</th>
+                      <th className="px-3 py-2.5 font-bold">Бренд</th>
+                      <th className="px-3 py-2.5 font-bold">Категорија</th>
+                      <th className="px-3 py-2.5 text-right font-bold">Количина</th>
+                      <th className="px-3 py-2.5 text-right font-bold">Вкупна продажба</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bsRows.map((r) => (
+                      <tr key={r.sku + r.rank} className="border-t border-zinc-800/70 transition hover:bg-zinc-800/30">
+                        <td className="px-3 py-2.5">
+                          <span className={`inline-flex h-6 w-6 items-center justify-center rounded-lg text-xs font-black ${
+                            r.rank === 1 ? "bg-yellow-500 text-black" :
+                            r.rank === 2 ? "bg-zinc-400 text-black" :
+                            r.rank === 3 ? "bg-amber-700 text-white" :
+                            "bg-zinc-800 text-zinc-400"
+                          }`}>{r.rank}</span>
+                        </td>
+                        <td className="px-3 py-2.5 font-mono text-xs text-zinc-400">{r.sku || "—"}</td>
+                        <td className="px-3 py-2.5 font-semibold text-white">{r.title}</td>
+                        <td className="px-3 py-2.5 text-zinc-400">{r.brand}</td>
+                        <td className="px-3 py-2.5 text-zinc-400">
+                          {r.category === "rubber_mats" ? "Гумени патосници" :
+                           r.category === "fabric_mats" ? "Платнени патосници" :
+                           r.category === "auto_accessories" ? "Авто додатоци" : (r.category === "—" ? "—" : r.category)}
+                        </td>
+                        <td className="px-3 py-2.5 text-right font-bold text-white">{r.quantity}</td>
+                        <td className="px-3 py-2.5 text-right font-bold text-red-500">{r.total.toLocaleString("mk-MK")} ден</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
