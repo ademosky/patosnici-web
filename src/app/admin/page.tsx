@@ -2456,14 +2456,43 @@ export default function AdminPage() {
               )}
             </div>
 
-            {/* Export button */}
-            <div className="mb-4 flex flex-wrap items-center gap-2">
-              <button type="button" onClick={exportBestSellers} disabled={bsExporting || bsRows.length === 0}
-                className="flex items-center gap-2 rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold uppercase text-white transition hover:bg-green-600 disabled:opacity-50">
-                {bsExporting ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
-                Export во Excel (.xlsx)
-              </button>
-              <span className="text-xs text-zinc-500">{bsRows.length} производи</span>
+            {/* Search + Export */}
+            <div className="mb-4 flex flex-col gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="relative min-w-[200px] flex-1 sm:max-w-xs">
+                  <input
+                    type="text"
+                    value={bsSearch}
+                    onChange={(e) => setBsSearch(e.target.value)}
+                    placeholder="🔍 Пребарај по SKU, назив или бренд..."
+                    className="w-full rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2.5 pr-9 text-sm text-white outline-none transition focus:border-red-600"
+                  />
+                  {bsSearch && (
+                    <button type="button" onClick={() => setBsSearch("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 transition hover:text-white">
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+                <button type="button" onClick={exportBestSellers} disabled={bsExporting || bsFiltered.length === 0}
+                  className="flex items-center gap-2 rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold uppercase text-white transition hover:bg-green-600 disabled:opacity-50">
+                  {bsExporting ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
+                  Export во Excel (.xlsx)
+                </button>
+              </div>
+
+              {/* Summary of the current view */}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+                <span className="text-zinc-500">
+                  {bsSearch.trim() ? `${bsFiltered.length} од ${bsRows.length} производи` : `${bsRows.length} производи`}
+                </span>
+                <span className="text-zinc-500">
+                  Вкупно продадено: <span className="font-bold text-white">{bsTotalQty}</span>
+                </span>
+                <span className="text-zinc-500">
+                  Вкупна вредност: <span className="font-bold text-red-500">{bsTotalValue.toLocaleString("mk-MK")} ден</span>
+                </span>
+              </div>
             </div>
 
             {/* Table */}
