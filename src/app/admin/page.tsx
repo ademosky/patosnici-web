@@ -2505,6 +2505,15 @@ export default function AdminPage() {
                 <TrendingUp size={40} className="mx-auto mb-3 opacity-30" />
                 <p>Нема продажби за избраниот период</p>
               </div>
+            ) : bsFiltered.length === 0 ? (
+              <div className="py-14 text-center text-zinc-600">
+                <TrendingUp size={40} className="mx-auto mb-3 opacity-30" />
+                <p>Нема резултати за „{bsSearch}“</p>
+                <button type="button" onClick={() => setBsSearch("")}
+                  className="mt-4 rounded-xl border border-zinc-700 px-4 py-2 text-xs font-bold uppercase text-zinc-400 transition hover:border-red-600 hover:text-white">
+                  Исчисти пребарување
+                </button>
+              </div>
             ) : (
               <div className="overflow-x-auto rounded-xl border border-zinc-800">
                 <table className="w-full min-w-[620px] text-left text-sm">
@@ -2520,7 +2529,7 @@ export default function AdminPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {bsRows.map((r) => (
+                    {bsFiltered.map((r) => (
                       <tr key={r.sku + r.rank} className="border-t border-zinc-800/70 transition hover:bg-zinc-800/30">
                         <td className="px-3 py-2.5">
                           <span className={`inline-flex h-6 w-6 items-center justify-center rounded-lg text-xs font-black ${
