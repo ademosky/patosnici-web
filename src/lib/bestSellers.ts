@@ -87,8 +87,13 @@ export async function computeBestSellers(
     .from("orders")
     .select("created_at, items, product_sku, product_title, product_price");
 
-  if (from) query = query.gte("created_at", `${from}T00:00:00`);
-  if (to) query = query.lte("created_at", `${to}T23:59:59.999`);
+  // Inclusive date range: from >= from-day, to < (to-day + 1) so the end day is fully included.
+  if (from) query = query.gte("created_at", from);
+  if (to) {
+    const d = new Date(`${to}T00:00:00Z`);
+    d.setUTCDate(d.getUTCDate() + 1);
+    query = query.lt("created_at", d.toISOString().slice(0, 10));
+  }
 
   const { data: orders, error } = await query;
   if (error) throw new Error(error.message);
