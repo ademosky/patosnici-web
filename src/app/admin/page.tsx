@@ -315,6 +315,74 @@ export default function AdminPage() {
     }
   };
 
+  // ── Најпродавани: fetch + export ──
+  const bsParams = (fmt?: string) => {
+    const p = new URLSearchParams();
+    if (bsPeriod === "range") {
+      if (bsFrom) p.set("from", bsFrom);
+      if (bsTo) p.set("to", bsTo);
+    }
+    if (fmt) p.set("format", fmt);
+    return p;
+  };
+
+  const fetchBestSellers = async () => {
+    const pw = getPw();
+    if (!pw) return;
+    setBsLoading(true);
+    try {
+      const res = await fetch(`/api/admin/products/best-sellers?${bsParams()}`, {
+        headers: { "x-admin-password": pw },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setBsRows(Array.isArray(data?.rows) ? data.rows : []);
+      } else {
+        setBsRows([]);
+        showToast("Грешка при вчитување", false);
+      }
+    } catch {
+      setBsRows([]);
+      showToast("Грешка при вчитување", false);
+    }
+    setBsLoading(false);
+  };
+
+  const exportBestSellers = async () => {
+    const pw = getPw();
+    if (!pw) return;
+    setBsExporting(true);
+    try {
+      const res = await fetch(`/api/admin/products/best-sellers?${bsParams("xlsx")}`, {
+        headers: { "x-admin-password": pw },
+      });
+      if (!res.ok) {
+        showToast("Грешка при експорт", false);
+        setBsExporting(false);
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "najprodavani.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast("Експортот е подготвен", true);
+    } catch {
+      showToast("Грешка при експорт", false);
+    }
+    setBsExporting(false);
+  };
+
+  // Auto-recompute the list whenever the period changes while the panel is open
+  useEffect(() => {
+    if (showBestSellers) fetchBestSellers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showBestSellers, bsPeriod, bsFrom, bsTo]);
+
   const deleteOrder = async (id: number) => {
     if (!confirm("Сигурно сакаш да ја избришеш оваа нарачка?")) return;
     const res = await fetch(`/api/admin/orders/${id}`, {
