@@ -1146,6 +1146,14 @@ export default function AdminPage() {
                   onChange={(e) => setListSearch(e.target.value)}
                   className="w-36 rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-2 text-sm text-white outline-none transition focus:border-red-600"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowBestSellers(true)}
+                  className="flex items-center gap-1.5 rounded-xl border border-green-700/60 px-3 py-2 text-xs font-bold uppercase text-green-400 transition hover:bg-green-600/20"
+                  title="Export најпродавани"
+                >
+                  <TrendingUp size={14} /> Export најпродавани
+                </button>
               </div>
             </div>
 
