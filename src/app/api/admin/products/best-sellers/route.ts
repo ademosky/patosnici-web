@@ -20,11 +20,12 @@ export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
   const from = params.get("from") || null;
   const to = params.get("to") || null;
+  const q = params.get("q") || null;
   const format = params.get("format") || "json";
 
   let rows;
   try {
-    rows = await computeBestSellers(from, to);
+    rows = await computeBestSellers(from, to, q);
   } catch (err: any) {
     return NextResponse.json({ error: err?.message ?? "Грешка" }, { status: 500 });
   }
@@ -63,7 +64,8 @@ export async function GET(req: NextRequest) {
   const buf = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
 
   const period = from || to ? `${from || "pocetok"}_${to || "sega"}` : "celosna";
-  const filename = `najprodavani-${period}.xlsx`;
+  const qSuffix = q ? `-${q.replace(/[^a-z0-9-]/gi, "")}` : "";
+  const filename = `najprodavani-${period}${qSuffix}.xlsx`;
 
   return new NextResponse(buf, {
     status: 200,
