@@ -11,7 +11,7 @@ import {
   Lock, Plus, Trash2, LogOut, Package, ShoppingCart, Warehouse,
   CheckCircle, AlertCircle, Loader2, Pencil,
   X, Upload, ImageIcon, Phone, Mail as MailIcon, Clock, Minus, Download,
-  ChevronUp, ChevronDown,
+  ChevronUp, ChevronDown, TrendingUp, Calendar,
 } from "lucide-react";
 
 type Product = {
