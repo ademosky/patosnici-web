@@ -79,7 +79,8 @@ function aggregate(orders: OrderLike[]) {
  */
 export async function computeBestSellers(
   from: string | null,
-  to: string | null
+  to: string | null,
+  q: string | null = null
 ): Promise<BestSellerRow[]> {
   const client = supabaseAdmin();
 
@@ -132,6 +133,20 @@ export async function computeBestSellers(
   // Highest sold → lowest
   rows.sort((a, b) => b.quantity - a.quantity || b.total - a.total);
   rows.forEach((r, i) => (r.rank = i + 1));
+
+  // Optional text filter (SKU primary; title/brand also match for convenience).
+  if (q && q.trim()) {
+    const needle = q.trim().toLowerCase();
+    const filtered = rows.filter(
+      (r) =>
+        (r.sku || "").toLowerCase().includes(needle) ||
+        (r.title || "").toLowerCase().includes(needle) ||
+        (r.brand || "").toLowerCase().includes(needle)
+    );
+    // Re-rank within the filtered result so the export shows 1..n
+    filtered.forEach((r, i) => (r.rank = i + 1));
+    return filtered;
+  }
 
   return rows;
 }
