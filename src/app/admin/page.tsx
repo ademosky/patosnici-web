@@ -137,6 +137,23 @@ export default function AdminPage() {
   const [bsFrom, setBsFrom] = useState("");
   const [bsTo, setBsTo] = useState("");
   const [bsExporting, setBsExporting] = useState(false);
+  const [bsSearch, setBsSearch] = useState("");
+
+  // Client-side filter by SKU (falls back to title/brand so searching by name also works)
+  const bsFiltered = bsSearch.trim()
+    ? bsRows.filter((r) => {
+        const q = bsSearch.trim().toLowerCase();
+        return (
+          (r.sku || "").toLowerCase().includes(q) ||
+          (r.title || "").toLowerCase().includes(q) ||
+          (r.brand || "").toLowerCase().includes(q)
+        );
+      })
+    : bsRows;
+
+  // Rank within the current filter (so a searched SKU shows its sales clearly)
+  const bsTotalQty = bsFiltered.reduce((s, r) => s + r.quantity, 0);
+  const bsTotalValue = bsFiltered.reduce((s, r) => s + r.total, 0);
   const [expandedBrands, setExpandedBrands] = useState<Record<string,boolean>>({});
   const [activeTab, setActiveTab] = useState<"products" | "orders" | "inventory" | "showcase" | "accessories">("orders");
   const [orders, setOrders] = useState<Order[]>([]);
