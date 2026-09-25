@@ -255,8 +255,10 @@ export default function AdminPage() {
     setOrdersLoading(true);
     const params = new URLSearchParams();
     if (month) params.set("month", month);
+    params.set("_t", String(Date.now())); // cache-buster — always fresh
     const res = await fetch(`/api/admin/orders?${params}`, {
       headers: { "x-admin-password": pw },
+      cache: "no-store",
     });
     if (res.ok) setOrders(await res.json());
     setOrdersLoading(false);
