@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { normalizeSearchWords, matchesAllWords } from "@/lib/search";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 
 export async function GET(req: NextRequest) {
   const q     = req.nextUrl.searchParams.get("q")     || "";
