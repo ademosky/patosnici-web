@@ -69,6 +69,12 @@ const mk = {
   rev2_car: "BMW 3 Series",
   rev3_text: "Веќе 6 месеци ги користам и изгледаат исто како нови. Брза достава и добра комуникација.",
   rev3_car: "Škoda Octavia",
+  rev1_name: "Arben Krasniqi",
+  rev2_name: "Ilir Hoxha",
+  rev3_name: "Elira Berisha",
+  rev1_name: "Марко Петровски",
+  rev2_name: "Сашо Илиевски",
+  rev3_name: "Ана Стефановска",
 
   // Footer
   footer_nav: "Навигација",
