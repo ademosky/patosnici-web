@@ -133,16 +133,21 @@ export function OrdersView({ openNew, onNewClosed }: { openNew: boolean; onNewCl
             { v: "sent" as const, label: "Пратени" },
           ]} />
 
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <IcSearch size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#4e4e58]" />
-            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Име, телефон, SKU…" className="pl-9" />
-            {q && (
-              <button onClick={() => setQ("")} aria-label="Исчисти"
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#5a5a64]"><IcX size={15} /></button>
-            )}
-          </div>
-          <Input type="date" value={day} onChange={(e) => setDay(e.target.value)} className="w-[142px]" />
+        {/* Search — full width, tall tap target */}
+        <div className="relative">
+          <IcSearch size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4e4e58]" />
+          <Input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Пребарај: име, телефон, SKU, град…"
+            className="h-[52px] pl-11 pr-11 text-[15px]"
+          />
+          {q && (
+            <button onClick={() => setQ("")} aria-label="Исчисти"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-[#5a5a64] active:scale-90">
+              <IcX size={16} />
+            </button>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -170,6 +175,23 @@ export function OrdersView({ openNew, onNewClosed }: { openNew: boolean; onNewCl
               {exporting ? <IcSpinner size={16} /> : <IcDownLoad size={17} />}
             </IconBtn>
           </div>
+        </div>
+
+        {/* Day filter — sits under the currency row, deliberately compact */}
+        <div className="flex items-center gap-2">
+          <span className="shrink-0 text-[10.5px] font-semibold uppercase tracking-[.12em] text-[#5a5a64]">Ден</span>
+          <Input
+            type="date"
+            value={day}
+            onChange={(e) => setDay(e.target.value)}
+            className="h-9 w-[150px] py-0 text-[12.5px]"
+          />
+          {day && (
+            <button onClick={() => setDay("")} aria-label="Исчисти датум"
+              className="rounded-lg border border-[#25252d] px-2.5 py-2 text-[11px] font-semibold text-[#8a8a95] active:scale-95">
+              <IcX size={13} />
+            </button>
+          )}
         </div>
       </Card>
 
