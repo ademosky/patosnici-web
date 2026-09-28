@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { headers } from "next/headers";
 import Header from "../../components/Header";
 import OrderForm from "../../components/OrderForm";
 import ImageCarousel from "../../components/ImageCarousel";
@@ -14,6 +13,7 @@ import {
   getEurValue,
   getAllValue,
 } from "@/lib/pricing";
+import { readMarketServer } from "@/lib/market-server";
 import { CheckCircle, ArrowLeft, Tag } from "lucide-react";
 import AddToCartButton from "../../components/AddToCartButton";
 import ProductDescription from "../../components/ProductDescription";
@@ -30,23 +30,7 @@ export const dynamic = "force-dynamic";
 
 const SITE_URL = "https://www.originalpatosnici.com";
 
-// Detect the market — stamped by src/middleware.ts BEFORE the /ks or /al
-// rewrite. Reliable header instead of x-invoke-path (Vercel doesn't populate it).
-async function readMarketServer(): Promise<Market> {
-  try {
-    const h = await headers();
-    const m = h.get("x-market");
-    if (m === "ks" || m === "al" || m === "mk") return m;
-    // Fallbacks: legacy Kosovo header, then the original path
-    if (h.get("x-ks-locale") === "1") return "ks";
-    const path = h.get("x-original-path") || "";
-    if (path.startsWith("/al")) return "al";
-    if (path.startsWith("/ks")) return "ks";
-    return "mk";
-  } catch {
-    return "mk";
-  }
-}
+
 
 type Props = {
   params: Promise<{ id: string }>;
