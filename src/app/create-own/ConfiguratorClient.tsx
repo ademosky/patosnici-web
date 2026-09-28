@@ -4,7 +4,7 @@ import { useState, useMemo, useRef } from "react";
 import { brands } from "../data/brands";
 import { useLanguage } from "../context/LanguageContext";
 import { useCart } from "../context/CartContext";
-import { getEurValue } from "@/lib/pricing";
+import { formatPrice, getEurValue, numericCartTotal } from "@/lib/pricing";
 import { Send, CheckCircle, Loader2, ShoppingCart, Check } from "lucide-react";
 import {
   BODY_COLORS,
@@ -98,7 +98,9 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
   const resetModel = () => setSelectedModel(null);
 
   const priceMkd = CONFIG_BASE_PRICE_MKD;
-  const priceDisplay = currency === "EUR" ? `${getEurValue(`${priceMkd} ден`)} €` : `${priceMkd.toLocaleString("mk-MK")} ден`;
+  const baseMkdPrice = `${priceMkd.toLocaleString("mk-MK")} ден`;
+  // Market-aware: MKD on /, EUR on /ks, ALL (Lekë) on /al
+  const priceDisplay = formatPrice(baseMkdPrice, currency);
   const configSummary = config.vehicle
     ? `${config.vehicle.generation} | ${config.bodyColor.label_mk} | ${config.borderColor.label_mk} | ${config.withLogo ? "Со лого" : "Без лого"}`
     : "";
@@ -116,14 +118,14 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
           content_ids: ["99999"],
           content_name: productTitle,
           content_type: "product",
-          value: priceMkd,
-          currency: "MKD",
+          value: numericCartTotal([{ price: baseMkdPrice, quantity: 1 }], currency),
+          currency,
         });
       }
     }
 
     try {
-      const res = await fetch("/api/order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, productTitle, productPrice: `${priceMkd.toLocaleString("mk-MK")} ден`, productSku: "", note: form.note && form.note.trim() ? `${form.note}\n\nКонфигурација: ${configSummary}` : configSummary, currency, source: "create_own" }) });
+      const res = await fetch("/api/order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, productTitle, productPrice: baseMkdPrice, productSku: "", note: form.note && form.note.trim() ? `${form.note}\n\nКонфигурација: ${configSummary}` : configSummary, currency, source: "create_own" }) });
       if (res.ok) {
         // ── Meta Pixel: Purchase ──
         if (!purchaseFiredRef.current) {
@@ -134,8 +136,8 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
               content_ids: ["99999"],
               content_name: productTitle,
               content_type: "product",
-              value: priceMkd,
-              currency: "MKD",
+              value: numericCartTotal([{ price: baseMkdPrice, quantity: 1 }], currency),
+              currency,
             });
           }
         }
@@ -156,8 +158,8 @@ export default function ConfiguratorClient({ initialVehicles }: { initialVehicle
         content_ids: ["99999"],
         content_name: productTitle,
         content_type: "product",
-        value: priceMkd,
-        currency: "MKD",
+        value: numericCartTotal([{ price: baseMkdPrice, quantity: 1 }], currency),
+        currency,
       });
     }
   };
