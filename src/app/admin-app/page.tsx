@@ -58,7 +58,7 @@ function AdminApp() {
         {tab === "products" && <CatalogView openNew={newOpen} onNewClosed={() => setNewOpen(false)} />}
         {tab === "accessories" && <CatalogView scope="auto_accessories" openNew={newOpen} onNewClosed={() => setNewOpen(false)} />}
         {tab === "stock" && <StockView />}
-        {tab === "showcase" && <StockView />}
+        {tab === "showcase" && <StockView initialTab="gal" />}
         {tab === "stats" && <StatsView />}
         {tab === "settings" && <SettingsView />}
       </Shell>
