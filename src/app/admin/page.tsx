@@ -1898,17 +1898,23 @@ export default function AdminPage() {
                     <div className="grid grid-cols-4 gap-2 sm:flex sm:gap-2">
                       <button
                         onClick={() => updateOrderStatus(order.id, "in_process")}
-                        disabled={order.status === "in_process"}
-                        className="rounded-xl border border-blue-700 px-3 py-2.5 sm:py-1.5 text-xs font-semibold text-blue-400 transition hover:bg-blue-600/20 disabled:opacity-40 active:bg-blue-600/30"
+                        disabled={order.status === "in_process" || statusSavingId === order.id}
+                        className="flex items-center justify-center gap-1.5 rounded-xl border border-blue-700 px-3 py-2.5 sm:py-1.5 text-xs font-semibold text-blue-400 transition hover:bg-blue-600/20 disabled:opacity-40 active:bg-blue-600/30"
                       >
-                        ⚙️ Во процес
+                        {statusSavingId === order.id
+                          ? <Loader2 size={13} className="animate-spin" />
+                          : "⚙️"}
+                        Во процес
                       </button>
                       <button
                         onClick={() => updateOrderStatus(order.id, "sent")}
-                        disabled={order.status === "sent"}
-                        className="rounded-xl border border-green-700 px-3 py-2.5 sm:py-1.5 text-xs font-semibold text-green-400 transition hover:bg-green-600/20 disabled:opacity-40 active:bg-green-600/30"
+                        disabled={order.status === "sent" || statusSavingId === order.id}
+                        className="flex items-center justify-center gap-1.5 rounded-xl border border-green-700 px-3 py-2.5 sm:py-1.5 text-xs font-semibold text-green-400 transition hover:bg-green-600/20 disabled:opacity-40 active:bg-green-600/30"
                       >
-                        ✅ Испратена
+                        {statusSavingId === order.id
+                          ? <Loader2 size={13} className="animate-spin" />
+                          : "✅"}
+                        Испратена
                       </button>
                       <button
                         onClick={() => openEditOrder(order)}
