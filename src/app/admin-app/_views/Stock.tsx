@@ -13,14 +13,14 @@ import {
   IcTrash, IcLayers, IcImage, IcUpload, IcUp, IcDown, IcAlert,
 } from "../_ui/kit";
 
-export function StockView() {
+export function StockView({ initialTab = "inv" }: { initialTab?: "inv" | "gal" }) {
   const {
     inventory, showcase, loading,
     addInventory, patchInventory, removeInventory,
     addShowcase, patchShowcase, removeShowcase, moveShowcase, toast,
   } = useAdmin();
 
-  const [tab, setTab] = useState<"inv" | "gal">("inv");
+  const [tab, setTab] = useState<"inv" | "gal">(initialTab);
 
   return (
     <div className="space-y-4">
