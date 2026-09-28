@@ -1898,7 +1898,7 @@ export default function AdminPage() {
                     <div className="grid grid-cols-4 gap-2 sm:flex sm:gap-2">
                       <button
                         onClick={() => updateOrderStatus(order.id, "in_process")}
-                        disabled={order.status === "in_process" || statusSavingId === order.id}
+                        disabled={order.status === "in_process" || statusSavingId !== null}
                         className="flex items-center justify-center gap-1.5 rounded-xl border border-blue-700 px-3 py-2.5 sm:py-1.5 text-xs font-semibold text-blue-400 transition hover:bg-blue-600/20 disabled:opacity-40 active:bg-blue-600/30"
                       >
                         {statusSavingId === order.id
@@ -1908,7 +1908,7 @@ export default function AdminPage() {
                       </button>
                       <button
                         onClick={() => updateOrderStatus(order.id, "sent")}
-                        disabled={order.status === "sent" || statusSavingId === order.id}
+                        disabled={order.status === "sent" || statusSavingId !== null}
                         className="flex items-center justify-center gap-1.5 rounded-xl border border-green-700 px-3 py-2.5 sm:py-1.5 text-xs font-semibold text-green-400 transition hover:bg-green-600/20 disabled:opacity-40 active:bg-green-600/30"
                       >
                         {statusSavingId === order.id
