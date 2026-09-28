@@ -313,6 +313,18 @@ const sq: typeof mk = {
 
 export type TKey = keyof typeof mk;
 
+/**
+ * Albania-only wording. The shared Albanian dictionary still names Macedonia
+ * in its delivery copy, which is wrong for the Albania market — these four
+ * keys are overridden there. Kosovo keeps its existing copy untouched.
+ */
+const sqAlOverrides: Partial<Record<TKey, string>> = {
+  rev_count: "Mbi 5.000 klientë të kënaqur në gjithë Shqipërinë",
+  feat_delivery: "Dërgesë në gjithë Shqipërinë",
+  acc_delivery: "Dërgesë në gjithë Shqipërinë",
+  cart_payment_info: "Pagesë në dorëzim · Dërgesë në gjithë Shqipërinë",
+};
+
 const LanguageContext = createContext<{
   lang: Lang;
   setLang: (l: Lang) => void;
@@ -375,8 +387,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setCurrency("MKD");
   };
 
-  const t = (key: TKey): string =>
-    (lang === "sq" ? sq[key] : mk[key]) ?? mk[key] ?? key;
+  const t = (key: TKey): string => {
+    // Albania overrides come first — same language, correct country.
+    if (market === "al" && sqAlOverrides[key]) return sqAlOverrides[key] as string;
+    return (lang === "sq" ? sq[key] : mk[key]) ?? mk[key] ?? key;
+  };
 
   const formatPrice = (price: string, priceEur?: string | null): string =>
     formatPriceFn(price, currency, priceEur);
