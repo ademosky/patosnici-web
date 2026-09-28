@@ -184,11 +184,8 @@ export default async function ProductPage({ params }: Props) {
             },
             offers: {
               "@type": "Offer",
-              price:
-                parseFloat(
-                  product.price.replace(/\./g, "").replace(/[^\d]/g, "")
-                ) || 0,
-              priceCurrency: "MKD",
+              price: ldPrice,
+              priceCurrency: marketCurrency,
               availability:
                 product.in_stock === false
                   ? "https://schema.org/OutOfStock"
