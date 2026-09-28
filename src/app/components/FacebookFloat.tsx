@@ -1,13 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useLanguage } from "../context/LanguageContext";
 
 export default function FacebookFloat() {
+  const pathname = usePathname();
   const { market } = useLanguage();
   const isMk = market === "mk";
   const label = isMk ? "Facebook страна" : "Faqja në Facebook";
   const tooltip = isMk ? "Следи не на Facebook" : "Na ndiqni në Facebook";
+
+  // Not part of the admin app — it renders its own chrome.
+  if (pathname?.startsWith("/admin-app")) return null;
 
   return (
     <Link
