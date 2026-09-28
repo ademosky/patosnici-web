@@ -6,7 +6,7 @@ import Link from "next/link";
 import Header from "../components/Header";
 import { useCart } from "../context/CartContext";
 import { useLanguage } from "../context/LanguageContext";
-import { getEurValue } from "@/lib/pricing";
+import { sumCartTotal, numericCartTotal } from "@/lib/pricing";
 import { Trash2, Plus, Minus, ShoppingCart, Send, CheckCircle, Loader2, ArrowLeft } from "lucide-react";
 
 export default function CartPage() {
@@ -28,10 +28,7 @@ export default function CartPage() {
 
     pixelFiredRef.current = true;      // lock before async polling starts
 
-    const totalValue = items.reduce((sum, item) => {
-      const num = parseInt(item.price.replace(/\./g, "").replace(/[^\d]/g, ""), 10) || 0;
-      return sum + num * item.quantity;
-    }, 0);
+    const totalValue = numericCartTotal(items, currency);
 
     type Fbq = (...args: unknown[]) => void;
     type Win = Window & { fbq?: Fbq };
@@ -45,14 +42,14 @@ export default function CartPage() {
       console.log("[MetaPixel] InitiateCheckout fired", {
         content_ids: items.map((i) => String(i.id)),
         value: totalValue,
-        currency: "MKD",
+        currency,
       });
       win.fbq("track", "InitiateCheckout", {
         content_ids: items.map((i) => String(i.id)),
         content_name: items.map((i) => i.title).join(", "),
         content_type: "product",
         value: totalValue,
-        currency: "MKD",
+        currency,
       });
       return true;
     };
@@ -62,7 +59,7 @@ export default function CartPage() {
     const interval = setInterval(() => { if (fire()) clearInterval(interval); }, 100);
     const timeout = setTimeout(() => clearInterval(interval), 10_000);
     return () => { clearInterval(interval); clearTimeout(timeout); };
-  }, [items]); // re-runs when items load from localStorage
+  }, [items, currency]); // re-runs when items load or the market changes
 
   const update = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -91,11 +88,7 @@ export default function CartPage() {
         // No polling needed: by the time user submits, fbq is already loaded.
         if (!purchaseFiredRef.current) {
           purchaseFiredRef.current = true;
-          const totalValue = items.reduce((sum, item) => {
-            const num =
-              parseInt(item.price.replace(/\./g, "").replace(/[^\d]/g, ""), 10) || 0;
-            return sum + num * item.quantity;
-          }, 0);
+          const totalValue = numericCartTotal(items, currency);
           type Win = Window & { fbq?: (...args: unknown[]) => void };
           const win = window as Win;
           if (typeof win.fbq === "function") {
@@ -104,7 +97,7 @@ export default function CartPage() {
               content_name: items.map((i) => i.title).join(", "),
               content_type: "product",
               value: totalValue,
-              currency: "MKD",
+              currency,
             });
           }
         }
@@ -225,12 +218,7 @@ export default function CartPage() {
                   <div className="mt-3 flex items-center justify-between">
                     <span className="text-sm font-semibold text-zinc-300">{t("cart_total_price")}:</span>
                     <span className="text-xl sm:text-2xl font-extrabold text-red-500">
-                      {currency === "EUR"
-                        ? `${items.reduce((sum, item) => sum + getEurValue(item.price, item.price_eur) * item.quantity, 0)} €`
-                        : `${items.reduce((sum, item) => {
-                            const num = parseInt(item.price.replace(/\./g, "").replace(/[^\d]/g, ""), 10) || 0;
-                            return sum + num * item.quantity;
-                          }, 0).toLocaleString("mk-MK")} ден`}
+                      {sumCartTotal(items, currency)}
                     </span>
                   </div>
 
