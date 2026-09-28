@@ -1,11 +1,13 @@
 import type { MetadataRoute } from "next";
 
+const SITE_URL = "https://www.originalpatosnici.com";
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
-      allow: "/",
+      allow: ["/", "/ks", "/al"],
     },
-    sitemap: "https://www.originalpatosnici.com/sitemap.xml",
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }
