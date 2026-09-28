@@ -166,6 +166,33 @@ const mk = {
   best_title: "Најпродавани производи",
   best_desc: "Избрани оригинални патосници од нашата понуда.",
   best_view_all: "Види ги сите →",
+
+  // Image gallery (screen-reader labels + UI copy)
+  img_none: "Нема слика",
+  img_zoom: "Зголеми слика",
+  img_prev: "Претходна",
+  img_next: "Следна",
+  img_close: "Затвори",
+  img_label: "Слика",
+  img_hint: "← → стрелки · ESC за затворање",
+
+  // Contact page
+  contact_label: "Контакт",
+  contact_title: "Пратете ни порака",
+  contact_desc: "Имате прашање или сакате да нарачате? Контактирајте не.",
+  contact_name: "Вашето име",
+  contact_name_ph: "Марко Петровски",
+  contact_email: "Вашиот email",
+  contact_car: "Вашето возило",
+  contact_car_ph: "пр. VW Golf 7, BMW E90...",
+  contact_message: "Порака",
+  contact_message_ph: "Напишете го вашето прашање или нарачка...",
+  contact_send: "Испрати порака",
+  contact_subject: "Прашање за патосници",
+  contact_not_specified: "не наведено",
+  contact_thanks: "Ви благодариме! ✓",
+  contact_opened: "Вашиот email клиент се отвори. Ако не се отвори,",
+  contact_write_directly: "пишете директно",
 };
 
 const sq: typeof mk = {
@@ -309,6 +336,33 @@ const sq: typeof mk = {
   best_title: "Produktet më të shitura",
   best_desc: "Tapete origjinale të zgjedhura nga oferta jonë.",
   best_view_all: "Shiko të gjitha →",
+
+  // Image gallery (screen-reader labels + UI copy)
+  img_none: "Nuk ka imazh",
+  img_zoom: "Zmadho imazhin",
+  img_prev: "E mëparshme",
+  img_next: "Tjetra",
+  img_close: "Mbyll",
+  img_label: "Imazh",
+  img_hint: "← → shigjetat · ESC për mbyllje",
+
+  // Contact page
+  contact_label: "Kontakt",
+  contact_title: "Na dërgoni një mesazh",
+  contact_desc: "Keni një pyetje ose dëshironi të porosisni? Kontaktoni.",
+  contact_name: "Emri juaj",
+  contact_name_ph: "Emri Mbiemri",
+  contact_email: "Email-i juaj",
+  contact_car: "Automjeti juaj",
+  contact_car_ph: "p.sh. VW Golf 7, BMW E90...",
+  contact_message: "Mesazhi",
+  contact_message_ph: "Shkruani pyetjen ose porosinë tuaj...",
+  contact_send: "Dërgo mesazhin",
+  contact_subject: "Pyetje për tapetet",
+  contact_not_specified: "e paspecifikuar",
+  contact_thanks: "Faleminderit! ✓",
+  contact_opened: "Klienti juaj i email-it u hap. Nëse nuk hapet,",
+  contact_write_directly: "shkruani direkt",
 };
 
 export type TKey = keyof typeof mk;
