@@ -102,29 +102,25 @@ export function formatPrice(
   return price;
 }
 
-/** Sum a list of cart items and format the total in the given currency.
- *  Single market-aware helper so cart/checkout never duplicate the maths. */
-export function sumCartTotal(
-  items: Array<{ price: string; price_eur?: string | null; quantity: number }>,
-  currency: Currency
-): string {
+type CartLine = { price: string; price_eur?: string | null; quantity: number };
+
+/** Numeric cart total in the given currency — for analytics payloads
+ *  (Meta Pixel `value`) which must be a plain number. */
+export function numericCartTotal(items: CartLine[], currency: Currency): number {
   if (currency === "MKD") {
-    const n = items.reduce(
-      (s, i) => s + normalizePriceToMkd(i.price) * i.quantity,
-      0
-    );
-    return `${n.toLocaleString("mk-MK")} ден`;
+    return items.reduce((s, i) => s + normalizePriceToMkd(i.price) * i.quantity, 0);
   }
   if (currency === "EUR") {
-    const n = items.reduce(
-      (s, i) => s + getEurValue(i.price, i.price_eur) * i.quantity,
-      0
-    );
-    return `${n} €`;
+    return items.reduce((s, i) => s + getEurValue(i.price, i.price_eur) * i.quantity, 0);
   }
-  const n = items.reduce(
-    (s, i) => s + getAllValue(i.price, i.price_eur) * i.quantity,
-    0
-  );
-  return `${n.toLocaleString("mk-MK")} Lekë`;
+  return items.reduce((s, i) => s + getAllValue(i.price, i.price_eur) * i.quantity, 0);
+}
+
+/** Sum a list of cart items and format the total in the given currency.
+ *  Single market-aware helper so cart/checkout never duplicate the maths. */
+export function sumCartTotal(items: CartLine[], currency: Currency): string {
+  const n = numericCartTotal(items, currency);
+  if (currency === "EUR") return `${n} €`;
+  if (currency === "ALL") return `${n.toLocaleString("mk-MK")} Lekë`;
+  return `${n.toLocaleString("mk-MK")} ден`;
 }
