@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
-import { Currency, formatPrice } from "@/lib/pricing";
+import { Currency, Market, formatPrice } from "@/lib/pricing";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -27,9 +27,13 @@ export async function POST(req: NextRequest) {
 
     // Cart order (multiple items) OR single product order
     const isCartOrder = Array.isArray(body.items) && body.items.length > 0;
-    // Market currency — the client sends "MKD" (Macedonia) | "EUR" (Kosovo) | "ALL" (Albania)
+    // Market currency — the client sends "MKD" (Macedonia) | "EUR" (Kosovo) | "ALL" (Albania).
+    // Currency identifies the market one-to-one, so it also drives the copy
+    // and the delivery estimate below.
     const currency: Currency =
       body.currency === "EUR" ? "EUR" : body.currency === "ALL" ? "ALL" : "MKD";
+
+    const market: Market = currency === "EUR" ? "ks" : currency === "ALL" ? "al" : "mk";
     const fmtPrice = (price: string, priceEur?: string): string =>
       formatPrice(price, currency, priceEur);
 
@@ -120,12 +124,19 @@ export async function POST(req: NextRequest) {
 
     // Ако клиентот внел email — испрати потврда и до него
     if (body.email) {
-      // Email copy follows the MARKET, not the currency:
-      // EUR = Kosovo, ALL = Albania — both Albanian-speaking.
-      const isAlbanian = currency === "EUR" || currency === "ALL";
+      // Email copy follows the MARKET:
+      //   mk → Macedonian, ks → Albanian (Kosovo), al → Albanian (Albania).
+      const isAlbanian = market !== "mk";
       const customerSubject = isAlbanian
         ? "Porosia juaj u pranua — Original Patosnici"
         : "Вашата нарачка е примена — Original Patosnici";
+
+      // Delivery estimate differs per market — tuned to each courier's reality.
+      const DELIVERY_NOTE: Record<Market, string> = {
+        mk: "Ви благодариме за нарачката! Ќе ви биде доставена за 2-4 работни дена. Очекувајте повик од карго курирот.",
+        ks: "Faleminderit për porosinë tuaj! Porosia do të dorëzohet brenda 5-7 ditë pune. Prisni thirrje nga korrieri.",
+        al: "Faleminderit për porosinë tuaj! Porosia do të dorëzohet brenda 6-8 ditë pune. Prisni thirrje nga korrieri.",
+      };
 
       const itemsList = isCartOrder
         ? (body.items as CartItem[]).map((i: CartItem) =>
@@ -143,11 +154,7 @@ export async function POST(req: NextRequest) {
               <h1 style="color: white; margin: 0; font-size: 20px;">${isAlbanian ? "✅ Porosia u pranua!" : "✅ Нарачката е примена!"}</h1>
             </div>
             <div style="background: #111; padding: 24px; border-radius: 0 0 12px 12px; border: 1px solid #333;">
-              <p style="color: #a1a1aa; margin-bottom: 16px;">${
-                isAlbanian
-                  ? "Faleminderit për porosinë tuaj! Porosia do të dorëzohet brenda 5-7 ditë pune. Prisni thirrje nga korrieri."
-                  : "Ви благодариме за нарачката! Ќе ви биде доставена за 2-4 работни дена. Очекувајте повик од карго курирот."
-              }</p>
+              <p style="color: #a1a1aa; margin-bottom: 16px;">${DELIVERY_NOTE[market]}</p>
 
               <div style="background: #1a1a1a; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
                 <p style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">${
