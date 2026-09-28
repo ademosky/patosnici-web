@@ -24,14 +24,21 @@ export default function MetaPixel(): JSX.Element {
   const pathname = usePathname();
   const isFirst = useRef(true);
 
+  // The admin app is not part of the storefront funnel — firing PageView there
+  // would pollute ad reporting with internal traffic.
+  const inAdminApp = pathname?.startsWith("/admin-app") ?? false;
+
   useEffect(() => {
+    if (inAdminApp) return;
     // Skip initial mount — the Script below already fires PageView on load.
     if (isFirst.current) {
       isFirst.current = false;
       return;
     }
     pageview();
-  }, [pathname]);
+  }, [pathname, inAdminApp]);
+
+  if (inAdminApp) return null;
 
   return (
     <Script
