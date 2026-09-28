@@ -7,9 +7,9 @@ export default function Reviews() {
   const { t } = useLanguage();
 
   const reviews = [
-    { name: "Марко Петровски", car: t("rev1_car"), text: t("rev1_text"), rating: 5 },
-    { name: "Сашо Илиевски",   car: t("rev2_car"), text: t("rev2_text"), rating: 5 },
-    { name: "Ана Стефановска", car: t("rev3_car"), text: t("rev3_text"), rating: 5 },
+    { name: t("rev1_name"), car: t("rev1_car"), text: t("rev1_text"), rating: 5 },
+    { name: t("rev2_name"), car: t("rev2_car"), text: t("rev2_text"), rating: 5 },
+    { name: t("rev3_name"), car: t("rev3_car"), text: t("rev3_text"), rating: 5 },
   ];
 
   return (
