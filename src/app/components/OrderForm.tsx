@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Send, CheckCircle, Loader2 } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
+import { numericCartTotal } from "@/lib/pricing";
 
 type Props = {
   productTitle: string;
@@ -27,8 +28,12 @@ export default function OrderForm({ productTitle, productPrice, productSku, prod
   const inputClass = "w-full rounded-xl border border-zinc-700 bg-[#1a1a1a] px-5 py-3 text-sm text-white outline-none transition focus:border-red-600";
   const labelClass = "mb-2 block text-xs font-bold uppercase tracking-wide text-zinc-400";
 
-  // Helper: parse numeric value from price string e.g. "1500 МКД" → 1500
-  const numericPrice = parseFloat(productPrice.replace(/[^\d.]/g, "")) || 0;
+  // Numeric value in the market's own currency — Meta Pixel payloads must
+  // report the amount the visitor actually sees (MKD | EUR | ALL).
+  const numericPrice = numericCartTotal(
+    [{ price: productPrice, price_eur: priceEur, quantity: 1 }],
+    currency
+  );
 
   // Helper: content_ids — always use numeric productId (DB primary key).
   // Never fall back to SKU: SKU is a string and won't match the catalog <g:id>.
@@ -53,7 +58,7 @@ export default function OrderForm({ productTitle, productPrice, productSku, prod
           content_name: productTitle,
           content_type: "product",
           value: numericPrice,
-          currency: "MKD",
+          currency,
         });
       }
     }
@@ -79,7 +84,7 @@ export default function OrderForm({ productTitle, productPrice, productSku, prod
               content_name: productTitle,
               content_type: "product",
               value: numericPrice,
-              currency: "MKD",
+              currency,
             });
           }
         }
