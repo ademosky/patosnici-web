@@ -8,7 +8,7 @@
  * reflects whatever is created here.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { brands } from "../../data/brands";
 import {
   Category, Product, CATEGORY_LABEL, CATEGORY_SHORT, categoryOf,
@@ -33,7 +33,9 @@ const EMPTY: Form = {
   description: "", description_sq: "", image: "", images: [], in_stock: true,
 };
 
-export function CatalogView({ scope }: { scope?: Category }) {
+export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
+  scope?: Category; openNew?: boolean; onNewClosed?: () => void;
+}) {
   const { products, saveProduct, removeProduct, toast, loading } = useAdmin();
   const [cat, setCat] = useState<Category | "">(scope ?? "");
   const [q, setQ] = useState("");
@@ -85,11 +87,17 @@ export function CatalogView({ scope }: { scope?: Category }) {
     [filtered],
   );
 
-  const openNew = () => {
+  const openNew = useCallback(() => {
     setEditId(null);
     setForm({ ...EMPTY, category: scope === "auto_accessories" ? "auto_accessories" : (cat || "rubber_mats") });
     setOpen(true);
-  };
+  }, [scope, cat]);
+
+  // The shell's "+" button raises this flag.
+  useEffect(() => {
+    if (openNewReq) { openNew(); onNewClosed?.(); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openNewReq]);
 
   const openEdit = (p: Product) => {
     setEditId(p.id);
