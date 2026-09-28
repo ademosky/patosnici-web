@@ -1,0 +1,79 @@
+{
+  "id": "/admin-app",
+  "name": "Original Patosnici — Admin",
+  "short_name": "OP Admin",
+  "description": "Управување со нарачки, производи, залиха и продажба.",
+  "start_url": "/admin-app",
+  "scope": "/admin-app",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "portrait-primary",
+  "background_color": "#08080a",
+  "theme_color": "#08080a",
+  "lang": "mk",
+  "dir": "ltr",
+  "categories": [
+    "business",
+    "productivity",
+    "shopping"
+  ],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/admin-app/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/admin-app/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/admin-app/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Нарачки",
+      "short_name": "Нарачки",
+      "url": "/admin-app?tab=orders",
+      "icons": [
+        {
+          "src": "/admin-app/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Статистики",
+      "short_name": "Статистики",
+      "url": "/admin-app?tab=stats",
+      "icons": [
+        {
+          "src": "/admin-app/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Производи",
+      "short_name": "Производи",
+      "url": "/admin-app?tab=products",
+      "icons": [
+        {
+          "src": "/admin-app/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
