@@ -3,10 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Mail } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useLanguage } from "../context/LanguageContext";
 
 export default function Footer() {
+  const pathname = usePathname();
   const { t, localizedPath } = useLanguage();
+
+  // Not part of the admin app.
+  if (pathname?.startsWith("/admin-app")) return null;
 
   return (
     <footer className="border-t border-zinc-800 bg-[#080808]">
