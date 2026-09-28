@@ -7,12 +7,13 @@ import { useState } from "react";
 import { Product } from "../data/products";
 import { useCart } from "../context/CartContext";
 import { useLanguage } from "../context/LanguageContext";
+import { numericCartTotal } from "@/lib/pricing";
 
 type ProductCardProps = { product: Product; };
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
-  const { t, formatPrice, localizedPath } = useLanguage();
+  const { t, formatPrice, localizedPath, currency } = useLanguage();
   const [added, setAdded] = useState(false);
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -22,8 +23,11 @@ export default function ProductCard({ product }: ProductCardProps) {
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
 
-    // Meta Pixel — AddToCart
-    const numericValue = parseFloat(product.price.replace(/\./g, "").replace(/[^\d]/g, "")) || 0;
+    // Meta Pixel — AddToCart (value in the market's own currency)
+    const numericValue = numericCartTotal(
+      [{ price: product.price, price_eur: product.price_eur, quantity: 1 }],
+      currency
+    );
     type Win = Window & { fbq?: (...args: unknown[]) => void };
     const win = window as Win;
     if (typeof win.fbq === "function") {
@@ -32,7 +36,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         content_name: product.title,
         content_type: "product",
         value: numericValue,
-        currency: "MKD",
+        currency,
       });
     }
   };
