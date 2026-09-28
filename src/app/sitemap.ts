@@ -1,23 +1,38 @@
 import type { MetadataRoute } from "next";
 import { supabase } from "@/lib/supabase";
 
-export const dynamic = "force-dynamic"; // always fetch fresh product list
+export const revalidate = 3600; // rebuild hourly — products change rarely
 
 const SITE_URL = "https://www.originalpatosnici.com";
+
+/** Every storefront shares the same content — three URLs, one product set. */
+const MARKET_PREFIXES = ["", "/ks", "/al"] as const;
+
+/**
+ * hreflang map shared by every entry, so Google understands that
+ * "/", "/ks" and "/al" for the same product are translations of each other.
+ */
+function languagesFor(path: string) {
+  return {
+    "mk-MK": `${SITE_URL}${path}`,
+    "sq-XK": `${SITE_URL}/ks${path}`,
+    "sq-AL": `${SITE_URL}/al${path}`,
+    "x-default": `${SITE_URL}${path}`,
+  };
+}
 
 /**
  * Next.js App Router sitemap — served at /sitemap.xml
  *
  * Includes:
- *  - Static pages (homepage, products list, contact)
- *  - Every product page from Supabase (/products/[slug])
+ *  - Static pages for all three markets (/, /ks, /al)
+ *  - Every product page from Supabase, per market
  *
- * Note: There are no dedicated /brands/[brand] routes in this project —
- * brand filtering is UI-state only on the /products page, so no brand
- * URLs are added to the sitemap.
+ * Note: there are no dedicated /brands/[brand] routes — brand filtering is
+ * UI state on /products, so no brand URLs are added.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Fetch all products — only slug and created_at needed for the sitemap
+  // Only the fields the sitemap needs — no description/image blobs.
   const { data: products } = await supabase
     .from("products")
     .select("slug, created_at")
@@ -26,34 +41,41 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   // ── Static pages ──────────────────────────────────────────────────
-  const staticPages: MetadataRoute.Sitemap = [
-    {
-      url: SITE_URL,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 1.0,
-    },
-    {
-      url: `${SITE_URL}/products`,
-      lastModified: now,
-      changeFrequency: "daily",
-      priority: 0.9,
-    },
-    {
-      url: `${SITE_URL}/contact`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
+  const staticPaths = [
+    { path: "", priority: 1.0, changeFrequency: "weekly" as const },
+    { path: "/products", priority: 0.9, changeFrequency: "daily" as const },
+    { path: "/create-own", priority: 0.8, changeFrequency: "weekly" as const },
+    { path: "/auto-accessories", priority: 0.7, changeFrequency: "weekly" as const },
+    { path: "/contact", priority: 0.5, changeFrequency: "monthly" as const },
   ];
 
-  // ── Product pages ─────────────────────────────────────────────────
-  const productPages: MetadataRoute.Sitemap = (products ?? []).map((p) => ({
-    url: `${SITE_URL}/products/${p.slug}`,
-    lastModified: p.created_at ? new Date(p.created_at) : now,
-    changeFrequency: "weekly" as const,
-    priority: 0.7,
-  }));
+  const staticPages: MetadataRoute.Sitemap = [];
+  for (const prefix of MARKET_PREFIXES) {
+    for (const p of staticPaths) {
+      staticPages.push({
+        url: `${SITE_URL}${prefix}${p.path}`,
+        lastModified: now,
+        changeFrequency: p.changeFrequency,
+        priority: p.priority,
+        alternates: { languages: languagesFor(p.path) },
+      });
+    }
+  }
+
+  // ── Product pages, per market ─────────────────────────────────────
+  const productPages: MetadataRoute.Sitemap = [];
+  for (const p of products ?? []) {
+    const path = `/products/${p.slug}`;
+    for (const prefix of MARKET_PREFIXES) {
+      productPages.push({
+        url: `${SITE_URL}${prefix}${path}`,
+        lastModified: p.created_at ? new Date(p.created_at) : now,
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+        alternates: { languages: languagesFor(path) },
+      });
+    }
+  }
 
   return [...staticPages, ...productPages];
 }
