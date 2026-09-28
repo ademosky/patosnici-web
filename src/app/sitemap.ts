@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { supabase } from "@/lib/supabase";
-import { marketAlternates } from "@/lib/market-server";
+import { marketAlternates, SITE_URL } from "@/lib/market-server";
 
 export const revalidate = 3600; // rebuild hourly — products change rarely
 
