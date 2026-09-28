@@ -2,7 +2,13 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { Currency, formatPrice as formatPriceFn } from "@/lib/pricing";
+import {
+  Currency,
+  Market,
+  MARKET_CURRENCY,
+  MARKET_PREFIX,
+  formatPrice as formatPriceFn,
+} from "@/lib/pricing";
 
 export type Lang = "mk" | "sq";
 
@@ -313,50 +319,56 @@ const LanguageContext = createContext<{
   t: (key: TKey) => string;
   currency: Currency;
   formatPrice: (price: string, priceEur?: string | null) => string;
+  /** Current market, derived from the URL prefix. */
+  market: Market;
+  /** True when the URL locks the language + currency (Kosovo, Albania). */
+  isMarketLocked: boolean;
+  /** @deprecated use `market` — kept so existing Kosovo code keeps working. */
   isKs: boolean;
   localizedPath: (path: string) => string;
 } | null>(null);
 
+/** Read the market straight from the browser URL.
+ *  window.location is the ONLY source of truth: usePathname() can return the
+ *  rewritten destination (e.g. /products instead of /ks/products) because the
+ *  market prefix is implemented as a rewrite in next.config.ts. */
+function readMarket(): Market {
+  if (typeof window === "undefined") return "mk";
+  const p = window.location.pathname;
+  if (p === "/ks" || p.startsWith("/ks/")) return "ks";
+  if (p === "/al" || p.startsWith("/al/")) return "al";
+  return "mk";
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname(); // re-render trigger on navigation
 
-  // The real browser URL (window.location) is the ONLY source of truth for
-  // locale. usePathname() can return the rewritten destination path (e.g.
-  // /products/... instead of /ks/products/...) under rewrites, so we read
-  // window.location.pathname directly — including for the very first render.
-  const readKs = (): boolean => {
-    if (typeof window === "undefined") return false;
-    const p = window.location.pathname;
-    return p === "/ks" || p.startsWith("/ks/");
-  };
-
   // Lazy initial state read straight from the URL — correct on first paint,
   // before any effect or localStorage touches it.
-  const [isKs, setIsKs] = useState<boolean>(readKs);
-  const [lang, setLang] = useState<Lang>(() => (readKs() ? "sq" : "mk"));
-  const [currency, setCurrency] = useState<Currency>(() => (readKs() ? "EUR" : "MKD"));
+  const [market, setMarket] = useState<Market>(readMarket);
+  const [lang, setLang] = useState<Lang>(() => (readMarket() === "mk" ? "mk" : "sq"));
+  const [currency, setCurrency] = useState<Currency>(() => MARKET_CURRENCY[readMarket()]);
 
   useEffect(() => {
-    const ks = readKs();
-    setIsKs(ks);
+    const m = readMarket();
+    setMarket(m);
 
-    if (ks) {
-      // Kosovo → locked Albanian + EUR. URL always wins, never overridden.
+    if (m !== "mk") {
+      // Kosovo + Albania → locked Albanian, URL decides the currency.
       setLang("sq");
-      setCurrency("EUR");
+      setCurrency(MARKET_CURRENCY[m]);
       return;
     }
 
-    // Macedonia → always MKD currency.
-    // Language: only the manual MK/SHQ toggle preference persists.
+    // Macedonia → always MKD. Language follows only the manual MK/SHQ toggle.
     setCurrency("MKD");
     const saved = localStorage.getItem("lang") as Lang;
     setLang(saved === "sq" ? "sq" : "mk");
   }, [pathname]);
 
   const changeLang = (l: Lang) => {
-    // No language toggle on the Kosovo version — it's URL-locked.
-    if (isKs) return;
+    // No language toggle outside Macedonia — those markets are URL-locked.
+    if (market !== "mk") return;
     setLang(l);
     localStorage.setItem("lang", l);
     // Both MK and SHQ toggles are for Macedonia → always MKD prices.
@@ -369,12 +381,27 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const formatPrice = (price: string, priceEur?: string | null): string =>
     formatPriceFn(price, currency, priceEur);
 
-  // Prefix a path with /ks when on the Kosovo version
-  const localizedPath = (path: string): string =>
-    isKs ? `/ks${path === "/" ? "" : path}` : path;
+  // Prefix a path with the current market's prefix (/ks, /al, or nothing)
+  const localizedPath = (path: string): string => {
+    const prefix = MARKET_PREFIX[market];
+    if (!prefix) return path;
+    return `${prefix}${path === "/" ? "" : path}`;
+  };
 
   return (
-    <LanguageContext.Provider value={{ lang, setLang: changeLang, t, currency, formatPrice, isKs, localizedPath }}>
+    <LanguageContext.Provider
+      value={{
+        lang,
+        setLang: changeLang,
+        t,
+        currency,
+        formatPrice,
+        market,
+        isMarketLocked: market !== "mk",
+        isKs: market === "ks",
+        localizedPath,
+      }}
+    >
       {children}
     </LanguageContext.Provider>
   );
@@ -385,5 +412,3 @@ export function useLanguage() {
   if (!ctx) throw new Error("useLanguage must be used within LanguageProvider");
   return ctx;
 }
-
-
