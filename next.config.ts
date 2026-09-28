@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
+      // ── Kosovo (/ks) — EUR · Albanian ──
       { source: "/ks", destination: "/" },
       { source: "/ks/products", destination: "/products" },
       { source: "/ks/products/:slug", destination: "/products/:slug" },
@@ -16,6 +17,15 @@ const nextConfig: NextConfig = {
       { source: "/ks/create-own", destination: "/create-own" },
       { source: "/ks/auto-accessories", destination: "/auto-accessories" },
       { source: "/ks/contact", destination: "/contact" },
+
+      // ── Albania (/al) — ALL (Lekë) · Albanian ──
+      { source: "/al", destination: "/" },
+      { source: "/al/products", destination: "/products" },
+      { source: "/al/products/:slug", destination: "/products/:slug" },
+      { source: "/al/cart", destination: "/cart" },
+      { source: "/al/create-own", destination: "/create-own" },
+      { source: "/al/auto-accessories", destination: "/auto-accessories" },
+      { source: "/al/contact", destination: "/contact" },
     ];
   },
   images: {
