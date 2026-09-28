@@ -12,7 +12,7 @@ export default function Header() {
   const [productsOpen, setProductsOpen] = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
   const { total } = useCart();
-  const { lang, setLang, t, isKs, localizedPath } = useLanguage();
+  const { lang, setLang, t, isMarketLocked, localizedPath } = useLanguage();
 
   return (
     <header className="fixed top-0 left-0 z-50 w-full border-b border-white/10 bg-black/95 backdrop-blur">
@@ -60,8 +60,8 @@ export default function Header() {
 
         <div className="flex items-center gap-3 text-white">
 
-          {/* Language switcher — hidden on /ks (Kosovo is locked Albanian+EUR) */}
-          {!isKs && (
+          {/* Language switcher — only on the Macedonian market */}
+          {!isMarketLocked && (
           <div className="hidden items-center overflow-hidden rounded-xl border border-zinc-700 md:flex">
             <button
               onClick={() => setLang("mk")}
@@ -126,8 +126,8 @@ export default function Header() {
             <Link href={localizedPath("/cart")} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 hover:text-red-500">
               {t("nav_cart")} {total > 0 && <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs">{total}</span>}
             </Link>
-            {/* Mobile language switcher — hidden on /ks */}
-            {!isKs && (
+            {/* Mobile language switcher — only on the Macedonian market */}
+            {!isMarketLocked && (
             <div className="flex gap-2 pt-2 border-t border-zinc-800">
               <button onClick={() => setLang("mk")} className={`rounded-lg px-4 py-2 text-xs font-bold uppercase ${lang === "mk" ? "bg-red-600" : "border border-zinc-700 text-zinc-400"}`}>МКД</button>
               <button onClick={() => setLang("sq")} className={`rounded-lg px-4 py-2 text-xs font-bold uppercase ${lang === "sq" ? "bg-red-600" : "border border-zinc-700 text-zinc-400"}`}>SHQ</button>
