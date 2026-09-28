@@ -1,9 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import { useLanguage } from "../context/LanguageContext";
 
 export default function FacebookFloat() {
   const { market } = useLanguage();
-  const label = market === "mk" ? "Facebook страна" : "Faqja në Facebook";
+  const isMk = market === "mk";
+  const label = isMk ? "Facebook страна" : "Faqja në Facebook";
+  const tooltip = isMk ? "Следи не на Facebook" : "Na ndiqni në Facebook";
 
   return (
     <Link
@@ -21,7 +25,7 @@ export default function FacebookFloat() {
 
       {/* Tooltip — само на desktop hover */}
       <span className="pointer-events-none absolute left-16 whitespace-nowrap rounded-xl bg-zinc-900 px-3 py-2 text-xs font-semibold text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
-        Следи не на Facebook
+        {tooltip}
         <span className="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 border-4 border-transparent border-r-zinc-900" />
       </span>
     </Link>
