@@ -1,12 +1,16 @@
 import Link from "next/link";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function FacebookFloat() {
+  const { market } = useLanguage();
+  const label = market === "mk" ? "Facebook страна" : "Faqja në Facebook";
+
   return (
     <Link
       href="https://www.facebook.com/patosnici"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Facebook страна"
+      aria-label={label}
       className="group fixed bottom-6 left-6 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-2xl transition-transform hover:scale-110 active:scale-95"
       style={{ background: "#1877F2", boxShadow: "0 4px 24px rgba(24,119,242,0.45)" }}
     >
