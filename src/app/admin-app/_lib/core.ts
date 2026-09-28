@@ -104,6 +104,20 @@ export function unitValue(price: string | null | undefined, priceEur: string | n
   return toNumber(price);
 }
 
+/**
+ * Normalise any market currency to MKD.
+ *
+ * The three storefronts price the same products in different currencies, so
+ * summing their totals directly would be meaningless. MKD is the base price,
+ * so every aggregate figure on the dashboard is reported in it.
+ */
+export function toMkd(value: number, cur: Currency): number {
+  if (cur === "MKD") return value;
+  if (cur === "EUR") return Math.round(value * EUR_RATE);
+  // ALL: strip the 2 EUR surcharge, convert back, then to MKD
+  return Math.round((value / 100 - 2) * EUR_RATE);
+}
+
 export function orderCurrency(o: Order): Currency {
   const c = o.currency;
   return c === "EUR" || c === "ALL" ? c : "MKD";
