@@ -4,7 +4,7 @@ import { useState, useMemo, useRef } from "react";
 import { brands } from "../data/brands";
 import { useLanguage } from "../context/LanguageContext";
 import { useCart } from "../context/CartContext";
-import { formatPrice, getEurValue, numericCartTotal } from "@/lib/pricing";
+import { formatPrice, numericCartTotal } from "@/lib/pricing";
 import { Send, CheckCircle, Loader2, ShoppingCart, Check } from "lucide-react";
 import {
   BODY_COLORS,
