@@ -41,15 +41,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const product = await getProductBySlug(id);
 
+  // ── Market (mk | ks | al) drives title, description, canonical and hreflang ──
+  const market = await readMarketServer();
+  const isAlbanianMarket = market !== "mk";
+
   if (!product) {
-    return { title: "Производ не е пронајден | Original Patosnici" };
+    return {
+      title: isAlbanianMarket
+        ? "Produkti nuk u gjet | Original Patosnici"
+        : "Производ не е пронајден | Original Patosnici",
+    };
   }
 
-  // ── Title: product | Оригинални гумени патосници | OriginalPatosnici.com
-  const title = `${product.title} | Оригинални гумени патосници | OriginalPatosnici.com`;
-
-  // ── Market (mk | ks | al) drives description, canonical and hreflang ──
-  const market = await readMarketServer();
+  // ── Title: product | brand line | OriginalPatosnici.com
+  const brandLine = isAlbanianMarket
+    ? "Tapete origjinale gome"
+    : "Оригинални гумени патосници";
+  const title = `${product.title} | ${brandLine} | OriginalPatosnici.com`;
 
   // ── Description: unique per product, market-localised, max 160 chars
   const descriptions: Record<Market, string> = {
@@ -105,7 +113,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           url: ogImage,
           width: 1200,
           height: 630,
-          alt: `${product.title} — Оригинални гумени патосници`,
+          alt: `${product.title} — ${brandLine}`,
         },
       ],
     },
@@ -160,7 +168,9 @@ export default async function ProductPage({ params }: Props) {
               : [],
             description:
               product.description ||
-              `${product.brand} ${product.model} ${product.year} — Оригинален гумен патосник за автомобил. Достава низ цела Македонија.`,
+              (isAlbanianMarket
+                ? `${product.brand} ${product.model} ${product.year} — Tapete origjinale gome për automjet. Përshtatje perfekte, gome ekologjike pa erë.`
+                : `${product.brand} ${product.model} ${product.year} — Оригинален гумен патосник за автомобил. Достава низ цела Македонија.`),
             sku: product.sku || undefined,
             brand: {
               "@type": "Brand",
@@ -210,7 +220,7 @@ export default async function ProductPage({ params }: Props) {
               {product.in_stock === false && (
                 <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60">
                   <span className="rounded-2xl border border-zinc-500 bg-zinc-900/95 px-8 py-4 text-xl font-black uppercase tracking-widest text-zinc-300">
-                    {ks ? "Nuk ka stok" : "Нема залиха"}
+                    {isAlbanianMarket ? "Nuk ka stok" : "Нема залиха"}
                   </span>
                 </div>
               )}
