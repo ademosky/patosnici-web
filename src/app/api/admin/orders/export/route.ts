@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import * as XLSX from "xlsx";
+import { Currency, formatPrice } from "@/lib/pricing";
 
 export const runtime = "nodejs";
 
@@ -39,14 +40,25 @@ export async function GET(req: NextRequest) {
   // Flatten each order into a spreadsheet row
   const rows = (orders || []).map((o) => {
     // Build a single products string from items[] or single-product fields
+    const cur = (o.currency as Currency) || "MKD";
+    const fmt = (p?: string | null, pe?: string | null) => formatPrice(p ?? "", cur, pe);
+
     let products = "";
     if (Array.isArray(o.items) && o.items.length > 0) {
       products = o.items
-        .map((it: any) => `${it.quantity || 1}× ${it.title || ""} — ${it.price || ""}${it.sku ? ` (${it.sku})` : ""}`)
+        .map((it: any) => `${it.quantity || 1}× ${it.title || ""} — ${fmt(it.price, it.price_eur)}${it.sku ? ` (${it.sku})` : ""}`)
         .join("; ");
     } else if (o.product_title) {
-      products = `1× ${o.product_title} — ${o.product_price || ""}${o.product_sku ? ` (${o.product_sku})` : ""}`;
+      products = `1× ${o.product_title} — ${fmt(o.product_price, o.product_price_eur)}${o.product_sku ? ` (${o.product_sku})` : ""}`;
     }
+
+    // Order total in the currency the customer actually paid in
+    const orderTotal = Array.isArray(o.items) && o.items.length > 0
+      ? fmt(String(o.items.reduce((s: number, it: any) => {
+          const n = parseInt(String(it.price || "").replace(/\./g, "").replace(/[^\d]/g, ""), 10) || 0;
+          return s + n * (it.quantity || 1);
+        }, 0)).replace(/\B(?=(\d{3})+(?!\d))/g, "."), null)
+      : fmt(o.product_price, o.product_price_eur);
 
     return {
       "ID": o.id,
@@ -61,6 +73,7 @@ export async function GET(req: NextRequest) {
       "Адреса": o.address || "",
       "Град": o.city || "",
       "Производи": products,
+      "Вкупно (прикажано)": orderTotal,
       "SKU": o.product_sku || (Array.isArray(o.items) ? o.items.map((i: any) => i.sku || "").filter(Boolean).join("; ") : ""),
       "Напомена": o.note || "",
     };
