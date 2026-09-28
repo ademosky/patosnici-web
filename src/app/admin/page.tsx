@@ -273,13 +273,45 @@ export default function AdminPage() {
     setOrdersLoading(false);
   };
 
-  const updateOrderStatus = async (id: number, status: string) => {
-    const res = await fetch(`/api/admin/orders/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", "x-admin-password": getPw() },
-      body: JSON.stringify({ status }),
-    });
-    if (res.ok) fetchOrders();
+  // Which order's status is currently being saved (for the per-button spinner).
+  // Only one at a time — prevents double-submits racing each other.
+  const [statusSavingId, setStatusSavingId] = useState<number | null>(null);
+
+  const updateOrderStatus = async (id: number, status: Order["status"]) => {
+    if (statusSavingId !== null) return;
+
+    const previous = orders.find((o) => o.id === id)?.status;
+    if (!previous || previous === status) return;
+
+    setStatusSavingId(id);
+
+    // Optimistic update: this order's card shows the new status immediately.
+    // Because we only patch local state (no refetch, no reload), React keeps
+    // every other card mounted and the scroll position is untouched.
+    setOrders((prev) =>
+      prev.map((o) => (o.id === id ? { ...o, status } : o))
+    );
+
+    try {
+      const res = await fetch(`/api/admin/orders/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "x-admin-password": getPw() },
+        body: JSON.stringify({ status }),
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error("save failed");
+      showToast(
+        status === "sent" ? "Означена како испратена ✓" : "Статусот е ажуриран ✓"
+      );
+    } catch {
+      // Roll back so the UI never claims a status the server did not store.
+      setOrders((prev) =>
+        prev.map((o) => (o.id === id ? { ...o, status: previous } : o))
+      );
+      showToast("Грешка при ажурирање на статусот", false);
+    } finally {
+      setStatusSavingId(null);
+    }
   };
 
   const openEditOrder = (order: Order) => {
