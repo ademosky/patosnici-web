@@ -1,4 +1,3 @@
-// deploy marker: force a fresh Vercel build (route cache)
 "use client";
 
 /**
@@ -11,15 +10,15 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
-import { AdminProvider, useAdmin } from "./_lib/store";
-import { Shell, type Tab } from "./_ui/Shell";
-import { Toaster, Btn, Field, Input, Pill, IcSpinner, IcLock, IcShare, IcCheck } from "./_ui/kit";
-import { Dashboard } from "./_views/Dashboard";
-import { OrdersView } from "./_views/Orders";
-import { CatalogView } from "./_views/Catalog";
-import { StockView } from "./_views/Stock";
-import { StatsView } from "./_views/Stats";
-import { SettingsView } from "./_views/Settings";
+import { AdminProvider, useAdmin } from "../_lib/store";
+import { Shell, type Tab } from "./Shell";
+import { Toaster, Btn, Field, Input, Pill, IcSpinner, IcLock, IcShare, IcCheck } from "./kit";
+import { Dashboard } from "../_views/Dashboard";
+import { OrdersView } from "../_views/Orders";
+import { CatalogView } from "../_views/Catalog";
+import { StockView } from "../_views/Stock";
+import { StatsView } from "../_views/Stats";
+import { SettingsView } from "../_views/Settings";
 
 export const TABS: Tab[] = ["home", "orders", "products", "stock", "accessories", "showcase", "stats", "settings"];
 
