@@ -135,6 +135,7 @@ export default async function ProductPage({ params }: Props) {
 
   // Market prefix for structured data URLs
   const market = await readMarketServer();
+  const isAlbanianMarket = market !== "mk";
   const productUrl = `${SITE_URL}${MARKET_PREFIX[market]}/products/${product.slug}`;
 
   // Structured-data price must match the currency the visitor actually sees
