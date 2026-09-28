@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { brands } from "../data/brands";
-import { getEurValue } from "@/lib/pricing";
+import { Currency, formatPrice, sumCartTotal } from "@/lib/pricing";
 import {
   Lock, Plus, Trash2, LogOut, Package, ShoppingCart, Warehouse,
   CheckCircle, AlertCircle, Loader2, Pencil,
@@ -61,6 +61,15 @@ function skopjeDate(iso: string): string {
     month: "2-digit",
     day: "2-digit",
   }).format(new Date(iso));
+}
+
+/** Render an order line price in the currency the order was placed in. */
+function fmtOrderPrice(
+  price: string | null | undefined,
+  currency: string | null | undefined,
+  priceEur?: string | null
+): string {
+  return formatPrice(price ?? "", (currency as Currency) ?? "MKD", priceEur);
 }
 
 const EMPTY_FORM = {
@@ -1729,6 +1738,7 @@ export default function AdminPage() {
                     { v: "",    label: "🌐 Сите" },
                     { v: "MKD", label: "🇲🇰 МКД" },
                     { v: "EUR", label: "🇽🇰 ЕУР" },
+                    { v: "ALL", label: "🇦🇱 ЛЕК" },
                   ].map(({ v, label }) => (
                     <button key={v}
                       onClick={() => setOrdersCurrency(v)}
@@ -1916,7 +1926,7 @@ export default function AdminPage() {
                             {order.items.map((item, i) => (
                               <li key={i} className="text-sm text-zinc-300">
                                 <span className="font-semibold">{item.quantity}×</span> {item.title}
-                                <span className="ml-2 font-bold text-red-500">{order.currency === "EUR" ? `${getEurValue(item.price, item.price_eur)} €` : item.price}</span>
+                                <span className="ml-2 font-bold text-red-500">{fmtOrderPrice(item.price, order.currency, item.price_eur)}</span>
                                 {item.sku && <span className="ml-1.5 inline-block rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-xs font-semibold text-zinc-300">SKU {item.sku}</span>}
                               </li>
                             ))}
@@ -1924,19 +1934,15 @@ export default function AdminPage() {
                           <div className="mt-2 flex items-center justify-between border-t border-zinc-800 pt-2">
                             <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Вкупно цена</span>
                             <span className="text-base font-extrabold text-red-500">
-                              {order.currency === "EUR"
-                                ? `${order.items.reduce((sum, it) => sum + getEurValue(it.price, it.price_eur) * (it.quantity || 1), 0)} €`
-                                : `${order.items.reduce((sum, it) => {
-                                    const n = parseInt(it.price.replace(/\./g, "").replace(/[^\d]/g, ""), 10) || 0;
-                                    return sum + n * (it.quantity || 1);
-                                  }, 0).toLocaleString("mk-MK")} ден`}
+                              {order.items &&
+                                sumCartTotal(order.items ?? [], (order.currency as Currency) ?? "MKD")}
                             </span>
                           </div>
                         </>
                       ) : (
                         <div className="text-sm text-zinc-300">
                           {order.product_title}
-                          <span className="ml-2 font-bold text-red-500">{order.currency === "EUR" ? `${getEurValue(order.product_price || "")} €` : order.product_price}</span>
+                          <span className="ml-2 font-bold text-red-500">{fmtOrderPrice(order.product_price, order.currency)}</span>
                           {order.product_sku && <span className="mt-1 inline-block rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-xs font-semibold text-zinc-300">SKU {order.product_sku}</span>}
                         </div>
                       )}
