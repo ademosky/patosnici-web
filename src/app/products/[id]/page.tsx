@@ -7,6 +7,13 @@ import Header from "../../components/Header";
 import OrderForm from "../../components/OrderForm";
 import ImageCarousel from "../../components/ImageCarousel";
 import { getProductBySlug, getRecommendedAccessories } from "../../data/products";
+import {
+  Market,
+  MARKET_CURRENCY,
+  MARKET_PREFIX,
+  getEurValue,
+  getAllValue,
+} from "@/lib/pricing";
 import { CheckCircle, ArrowLeft, Tag } from "lucide-react";
 import AddToCartButton from "../../components/AddToCartButton";
 import ProductDescription from "../../components/ProductDescription";
@@ -23,19 +30,21 @@ export const dynamic = "force-dynamic";
 
 const SITE_URL = "https://www.originalpatosnici.com";
 
-// Detect Kosovo locale — set by src/middleware.ts BEFORE the /ks rewrite.
-// Reliable header instead of x-invoke-path (which Vercel does not populate).
-async function isKsRequest(): Promise<boolean> {
+// Detect the market — stamped by src/middleware.ts BEFORE the /ks or /al
+// rewrite. Reliable header instead of x-invoke-path (Vercel doesn't populate it).
+async function readMarketServer(): Promise<Market> {
   try {
     const h = await headers();
-    const ksHeader = h.get("x-ks-locale");
-    if (ksHeader === "1") return true;
-    if (ksHeader === "0") return false;
-    // Fallback: original path header
+    const m = h.get("x-market");
+    if (m === "ks" || m === "al" || m === "mk") return m;
+    // Fallbacks: legacy Kosovo header, then the original path
+    if (h.get("x-ks-locale") === "1") return "ks";
     const path = h.get("x-original-path") || "";
-    return path.startsWith("/ks");
+    if (path.startsWith("/al")) return "al";
+    if (path.startsWith("/ks")) return "ks";
+    return "mk";
   } catch {
-    return false;
+    return "mk";
   }
 }
 
@@ -55,16 +64,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // ── Title: product | Оригинални гумени патосници | OriginalPatosnici.com
   const title = `${product.title} | Оригинални гумени патосници | OriginalPatosnici.com`;
 
-  // ── Description: unique per product, SEO-optimised, max 160 chars
-  const descRaw = `Купете оригинални гумени патосници за ${product.title}. 100% еко гума без мирис, совршено вклопување, брза достава низ Македонија. Нарачајте онлајн.`;
+  // ── Market (mk | ks | al) drives description, canonical and hreflang ──
+  const market = await readMarketServer();
+
+  // ── Description: unique per product, market-localised, max 160 chars
+  const descriptions: Record<Market, string> = {
+    mk: `Купете оригинални гумени патосници за ${product.title}. 100% еко гума без мирис, совршено вклопување, брза достава низ Македонија. Нарачајте онлајн.`,
+    ks: `Bleni tapete origjinale gome për ${product.title}. Gome ekologjike pa erë, përshtatje perfekte, dërgesë e shpejtë në Kosovë. Porositni online.`,
+    al: `Bleni tapete origjinale gome për ${product.title}. Gome ekologjike pa erë, përshtatje perfekte, dërgesë e shpejtë në Shqipëri. Porositni online.`,
+  };
+  const descRaw = descriptions[market];
   const description =
     descRaw.length > 160 ? descRaw.slice(0, 157) + "..." : descRaw;
 
-  // ── Canonical URL — preserve /ks locale prefix when present
-  const ks = await isKsRequest();
-  const canonicalUrl = ks
-    ? `${SITE_URL}/ks/products/${product.slug}`
-    : `${SITE_URL}/products/${product.slug}`;
+  // ── Canonical URL — always the market's own URL
+  const canonicalUrl = `${SITE_URL}${MARKET_PREFIX[market]}/products/${product.slug}`;
+
+  // ── hreflang — tell Google these three URLs are the same product
+  const alternatesLanguages = {
+    "mk-MK": `${SITE_URL}/products/${product.slug}`,
+    "sq-XK": `${SITE_URL}/ks/products/${product.slug}`,
+    "sq-AL": `${SITE_URL}/al/products/${product.slug}`,
+    "x-default": `${SITE_URL}/products/${product.slug}`,
+  };
+
+  const ogLocale: Record<Market, string> = {
+    mk: "mk_MK",
+    ks: "sq_XK",
+    al: "sq_AL",
+  };
 
   // ── OG image — product image if absolute URL, else fallback to logo
   const ogImage = product.image?.startsWith("http")
@@ -78,11 +106,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     // Canonical URL tells Google the definitive URL for this page
     alternates: {
       canonical: canonicalUrl,
+      languages: alternatesLanguages,
     },
 
     openGraph: {
       type: "website",
-      locale: "mk_MK",
+      locale: ogLocale[market],
       url: canonicalUrl,
       siteName: "Original Patosnici",
       title,
@@ -112,11 +141,18 @@ export default async function ProductPage({ params }: Props) {
 
   if (!product) notFound();
 
-  // Preserve /ks locale prefix in structured data URLs
-  const ks = await isKsRequest();
-  const productUrl = ks
-    ? `${SITE_URL}/ks/products/${product.slug}`
-    : `${SITE_URL}/products/${product.slug}`;
+  // Market prefix for structured data URLs
+  const market = await readMarketServer();
+  const productUrl = `${SITE_URL}${MARKET_PREFIX[market]}/products/${product.slug}`;
+
+  // Structured-data price must match the currency the visitor actually sees
+  const marketCurrency = MARKET_CURRENCY[market];
+  const ldPrice =
+    marketCurrency === "EUR"
+      ? getEurValue(product.price, product.price_eur)
+      : marketCurrency === "ALL"
+        ? getAllValue(product.price, product.price_eur)
+        : parseFloat(product.price.replace(/\./g, "").replace(/[^\d]/g, "")) || 0;
 
   // Recommended auto-accessories for this product's brand (dynamic).
   const recommended = await getRecommendedAccessories(product.brand);
