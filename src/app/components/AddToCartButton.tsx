@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ShoppingCart, CheckCircle } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useLanguage } from "../context/LanguageContext";
+import { numericCartTotal } from "@/lib/pricing";
 
 type Props = {
   product: { id: number; slug: string; title: string; price: string; image: string; brand: string; sku?: string; price_eur?: string; };
@@ -13,7 +14,7 @@ const MESSENGER_URL = "https://m.me/patosnici";
 
 export default function AddToCartButton({ product }: Props) {
   const { addItem } = useCart();
-  const { t } = useLanguage();
+  const { t, currency } = useLanguage();
   const [added, setAdded] = useState(false);
 
   const handle = () => {
@@ -23,7 +24,10 @@ export default function AddToCartButton({ product }: Props) {
 
     // Meta Pixel — AddToCart
     // fbq is always loaded by the time the user clicks a button
-    const numericValue = parseFloat(product.price.replace(/\./g, "").replace(/[^\d]/g, "")) || 0;
+    const numericValue = numericCartTotal(
+      [{ price: product.price, price_eur: product.price_eur, quantity: 1 }],
+      currency
+    );
     type Win = Window & { fbq?: (...args: unknown[]) => void };
     const win = window as Win;
     if (typeof win.fbq === "function") {
@@ -32,7 +36,7 @@ export default function AddToCartButton({ product }: Props) {
         content_name: product.title,
         content_type: "product",
         value: numericValue,
-        currency: "MKD",
+        currency,
       });
     }
   };
