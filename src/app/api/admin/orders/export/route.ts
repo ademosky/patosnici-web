@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import * as XLSX from "xlsx";
-import { Currency, formatPrice } from "@/lib/pricing";
+import { Currency, formatPrice, sumCartTotal } from "@/lib/pricing";
 
 export const runtime = "nodejs";
 
@@ -53,12 +53,17 @@ export async function GET(req: NextRequest) {
     }
 
     // Order total in the currency the customer actually paid in
-    const orderTotal = Array.isArray(o.items) && o.items.length > 0
-      ? fmt(String(o.items.reduce((s: number, it: any) => {
-          const n = parseInt(String(it.price || "").replace(/\./g, "").replace(/[^\d]/g, ""), 10) || 0;
-          return s + n * (it.quantity || 1);
-        }, 0)).replace(/\B(?=(\d{3})+(?!\d))/g, "."), null)
-      : fmt(o.product_price, o.product_price_eur);
+    const orderTotal =
+      Array.isArray(o.items) && o.items.length > 0
+        ? sumCartTotal(
+            o.items.map((it: any) => ({
+              price: it.price || "",
+              price_eur: it.price_eur ?? null,
+              quantity: it.quantity || 1,
+            })),
+            cur
+          )
+        : fmt(o.product_price, o.product_price_eur);
 
     return {
       "ID": o.id,
