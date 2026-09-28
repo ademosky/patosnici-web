@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
 
 type Props = {
   images: string[];
@@ -10,25 +11,23 @@ type Props = {
 };
 
 export default function ImageCarousel({ images, alt }: Props) {
+  const { t } = useLanguage();
   const [current, setCurrent] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
-      if (!images || images.length === 0) {
-    return (
-      <div className="relative h-[420px] w-full overflow-hidden rounded-2xl border border-zinc-800 bg-[#111111] flex items-center justify-center">
-        <p className="text-zinc-600 text-sm">Нема слика</p>
-      </div>
-    );
-  }
+
+  const hasImages = !!images && images.length > 0;
+  const count = images?.length ?? 0;
+
   const prev = useCallback(() => {
-    setCurrent((c) => (c === 0 ? images.length - 1 : c - 1));
-  }, [images.length]);
+    setCurrent((c) => (c === 0 ? count - 1 : c - 1));
+  }, [count]);
 
   const next = useCallback(() => {
-    setCurrent((c) => (c === images.length - 1 ? 0 : c + 1));
-  }, [images.length]);
+    setCurrent((c) => (c === count - 1 ? 0 : c + 1));
+  }, [count]);
 
-  // ESC за затворање + стрелки за навигација
+  // ESC closes the lightbox; arrow keys navigate
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setLightboxOpen(false);
@@ -39,13 +38,13 @@ export default function ImageCarousel({ images, alt }: Props) {
     return () => document.removeEventListener("keydown", handleKey);
   }, [prev, next]);
 
-  // Блокирај скрол кога е lightbox отворен
+  // Lock page scroll while the lightbox is open
   useEffect(() => {
     document.body.style.overflow = lightboxOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [lightboxOpen]);
 
-  // Swipe поддршка за мобилен
+  // Swipe support on touch devices
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.touches[0].clientX);
   };
@@ -59,9 +58,19 @@ export default function ImageCarousel({ images, alt }: Props) {
     setTouchStart(null);
   };
 
+  // All hooks above run on every render — the empty state returns AFTER them,
+  // otherwise the hook order would change between renders and React would throw.
+  if (!hasImages) {
+    return (
+      <div className="relative h-[420px] w-full overflow-hidden rounded-2xl border border-zinc-800 bg-[#111111] flex items-center justify-center">
+        <p className="text-zinc-600 text-sm">{t("img_none")}</p>
+      </div>
+    );
+  }
+
   return (
     <>
-      {/* ── ГЛАВНА СЛИКА ── */}
+      {/* ── MAIN IMAGE ── */}
       <div
         className="relative"
         onTouchStart={handleTouchStart}
@@ -70,11 +79,11 @@ export default function ImageCarousel({ images, alt }: Props) {
         <button
           onClick={() => setLightboxOpen(true)}
           className="group relative h-[420px] w-full overflow-hidden rounded-2xl border border-zinc-800 bg-[#111111]"
-          aria-label="Зголеми слика"
+          aria-label={t("img_zoom")}
         >
           <Image
             src={images[current]}
-            alt={`${alt} — слика ${current + 1}`}
+            alt={`${alt} — ${t("img_label")} ${current + 1}`}
             fill
             priority
             className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -87,28 +96,28 @@ export default function ImageCarousel({ images, alt }: Props) {
             </div>
           </div>
 
-          {/* Бројач */}
-          {images.length > 1 && (
+          {/* Counter */}
+          {count > 1 && (
             <div className="absolute bottom-3 right-3 rounded-lg bg-black/70 px-3 py-1 text-xs text-white/80 backdrop-blur-sm">
-              {current + 1} / {images.length}
+              {current + 1} / {count}
             </div>
           )}
         </button>
 
-        {/* Стрелки */}
-        {images.length > 1 && (
+        {/* Arrows */}
+        {count > 1 && (
           <>
             <button
               onClick={prev}
               className="absolute left-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/70 text-white backdrop-blur-sm transition hover:bg-red-600"
-              aria-label="Претходна"
+              aria-label={t("img_prev")}
             >
               <ChevronLeft size={20} />
             </button>
             <button
               onClick={next}
               className="absolute right-3 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/70 text-white backdrop-blur-sm transition hover:bg-red-600"
-              aria-label="Следна"
+              aria-label={t("img_next")}
             >
               <ChevronRight size={20} />
             </button>
@@ -117,7 +126,7 @@ export default function ImageCarousel({ images, alt }: Props) {
       </div>
 
       {/* ── THUMBNAILS ── */}
-      {images.length > 1 && (
+      {count > 1 && (
         <div className="mt-3 flex gap-3 overflow-x-auto pb-1">
           {images.map((img, i) => (
             <button
@@ -128,11 +137,11 @@ export default function ImageCarousel({ images, alt }: Props) {
                   ? "border-red-600 opacity-100"
                   : "border-zinc-700 opacity-50 hover:opacity-90"
               }`}
-              aria-label={`Слика ${i + 1}`}
+              aria-label={`${t("img_label")} ${i + 1}`}
             >
               <Image
                 src={img}
-                alt={`${alt} — thumbnail ${i + 1}`}
+                alt={`${alt} — ${t("img_label")} ${i + 1}`}
                 fill
                 className="object-cover"
               />
@@ -147,49 +156,51 @@ export default function ImageCarousel({ images, alt }: Props) {
           className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95"
           onClick={() => setLightboxOpen(false)}
         >
-          {/* Затвори */}
+          {/* Close */}
           <button
             onClick={() => setLightboxOpen(false)}
             className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white backdrop-blur-sm transition hover:bg-white/20"
-            aria-label="Затвори"
+            aria-label={t("img_close")}
           >
             <X size={20} />
           </button>
 
-          {/* Стрелки во lightbox */}
-          {images.length > 1 && (
+          {/* Lightbox arrows */}
+          {count > 1 && (
             <>
               <button
                 onClick={(e) => { e.stopPropagation(); prev(); }}
                 className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition hover:bg-red-600"
+                aria-label={t("img_prev")}
               >
                 <ChevronLeft size={26} />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); next(); }}
                 className="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition hover:bg-red-600"
+                aria-label={t("img_next")}
               >
                 <ChevronRight size={26} />
               </button>
             </>
           )}
 
-          {/* Голема слика */}
+          {/* Large image */}
           <div
             className="relative h-[78vh] w-full max-w-5xl px-20"
             onClick={(e) => e.stopPropagation()}
           >
             <Image
               src={images[current]}
-              alt={`${alt} — слика ${current + 1}`}
+              alt={`${alt} — ${t("img_label")} ${current + 1}`}
               fill
               className="object-contain"
               priority
             />
           </div>
 
-          {/* Thumbnails во lightbox */}
-          {images.length > 1 && (
+          {/* Lightbox thumbnails */}
+          {count > 1 && (
             <div
               className="mt-4 flex gap-2"
               onClick={(e) => e.stopPropagation()}
@@ -203,16 +214,15 @@ export default function ImageCarousel({ images, alt }: Props) {
                       ? "border-red-600 opacity-100"
                       : "border-white/20 opacity-40 hover:opacity-80"
                   }`}
+                  aria-label={`${t("img_label")} ${i + 1}`}
                 >
-                  <Image src={img} alt={`thumbnail ${i + 1}`} fill className="object-cover" />
+                  <Image src={img} alt={`${alt} — ${t("img_label")} ${i + 1}`} fill className="object-cover" />
                 </button>
               ))}
             </div>
           )}
 
-          <p className="mt-4 text-xs text-white/25">
-            ← → стрелки · ESC за затворање
-          </p>
+          <p className="mt-4 text-xs text-white/25">{t("img_hint")}</p>
         </div>
       )}
     </>
