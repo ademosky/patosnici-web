@@ -1,25 +1,11 @@
 import type { MetadataRoute } from "next";
 import { supabase } from "@/lib/supabase";
+import { marketAlternates } from "@/lib/market-server";
 
 export const revalidate = 3600; // rebuild hourly — products change rarely
 
-const SITE_URL = "https://www.originalpatosnici.com";
-
 /** Every storefront shares the same content — three URLs, one product set. */
 const MARKET_PREFIXES = ["", "/ks", "/al"] as const;
-
-/**
- * hreflang map shared by every entry, so Google understands that
- * "/", "/ks" and "/al" for the same product are translations of each other.
- */
-function languagesFor(path: string) {
-  return {
-    "mk-MK": `${SITE_URL}${path}`,
-    "sq-XK": `${SITE_URL}/ks${path}`,
-    "sq-AL": `${SITE_URL}/al${path}`,
-    "x-default": `${SITE_URL}${path}`,
-  };
-}
 
 /**
  * Next.js App Router sitemap — served at /sitemap.xml
@@ -57,7 +43,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: now,
         changeFrequency: p.changeFrequency,
         priority: p.priority,
-        alternates: { languages: languagesFor(p.path) },
+        alternates: { languages: marketAlternates(p.path) },
       });
     }
   }
@@ -72,7 +58,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: p.created_at ? new Date(p.created_at) : now,
         changeFrequency: "weekly" as const,
         priority: 0.7,
-        alternates: { languages: languagesFor(path) },
+        alternates: { languages: marketAlternates(path) },
       });
     }
   }
