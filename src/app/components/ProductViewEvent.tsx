@@ -13,6 +13,8 @@
  */
 
 import { useEffect } from "react";
+import { useLanguage } from "../context/LanguageContext";
+import { numericCartTotal } from "@/lib/pricing";
 
 type Fbq = (...args: unknown[]) => void;
 type WindowWithFbq = Window & { fbq?: Fbq };
@@ -29,9 +31,14 @@ export default function ProductViewEvent({
   productName,
   productPrice,
 }: Props): null {
+  const { currency } = useLanguage();
+
   useEffect(() => {
-    const numericValue =
-      parseFloat(productPrice.replace(/[^\d.]/g, "")) || 0;
+    // Report the amount in the market's own currency (MKD | EUR | ALL).
+    const numericValue = numericCartTotal(
+      [{ price: productPrice, quantity: 1 }],
+      currency
+    );
 
     let fired = false;
 
@@ -46,7 +53,7 @@ export default function ProductViewEvent({
         content_name: productName,
         content_type: "product",
         value: numericValue,
-        currency: "MKD",
+        currency,
       });
       return true;
     };
