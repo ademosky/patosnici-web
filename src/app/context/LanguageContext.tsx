@@ -314,15 +314,36 @@ const sq: typeof mk = {
 export type TKey = keyof typeof mk;
 
 /**
- * Albania-only wording. The shared Albanian dictionary still names Macedonia
- * in its delivery copy, which is wrong for the Albania market — these four
- * keys are overridden there. Kosovo keeps its existing copy untouched.
+ * Per-market wording overrides.
+ *
+ * The shared Albanian dictionary was written for the Macedonian storefront
+ * translated into Albanian, so its delivery copy names Macedonia. That is
+ * wrong on BOTH Albanian-speaking markets — Kosovo must say Kosovë, Albania
+ * must say Shqipëri. Each market overrides just the keys that name a country.
+ *
+ * The shared dictionary's form placeholders are Kosovo-flavoured
+ * (Prishtinë / +383), so Albania overrides those too.
  */
-const sqAlOverrides: Partial<Record<TKey, string>> = {
-  rev_count: "Mbi 5.000 klientë të kënaqur në gjithë Shqipërinë",
-  feat_delivery: "Dërgesë në gjithë Shqipërinë",
-  acc_delivery: "Dërgesë në gjithë Shqipërinë",
-  cart_payment_info: "Pagesë në dorëzim · Dërgesë në gjithë Shqipërinë",
+const marketOverrides: Record<Market, Partial<Record<TKey, string>>> = {
+  mk: {},
+
+  ks: {
+    rev_count: "Mbi 5.000 klientë të kënaqur në gjithë Kosovën",
+    feat_delivery: "Dërgesë në gjithë Kosovën",
+    acc_delivery: "Dërgesë në gjithë Kosovën",
+    cart_payment_info: "Pagesë në dorëzim · Dërgesë në gjithë Kosovën",
+  },
+
+  al: {
+    rev_count: "Mbi 5.000 klientë të kënaqur në gjithë Shqipërinë",
+    feat_delivery: "Dërgesë në gjithë Shqipërinë",
+    acc_delivery: "Dërgesë në gjithë Shqipërinë",
+    cart_payment_info: "Pagesë në dorëzim · Dërgesë në gjithë Shqipërinë",
+    // Country-specific form hints
+    form_address_ph: "Rr. Myslym Shyri 12",
+    form_city_ph: "Tiranë",
+    form_phone_ph: "+355 69 123 4567",
+  },
 };
 
 const LanguageContext = createContext<{
@@ -388,8 +409,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   const t = (key: TKey): string => {
-    // Albania overrides come first — same language, correct country.
-    if (market === "al" && sqAlOverrides[key]) return sqAlOverrides[key] as string;
+    // Market-specific wording wins — same language, correct country.
+    const override = marketOverrides[market][key];
+    if (override) return override;
     return (lang === "sq" ? sq[key] : mk[key]) ?? mk[key] ?? key;
   };
 
