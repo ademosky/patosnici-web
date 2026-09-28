@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getProductsByCategory } from "../data/products";
 import { brands } from "../data/brands";
 import ProductsClient from "./ProductsClient";
-import { Market, MARKET_CURRENCY } from "@/lib/pricing";
+import { Market } from "@/lib/pricing";
 import {
   readMarketServer,
   marketAlternates,
