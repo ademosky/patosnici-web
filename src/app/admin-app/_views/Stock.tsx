@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { InvItem, ShowcaseItem, prettyDate, toCsv, download, cx } from "../_lib/core";
+import { InvItem, Product, ShowcaseItem, prettyDate, toCsv, download, cx } from "../_lib/core";
 import { useAdmin } from "../_lib/store";
 import {
   Card, SectionTitle, Stat, Pill, Btn, IconBtn, Sheet, Field, Input,
@@ -15,7 +15,7 @@ import {
 
 export function StockView({ initialTab = "inv" }: { initialTab?: "inv" | "gal" }) {
   const {
-    inventory, showcase, loading,
+    inventory, showcase, products, loading,
     addInventory, patchInventory, removeInventory,
     addShowcase, patchShowcase, removeShowcase, moveShowcase, toast,
   } = useAdmin();
@@ -27,7 +27,7 @@ export function StockView({ initialTab = "inv" }: { initialTab?: "inv" | "gal" }
       <Segmented value={tab} onChange={setTab}
         options={[{ v: "inv" as const, label: "Залиха" }, { v: "gal" as const, label: "Галерија" }]} />
       {tab === "inv"
-        ? <InventoryPanel {...{ inventory, loading, addInventory, patchInventory, removeInventory, toast }} />
+        ? <InventoryPanel {...{ inventory, products, loading, addInventory, patchInventory, removeInventory, toast }} />
         : <ShowcasePanel {...{ showcase, loading, addShowcase, patchShowcase, removeShowcase, moveShowcase, toast }} />}
     </div>
   );
@@ -35,11 +35,28 @@ export function StockView({ initialTab = "inv" }: { initialTab?: "inv" | "gal" }
 
 /* ── inventory ─────────────────────────────────────────────────────── */
 
-function InventoryPanel({ inventory, loading, addInventory, patchInventory, removeInventory, toast }: any) {
+function InventoryPanel({ inventory, products, loading, addInventory, patchInventory, removeInventory, toast }: any) {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ sku: "", name: "", quantity: "1" });
+  const [skuMatch, setSkuMatch] = useState<null | { title: string; sku: string } | "none">(null);
+
+  /**
+   * Look the typed SKU up in the catalog and fill the name automatically —
+   * the same behaviour as the classic panel, so stock entries stay consistent.
+   */
+  const lookupSku = (sku: string) => {
+    const needle = sku.trim().toLowerCase();
+    if (!needle) { setSkuMatch(null); return; }
+    const found = (products as Product[]).find((p) => (p.sku ?? "").trim().toLowerCase() === needle);
+    if (found) {
+      setSkuMatch({ title: found.title, sku: found.sku ?? "" });
+      setForm((f) => ({ ...f, name: found.title }));
+    } else {
+      setSkuMatch("none");
+    }
+  };
 
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
@@ -57,8 +74,10 @@ function InventoryPanel({ inventory, loading, addInventory, patchInventory, remo
     setSaving(true);
     const ok = await addInventory(form);
     setSaving(false);
-    if (ok) { setOpen(false); setForm({ sku: "", name: "", quantity: "1" }); }
+    if (ok) { setOpen(false); setForm({ sku: "", name: "", quantity: "1" }); setSkuMatch(null); }
   };
+
+  const closeSheet = () => { setOpen(false); setSkuMatch(null); };
 
   const step = (item: InvItem, delta: number) => {
     const next = Math.max(0, (item.quantity || 0) + delta);
@@ -115,10 +134,35 @@ function InventoryPanel({ inventory, loading, addInventory, patchInventory, remo
         </div>
       )}
 
-      <Sheet open={open} onClose={() => setOpen(false)} title="Нова ставка"
+      <Sheet open={open} onClose={closeSheet} title="Нова ставка"
         footer={<Btn className="w-full" size="lg" loading={saving} onClick={save}>Додај</Btn>}>
         <div className="space-y-3">
-          <Field label="SKU *"><Input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} placeholder="444805" /></Field>
+          <Field label="SKU *" hint="Внеси SKU — името се пополнува автоматски">
+            <Input
+              value={form.sku}
+              onChange={(e) => { setForm({ ...form, sku: e.target.value }); lookupSku(e.target.value); }}
+              placeholder="444805"
+              inputMode="numeric"
+              autoFocus
+            />
+          </Field>
+
+          {skuMatch === "none" && (
+            <div className="flex items-center gap-2.5 rounded-xl border border-[#5c2024] bg-[#240f11] px-3.5 py-3">
+              <IcAlert size={16} className="shrink-0 text-[#e5454a]" />
+              <span className="text-[12.5px] font-semibold text-[#f0a2a5]">
+                Производот со овој SKU не е пронајден
+              </span>
+            </div>
+          )}
+          {skuMatch && skuMatch !== "none" && (
+            <div className="flex items-center gap-2.5 rounded-xl border border-[#2c5c43] bg-[#12241a] px-3.5 py-3">
+              <IcCheck size={16} className="shrink-0 text-[#5fc48f]" />
+              <span className="min-w-0 flex-1 truncate text-[12.5px] font-semibold text-[#8fe0b2]">{skuMatch.title}</span>
+              <span className="shrink-0 font-mono text-[10.5px] text-[#5a5a64]">{skuMatch.sku}</span>
+            </div>
+          )}
+
           <Field label="Име *"><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="VW Golf 5 — гумени" /></Field>
           <Field label="Количина"><Input type="number" inputMode="numeric" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} /></Field>
         </div>
