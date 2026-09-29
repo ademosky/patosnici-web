@@ -5,6 +5,16 @@
  * /api/admin/* routes already return — the backend is untouched.
  */
 
+export {
+  normalizePriceToMkd,
+  getEurValue,
+  getAllValue,
+  formatPrice as formatMarketPrice,
+  sumCartTotal,
+} from "@/lib/pricing";
+
+import { getEurValue, getAllValue, normalizePriceToMkd } from "@/lib/pricing";
+
 export type Currency = "MKD" | "EUR" | "ALL";
 export type OrderStatus = "new" | "in_process" | "sent";
 export type Category = "rubber_mats" | "fabric_mats" | "auto_accessories";
@@ -76,46 +86,45 @@ export type ShowcaseItem = {
 /* ── money ─────────────────────────────────────────────────────────── */
 
 /** Parse the numeric part of a messy MKD price string ("2.490 ден" → 2490). */
-export function toNumber(price: string | null | undefined): number {
-  if (!price) return 0;
-  return parseInt(String(price).replace(/\./g, "").replace(/[^\d]/g, ""), 10) || 0;
-}
+export const toNumber = normalizePriceToMkd;
 
-const EUR_RATE = 61.5;
+/**
+ * Kosovo EUR and Albania Lekë values.
+ *
+ * These are the STOREFRONT's own helpers — the same functions /ks and /al use
+ * to render prices. Nothing is recomputed here, so an order shows exactly what
+ * the customer was charged: 1.590 ден → 34 € (the ladder price), never a raw
+ * currency conversion.
+ */
+export const eurValue = getEurValue;
+export const allValue = getAllValue;
 
-/** Kosovo EUR value: manual override → the storefront ladder → fixed rate. */
-export function eurValue(price: string | null | undefined, priceEur?: string | null): number {
-  if (priceEur && String(priceEur).trim()) {
-    const n = parseInt(String(priceEur).replace(/[^\d]/g, ""), 10);
-    if (n) return n;
-  }
-  const mkd = toNumber(price);
-  return Math.round((mkd / EUR_RATE) * 100) / 100;
-}
-
-/** Albania Lekë value — mirrors lib/pricing so admin totals match the shop. */
-export function allValue(price: string | null | undefined, priceEur?: string | null): number {
-  return Math.round(((eurValue(price, priceEur) + 2) * 100) / 100) * 100;
-}
-
-export function unitValue(price: string | null | undefined, priceEur: string | null | undefined, cur: Currency): number {
-  if (cur === "EUR") return eurValue(price, priceEur);
-  if (cur === "ALL") return allValue(price, priceEur);
-  return toNumber(price);
+/** One unit's price in the currency the order was placed in. */
+export function unitValue(
+  price: string | null | undefined,
+  priceEur: string | null | undefined,
+  cur: Currency
+): number {
+  if (cur === "EUR") return getEurValue(price ?? "", priceEur);
+  if (cur === "ALL") return getAllValue(price ?? "", priceEur);
+  return normalizePriceToMkd(price);
 }
 
 /**
- * Normalise any market currency to MKD.
+ * Order value in Macedonian denars — the shop's base currency.
  *
- * The three storefronts price the same products in different currencies, so
- * summing their totals directly would be meaningless. MKD is the base price,
- * so every aggregate figure on the dashboard is reported in it.
+ * Every order line stores the MKD base price it was created from, so this is
+ * an exact sum of stored values. It never converts from EUR/ALL, which would
+ * re-introduce rounding and drift from the configured price ladder.
  */
-export function toMkd(value: number, cur: Currency): number {
-  if (cur === "MKD") return value;
-  if (cur === "EUR") return Math.round(value * EUR_RATE);
-  // ALL: strip the 2 EUR surcharge, convert back, then to MKD
-  return Math.round((value / 100 - 2) * EUR_RATE);
+export function orderTotalMkd(o: Order): number {
+  if (o.items && o.items.length > 0) {
+    return o.items.reduce(
+      (s, it) => s + normalizePriceToMkd(it.price) * (it.quantity || 1),
+      0
+    );
+  }
+  return normalizePriceToMkd(o.product_price);
 }
 
 export function orderCurrency(o: Order): Currency {
