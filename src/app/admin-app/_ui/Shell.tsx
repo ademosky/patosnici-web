@@ -14,9 +14,9 @@ import {
   IcX, IcShare, IcPlus, IcAlert, IconBtn, Sheet,
 } from "./kit";
 
-export type Tab =
-  | "home" | "orders" | "products" | "stock"
-  | "accessories" | "showcase" | "stats" | "settings";
+import type { Tab } from "../_lib/core";
+
+export type { Tab };
 
 const PRIMARY: Array<{ t: Tab; label: string; icon: (p: { size?: number; className?: string }) => ReactNode }> = [
   { t: "home",     label: "Почетна",   icon: IcHome },
