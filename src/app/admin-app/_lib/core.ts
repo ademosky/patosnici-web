@@ -15,6 +15,27 @@ export {
 
 import { getEurValue, getAllValue, normalizePriceToMkd } from "@/lib/pricing";
 
+/**
+ * Tab vocabulary.
+ *
+ * This lives in a plain module (not a "use client" one) so BOTH the server
+ * page and the client shell can use it. A client module's exports cannot be
+ * called from a Server Component — doing so throws at runtime.
+ */
+export type Tab =
+  | "home" | "orders" | "products" | "stock"
+  | "accessories" | "showcase" | "stats" | "settings";
+
+export const TABS: Tab[] = [
+  "home", "orders", "products", "stock", "accessories", "showcase", "stats", "settings",
+];
+
+/** Validate a tab value coming from the URL. */
+export function asTab(v: string | string[] | undefined): Tab {
+  const raw = Array.isArray(v) ? v[0] : v;
+  return (TABS as string[]).includes(raw ?? "") ? (raw as Tab) : "home";
+}
+
 export type Currency = "MKD" | "EUR" | "ALL";
 export type OrderStatus = "new" | "in_process" | "sent";
 export type Category = "rubber_mats" | "fabric_mats" | "auto_accessories";
