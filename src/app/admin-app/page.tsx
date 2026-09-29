@@ -1,4 +1,5 @@
-import { AdminAppShell, asTab } from "./_ui/AdminApp";
+import { AdminAppShell } from "./_ui/AdminApp";
+import { asTab } from "./_lib/core";
 
 /**
  * /admin-app — the installable admin application.
@@ -14,7 +15,6 @@ export default async function AdminAppPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = await searchParams;
-  const raw = Array.isArray(sp?.tab) ? sp.tab[0] : sp?.tab;
 
-  return <AdminAppShell initialTab={asTab(raw)} />;
+  return <AdminAppShell initialTab={asTab(sp?.tab)} />;
 }
