@@ -11,7 +11,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { AdminProvider, useAdmin } from "../_lib/store";
-import { Shell, type Tab } from "./Shell";
+import { Shell } from "./Shell";
+import { asTab, TABS, type Tab } from "../_lib/core";
 import { Toaster, Btn, Field, Input, Pill, IcSpinner, IcLock, IcShare, IcCheck } from "./kit";
 import { Dashboard } from "../_views/Dashboard";
 import { OrdersView } from "../_views/Orders";
@@ -19,13 +20,6 @@ import { CatalogView } from "../_views/Catalog";
 import { StockView } from "../_views/Stock";
 import { StatsView } from "../_views/Stats";
 import { SettingsView } from "../_views/Settings";
-
-export const TABS: Tab[] = ["home", "orders", "products", "stock", "accessories", "showcase", "stats", "settings"];
-
-/** Validate a value coming from the URL. */
-export function asTab(v: string | undefined): Tab {
-  return (TABS as string[]).includes(v ?? "") ? (v as Tab) : "home";
-}
 
 export function AdminAppShell({ initialTab }: { initialTab: Tab }) {
   return (
