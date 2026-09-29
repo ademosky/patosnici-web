@@ -302,6 +302,9 @@ function OrderDetail({ order, onClose, onSave, onDelete, onStatus, busy }: {
       name: order.name, surname: order.surname, phone: order.phone,
       address: order.address, city: order.city, email: order.email ?? "",
       note: order.note ?? "", status: order.status,
+      product_title: order.product_title ?? "",
+      product_price: order.product_price ?? "",
+      product_sku: order.product_sku ?? "",
     });
     setItems((order.items ?? []).map((i) => ({ ...i })));
     setEdit(false);
@@ -313,7 +316,12 @@ function OrderDetail({ order, onClose, onSave, onDelete, onStatus, busy }: {
   const save = async () => {
     setSaving(true);
     const payload: Partial<Order> = { ...form };
-    if (order.items?.length) payload.items = items;
+    if (order.items?.length) {
+      payload.items = items;
+      // keep the mirrored single-product fields consistent with the cart
+      payload.product_title = items[0]?.title ?? order.product_title ?? null;
+      payload.product_price = items[0]?.price ?? order.product_price ?? null;
+    }
     const ok = await onSave(order.id, payload);
     setSaving(false);
     if (ok) { setEdit(false); onClose(); }
@@ -400,8 +408,41 @@ function OrderDetail({ order, onClose, onSave, onDelete, onStatus, busy }: {
               </div>
             </div>
           ) : (
-            <Field label="Производ"><Input value={order.product_title ?? ""} disabled /></Field>
+            <div>
+              <p className="mb-2 text-[10.5px] font-semibold uppercase tracking-[.12em] text-[#6c6c78]">Производ</p>
+              <div className="space-y-2.5 rounded-xl border border-[#1f1f26] bg-[#0c0c0f] p-3">
+                <Field label="Назив">
+                  <Input value={(form.product_title as string) ?? ""} placeholder="Назив на производ"
+                    onChange={(e) => setForm({ ...form, product_title: e.target.value })} />
+                </Field>
+                <div className="grid grid-cols-[1fr_110px] gap-3">
+                  <Field label="Цена">
+                    <Input value={(form.product_price as string) ?? ""} placeholder="1.590 ден"
+                      onChange={(e) => setForm({ ...form, product_price: e.target.value })} />
+                  </Field>
+                  <Field label="SKU">
+                    <Input value={(form.product_sku as string) ?? ""} placeholder="444805" inputMode="numeric"
+                      onChange={(e) => setForm({ ...form, product_sku: e.target.value })} />
+                  </Field>
+                </div>
+              </div>
+            </div>
           )}
+
+          {/* Live total — updates as the prices above are typed */}
+          <div className="flex items-center justify-between rounded-xl border border-[#1f1f26] bg-[#0c0c0f] px-3.5 py-3">
+            <span className="text-[10.5px] font-semibold uppercase tracking-[.12em] text-[#6c6c78]">
+              Вкупно сега
+            </span>
+            <span className="font-heading text-[19px] font-bold tabular-nums text-[#e5454a]">
+              {money(
+                order.items?.length
+                  ? items.reduce((s, it) => s + unitValue(it.price, it.price_eur, c) * (it.quantity || 1), 0)
+                  : unitValue((form.product_price as string) ?? "", null, c),
+                c
+              )}
+            </span>
+          </div>
         </div>
       ) : (
         <div className="space-y-4">
