@@ -10,7 +10,7 @@
 
 import { useMemo } from "react";
 import {
-  Order, Product, money, orderTotal, orderPieces, orderCurrency, toMkd,
+  Order, Product, money, orderTotal, orderTotalMkd, orderPieces, orderCurrency,
   skopjeDate, today, relTime, STATUS_LABEL, CATEGORY_SHORT, categoryOf, prettyDate,
 } from "../_lib/core";
 import { useAdmin } from "../_lib/store";
@@ -30,7 +30,8 @@ export function Dashboard({ goto }: { goto: (t: Tab) => void }) {
     const inProcess = orders.filter((o) => o.status === "in_process");
     const sent = orders.filter((o) => o.status === "sent");
 
-    const rev = (list: Order[]) => list.reduce((s, o) => s + toMkd(orderTotal(o), orderCurrency(o)), 0);
+    // Exact: every line stores its MKD base price, so this needs no conversion.
+    const rev = (list: Order[]) => list.reduce((s, o) => s + orderTotalMkd(o), 0);
 
     // last 14 days, oldest → newest
     const days: Array<{ key: string; label: string; count: number; revenue: number }> = [];
