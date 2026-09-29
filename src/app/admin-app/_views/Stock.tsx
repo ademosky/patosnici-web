@@ -10,7 +10,7 @@ import { useAdmin } from "../_lib/store";
 import {
   Card, SectionTitle, Stat, Pill, Btn, IconBtn, Sheet, Field, Input,
   Segmented, Empty, IcSpinner, IcSearch, IcX, IcPlus, IcMinus, IcPencil,
-  IcTrash, IcLayers, IcImage, IcUpload, IcUp, IcDown, IcAlert,
+  IcTrash, IcLayers, IcImage, IcUpload, IcUp, IcDown, IcAlert, IcCheck,
 } from "../_ui/kit";
 
 export function StockView({ initialTab = "inv" }: { initialTab?: "inv" | "gal" }) {
