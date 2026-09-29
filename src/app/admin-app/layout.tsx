@@ -1,4 +1,3 @@
-/* build stamp: 2026-09-29T00:20:56Z */
 import type { Metadata, Viewport } from "next";
 
 const SITE_URL = "https://www.originalpatosnici.com";
