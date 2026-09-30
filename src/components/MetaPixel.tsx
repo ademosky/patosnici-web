@@ -20,7 +20,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { pageview, FB_PIXEL_ID } from "@/lib/facebookPixel";
 
-export default function MetaPixel(): JSX.Element {
+export default function MetaPixel() {
   const pathname = usePathname();
   const isFirst = useRef(true);
 
