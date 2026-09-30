@@ -148,6 +148,35 @@ export function orderTotalMkd(o: Order): number {
   return normalizePriceToMkd(o.product_price);
 }
 
+/**
+ * Every SKU on an order, in line order.
+ *
+ * Cart orders carry one SKU per item; single-product orders carry one in
+ * product_sku. Duplicates are collapsed so a 3× order shows its SKU once.
+ */
+export function orderSkus(o: Order): string[] {
+  const raw = o.items && o.items.length > 0
+    ? o.items.map((it) => it.sku)
+    : [o.product_sku];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const s of raw) {
+    const v = (s ?? "").trim();
+    if (v && !seen.has(v)) { seen.add(v); out.push(v); }
+  }
+  return out;
+}
+
+/** SKUs paired with their line — used where the pairing must stay visible. */
+export function orderLines(o: Order): Array<{ title: string; sku?: string | null; quantity: number }> {
+  if (o.items && o.items.length > 0) {
+    return o.items.map((it) => ({ title: it.title, sku: it.sku, quantity: it.quantity || 1 }));
+  }
+  return o.product_title
+    ? [{ title: o.product_title, sku: o.product_sku, quantity: 1 }]
+    : [];
+}
+
 export function orderCurrency(o: Order): Currency {
   const c = o.currency;
   return c === "EUR" || c === "ALL" ? c : "MKD";
