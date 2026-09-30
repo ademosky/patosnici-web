@@ -24,7 +24,12 @@ type BsRow = { rank: number; sku: string; title: string; brand: string; category
 
 type Ctx = {
   /* auth */
+  /** "checking" while a stored password is verified — so the login screen
+   *  never flashes on launch when the user is already signed in. */
+  session: "checking" | "authed" | "anon";
   authed: boolean;
+  /** Re-fetch everything for the current month (used by pull-to-refresh). */
+  refresh: () => Promise<void>;
   signIn: (pw: string, remember: boolean) => Promise<boolean>;
   signOut: () => void;
   /* data */
@@ -72,7 +77,12 @@ function readPw(): string {
 
 export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [pw, setPw] = useState<string>(readPw);
-  const [authed, setAuthed] = useState<boolean>(false);
+  // Start in "checking" when a password is stored — the launch renders a
+  // splash, never the login form, and resolves to whichever is correct.
+  const [session, setSession] = useState<"checking" | "authed" | "anon">(
+    () => (readPw() ? "checking" : "anon"),
+  );
+  const authed = session === "authed";
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [inventory, setInventory] = useState<InvItem[]>([]);
@@ -146,20 +156,30 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const stored = readPw();
-    if (!stored) return;
+    if (!stored) { setSession("anon"); return; }
     // Verify the stored password against the API before trusting it.
     (async () => {
-      const res = await fetch("/api/admin/products", { headers: { "x-admin-password": stored } });
-      if (res.ok) {
+      try {
+        const res = await fetch("/api/admin/products", {
+          headers: { "x-admin-password": stored }, cache: "no-store",
+        });
+        if (res.ok) {
+          setPw(stored);
+          setProducts(await res.json());
+          setSession("authed");
+          loadOrders(monthKey(), stored);
+          loadInventory(stored);
+          loadShowcase(stored);
+        } else {
+          localStorage.removeItem(KEY);
+          sessionStorage.removeItem(KEY);
+          setSession("anon");
+        }
+      } catch {
+        // Offline on launch: keep the stored credential and let the user in;
+        // every request will retry when the connection returns.
         setPw(stored);
-        setAuthed(true);
-        setProducts(await res.json());
-        loadOrders(monthKey(), stored);
-        loadInventory(stored);
-        loadShowcase(stored);
-      } else {
-        localStorage.removeItem(KEY);
-        sessionStorage.removeItem(KEY);
+        setSession("authed");
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -171,7 +191,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (remember) localStorage.setItem(KEY, password);
     else sessionStorage.setItem(KEY, password);
     setPw(password);
-    setAuthed(true);
+    setSession("authed");
     setProducts(await res.json());
     await loadAll(monthKey(), password);
     return true;
@@ -180,7 +200,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const signOut = useCallback(() => {
     localStorage.removeItem(KEY);
     sessionStorage.removeItem(KEY);
-    setAuthed(false);
+    setSession("anon");
     setPw("");
     setOrders([]); setProducts([]); setInventory([]); setShowcase([]);
   }, []);
@@ -189,6 +209,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     setMonthState(m);
     loadOrders(m);
   }, [loadOrders]);
+
+  /** Pull-to-refresh: reload every dataset for the month on screen. */
+  const refresh = useCallback(async () => {
+    if (!pw) return;
+    await loadAll(month, pw);
+  }, [pw, month, loadAll]);
 
   /* ── orders ──────────────────────────────────────────────────────── */
 
@@ -435,7 +461,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   }, [authHeaders]);
 
   const value = useMemo<Ctx>(() => ({
-    authed, signIn, signOut,
+    session, authed, signIn, signOut, refresh,
     orders, products, inventory, showcase, month, setMonth, loading,
     toasts, toast, dismiss,
     setOrderStatus, patchOrder, removeOrder, addOrder, exportOrders,
@@ -444,7 +470,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     addShowcase, patchShowcase, removeShowcase, moveShowcase,
     bestSellers,
   }), [
-    authed, signIn, signOut, orders, products, inventory, showcase, month, setMonth,
+    session, authed, signIn, signOut, refresh, orders, products, inventory, showcase, month, setMonth,
     loading, toasts, toast, dismiss, setOrderStatus, patchOrder, removeOrder, addOrder,
     exportOrders, saveProduct, removeProduct, addInventory, patchInventory,
     removeInventory, addShowcase, patchShowcase, removeShowcase, moveShowcase, bestSellers,
