@@ -685,7 +685,7 @@ export default function AdminPage() {
     setEditId(p.id);
     setForm({
       title: p.title, brand: p.brand, car_model: p.car_model ?? "", model: p.model, category: p.category ?? "rubber_mats",
-      year: p.year, price: p.price, image: p.image,
+      year: p.year, price: p.price, price_eur: p.price_eur ?? "", image: p.image,
       description: p.description, sku: p.sku ?? "",
       images: p.images && p.images.length > 0 ? p.images : (p.image ? [p.image] : []),
       in_stock: p.in_stock !== false,
