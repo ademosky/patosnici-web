@@ -18,6 +18,8 @@ type CartItem = {
   price: string;
   quantity: number;
   sku?: string;
+  /** Optional EUR override, used by the Kosovo and Albania markets. */
+  price_eur?: string;
 };
 
 export async function POST(req: NextRequest) {
