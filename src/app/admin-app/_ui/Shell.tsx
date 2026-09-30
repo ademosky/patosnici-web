@@ -8,7 +8,7 @@
  * safe-area padding, and a "More" sheet for the secondary sections.
  */
 
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import {
   IcHome, IcOrders, IcBox, IcLayers, IcSpark, IcImage, IcChart, IcSettings,
   IcX, IcShare, IcPlus, IcAlert, IconBtn, Sheet,
@@ -34,6 +34,68 @@ const SECONDARY: Array<{ t: Tab; label: string; desc: string; icon: (p: { size?:
 
 const ALL: Array<{ t: Tab; label: string; icon: (p: { size?: number; className?: string }) => ReactNode }> =
   [...PRIMARY, ...SECONDARY.map(({ t, label, icon }) => ({ t, label, icon }))];
+
+/* ── pull to refresh ───────────────────────────────────────────────── */
+
+/**
+ * Drag down from the very top to refresh the data.
+ *
+ * Deliberately hand-rolled rather than relying on the browser: iOS shows its
+ * own indicator only in some contexts, and inside a standalone PWA it is easy
+ * to lose. This gesture works identically in Safari and when installed.
+ */
+function usePullToRefresh(onRefresh?: () => Promise<void>) {
+  const [pull, setPull] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const startY = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!onRefresh) return;
+
+    const THRESHOLD = 70;   // px of drag that arms the refresh
+    const MAX = 110;
+
+    const onStart = (e: TouchEvent) => {
+      // only arm when the page is already scrolled to the top
+      if (window.scrollY > 0 || busy) { startY.current = null; return; }
+      startY.current = e.touches[0].clientY;
+    };
+
+    const onMove = (e: TouchEvent) => {
+      if (startY.current === null) return;
+      const dy = e.touches[0].clientY - startY.current;
+      if (dy <= 0) { setPull(0); return; }
+      // rubber-band so the indicator never runs away
+      setPull(Math.min(MAX, dy * 0.55));
+    };
+
+    const onEnd = async () => {
+      if (startY.current === null) return;
+      const armed = pull >= THRESHOLD * 0.55;
+      startY.current = null;
+      if (!armed) { setPull(0); return; }
+      setBusy(true);
+      setPull(THRESHOLD * 0.75);
+      try { await onRefresh(); } finally {
+        setBusy(false);
+        setPull(0);
+      }
+    };
+
+    window.addEventListener("touchstart", onStart, { passive: true });
+    window.addEventListener("touchmove", onMove, { passive: true });
+    window.addEventListener("touchend", onEnd);
+    window.addEventListener("touchcancel", onEnd);
+    return () => {
+      window.removeEventListener("touchstart", onStart);
+      window.removeEventListener("touchmove", onMove);
+      window.removeEventListener("touchend", onEnd);
+      window.removeEventListener("touchcancel", onEnd);
+    };
+  }, [onRefresh, pull, busy]);
+
+  return { pull, busy };
+}
 
 /* ── install prompt ────────────────────────────────────────────────── */
 
@@ -79,10 +141,12 @@ function useInstall() {
 
 /* ── shell ─────────────────────────────────────────────────────────── */
 
-export function Shell({ tab, setTab, onNew, children }: {
-  tab: Tab; setTab: (t: Tab) => void; onNew?: () => void; children: ReactNode;
+export function Shell({ tab, setTab, onNew, onRefresh, children }: {
+  tab: Tab; setTab: (t: Tab) => void; onNew?: () => void;
+  onRefresh?: () => Promise<void>; children: ReactNode;
 }) {
   const [moreOpen, setMoreOpen] = useState(false);
+  const { pull, busy: refreshing } = usePullToRefresh(onRefresh);
   const { show, ios, deferred, dismiss, install } = useInstall();
   const current = ALL.find((x) => x.t === tab);
 
@@ -116,6 +180,28 @@ export function Shell({ tab, setTab, onNew, children }: {
       `}</style>
 
       <div className="admin-app min-h-[100dvh] bg-[#08080a] text-[#e9e9ee] antialiased">
+
+        {/* ── pull-to-refresh indicator ── */}
+        <div
+          className="pointer-events-none fixed inset-x-0 top-0 z-40 flex items-center justify-center"
+          style={{
+            height: Math.max(pull, refreshing ? 54 : 0),
+            transition: pull === 0 ? "height .26s cubic-bezier(.2,.9,.25,1)" : "none",
+            paddingTop: "env(safe-area-inset-top)",
+          }}
+        >
+          {(pull > 6 || refreshing) && (
+            <div className="flex items-center gap-2 rounded-full border border-[#25252d] bg-[#101014] px-3.5 py-2 shadow-2xl">
+              {refreshing ? <IcSpinner size={15} /> : (
+                <span className="text-[13px] text-[#e5454a] transition-transform"
+                  style={{ transform: `rotate(${pull >= 38 ? 180 : 0}deg)` }}>↓</span>
+              )}
+              <span className="text-[11.5px] font-semibold text-[#9a9aa5]">
+                {refreshing ? "Се освежува…" : pull >= 38 ? "Пуштете за освежување" : "Влечете надолу"}
+              </span>
+            </div>
+          )}
+        </div>
 
         {/* ── desktop sidebar ── */}
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-[232px] flex-col border-r border-[#1c1c23] bg-[#0b0b0e] lg:flex">
