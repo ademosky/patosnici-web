@@ -12,14 +12,14 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Order, OrderItem, OrderStatus, Currency,
   money, orderTotal, orderPieces, orderCurrency, unitValue,
-  skopjeDate, today, relTime, prettyDateTime, monthKey,
+  skopjeDate, today, relTime, prettyDateTime, monthKey, orderSkus, orderLines,
   STATUS_LABEL, CURRENCY_LABEL, toCsv, download, cx,
 } from "../_lib/core";
 import { useAdmin } from "../_lib/store";
 import {
   Card, SectionTitle, Stat, Pill, Btn, IconBtn, Sheet, Field, Input, Select, Textarea,
   Segmented, Empty, IcSpinner, IcSearch, IcX, IcPlus, IcMinus, IcPencil, IcTrash,
-  IcPhone, IcMail, IcPin, IcDownLoad, IcLeft, IcRight, IcRefresh, IcClock, IcCheck, IcOrders,
+  IcPhone, IcMail, IcPin, IcDownLoad, IcLeft, IcRight, IcRefresh, IcClock, IcCheck, IcOrders, IcTag,
 } from "../_ui/kit";
 
 const MONTH_NAMES = ["јан","фев","мар","апр","мај","јун","јул","авг","сеп","окт","ное","дек"];
@@ -219,6 +219,7 @@ export function OrdersView({ openNew, onNewClosed }: { openNew: boolean; onNewCl
           {filtered.map((o) => {
             const c = orderCurrency(o);
             const busy = busyId === o.id;
+            const skus = orderSkus(o);
             return (
               <Card key={o.id} className="overflow-hidden">
                 <button onClick={() => setDetail(o)} className="flex w-full items-start gap-3 p-3.5 text-left">
@@ -231,7 +232,25 @@ export function OrdersView({ openNew, onNewClosed }: { openNew: boolean; onNewCl
                         <Pill tone="muted" className="shrink-0">{o.source === "facebook" ? "FB" : o.source === "phone" ? "Тел" : "Рачно"}</Pill>
                       )}
                     </div>
-                    <p className="mt-0.5 truncate text-[11.5px] text-[#7c7c88]">
+
+                    {/* SKU — the identifier used when preparing the shipment */}
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                      {skus.length > 0 ? (
+                        skus.map((s) => (
+                          <span key={s}
+                            className="inline-flex items-center gap-1 rounded-lg border border-[#3a3a46] bg-[#1b1b21] px-2 py-1 font-mono text-[12px] font-bold tracking-wider text-[#f0b0ae]">
+                            <IcTag size={11} className="text-[#e5454a]" />
+                            {s}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-lg border border-[#25252d] px-2 py-1 font-mono text-[11px] text-[#5a5a64]">
+                          без SKU
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="mt-1.5 truncate text-[11.5px] text-[#7c7c88]">
                       {o.items?.length
                         ? o.items.map((i) => `${i.quantity}× ${i.title}`).join(" · ")
                         : o.product_title}
