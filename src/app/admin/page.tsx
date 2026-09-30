@@ -27,9 +27,12 @@ type Product = {
   description: string;
   sku?: string;
   images?: string[];
-  car_model?: string;
   in_stock?: boolean;
   category?: string;
+  /** Optional EUR override, used by the /ks and /al markets. */
+  price_eur?: string;
+  /** Albanian description, shown on the Albanian markets. */
+  description_sq?: string;
 };
 
 type Order = {
@@ -74,7 +77,8 @@ function fmtOrderPrice(
 
 const EMPTY_FORM = {
   title: "", brand: "", car_model: "", model: "", year: "", category: "rubber_mats",
-  price: "", image: "", description: "", description_sq: "", sku: "", images: [] as string[], in_stock: true,
+  price: "", price_eur: "", image: "", description: "", description_sq: "", sku: "",
+  images: [] as string[], in_stock: true,
 };
 
 async function compressImage(file: File): Promise<Blob> {
@@ -1705,7 +1709,7 @@ export default function AdminPage() {
                   >←</button>
 
                   <input type="month" value={ordersMonth}
-                    onChange={(e) => { setOrdersMonth(e.target.value); fetchOrders(e.target.value, ordersStatus); }}
+                    onChange={(e) => { setOrdersMonth(e.target.value); fetchOrders(e.target.value); }}
                     className="rounded-lg border border-zinc-700 bg-[#1a1a1a] px-3 py-1.5 text-sm font-semibold text-white outline-none transition focus:border-red-600"
                   />
 
