@@ -2,15 +2,20 @@
 
 import { brands, type Brand } from "../data/brands";
 
-function getBrand(brandId: string): Brand | undefined {
+// brandId arrives from the configurator and can be empty, so the helpers
+// accept null/undefined and resolve to a safe default.
+type MaybeId = string | null | undefined;
+
+function getBrand(brandId: MaybeId): Brand | undefined {
+  if (!brandId) return undefined;
   return brands.find((b) => b.id === brandId);
 }
 
-function brandLogo(brandId: string) {
+function brandLogo(brandId: MaybeId) {
   return getBrand(brandId)?.logo ?? "";
 }
 
-function isLightLogo(brandId: string) {
+function isLightLogo(brandId: MaybeId) {
   return getBrand(brandId)?.lightLogo === true;
 }
 
