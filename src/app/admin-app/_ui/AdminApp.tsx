@@ -30,7 +30,7 @@ export function AdminAppShell({ initialTab }: { initialTab: Tab }) {
 }
 
 function AdminApp({ initialTab }: { initialTab: Tab }) {
-  const { authed } = useAdmin();
+  const { session } = useAdmin();
   const [tab, setTab] = useState<Tab>(initialTab);
   const [newOpen, setNewOpen] = useState(false);
 
@@ -42,7 +42,10 @@ function AdminApp({ initialTab }: { initialTab: Tab }) {
 
   useEffect(() => { document.title = "OP Admin"; }, []);
 
-  if (!authed) return <LoginScreen />;
+  // Already signed in? Show the launch splash while the stored credential is
+  // verified, so the login form never flashes on the way in.
+  if (session === "checking") return <LaunchSplash />;
+  if (session === "anon") return <LoginScreen />;
 
   return (
     <>
@@ -64,6 +67,31 @@ function AdminApp({ initialTab }: { initialTab: Tab }) {
 function Toasts() {
   const { toasts, dismiss } = useAdmin();
   return <Toaster toasts={toasts} onDismiss={dismiss} />;
+}
+
+/* ── launch splash ─────────────────────────────────────────────────── */
+
+function LaunchSplash() {
+  return (
+    <div className="admin-app relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[#08080a]"
+      style={{
+        background:
+          "radial-gradient(60% 45% at 50% 38%, rgba(215,32,38,.22), transparent 62%)," +
+          "radial-gradient(50% 40% at 85% 90%, rgba(215,32,38,.08), transparent 60%)",
+      }}>
+      <style>{`.admin-app{font-family:var(--font-body),"DM Sans",system-ui,sans-serif}
+        @keyframes opIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}`}</style>
+      <div style={{ animation: "opIn .45s cubic-bezier(.2,.9,.25,1)" }} className="flex flex-col items-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/admin-app/icon-192.png" alt="" width={96} height={96}
+          className="rounded-[28px] shadow-[0_20px_60px_rgba(215,32,38,.3)]" />
+        <p className="font-heading mt-5 text-[20px] font-bold uppercase tracking-[.2em] text-white">OP Admin</p>
+        <div className="mt-6 flex items-center gap-2 text-[11.5px] text-[#5a5a64]">
+          <IcSpinner size={14} /> <span>Се вчитува…</span>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 /* ── login ─────────────────────────────────────────────────────────── */
