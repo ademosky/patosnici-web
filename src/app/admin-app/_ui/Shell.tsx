@@ -11,7 +11,7 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import {
   IcHome, IcOrders, IcBox, IcLayers, IcSpark, IcImage, IcChart, IcSettings,
-  IcX, IcShare, IcPlus, IcAlert, IconBtn, Sheet,
+  IcX, IcShare, IcPlus, IcAlert, IconBtn, Sheet, IcSpinner,
 } from "./kit";
 
 import type { Tab } from "../_lib/core";
