@@ -100,9 +100,10 @@ export function OrdersView({ openNew, onNewClosed }: { openNew: boolean; onNewCl
       Телефон: o.phone,
       Град: o.city ?? "",
       Адреса: o.address ?? "",
+      SKU: orderSkus(o).join(" | "),
       Производи: (o.items?.length
-        ? o.items.map((i) => `${i.quantity}× ${i.title}`).join(" | ")
-        : o.product_title) ?? "",
+        ? o.items.map((i) => `${i.quantity}× ${i.title}${i.sku ? ` (${i.sku})` : ""}`).join(" | ")
+        : `${o.product_title ?? ""}${o.product_sku ? ` (${o.product_sku})` : ""}`),
       Валута: orderCurrency(o),
       Вкупно: orderTotal(o),
     }));
@@ -414,6 +415,12 @@ function OrderDetail({ order, onClose, onSave, onDelete, onStatus, busy }: {
                 {items.map((it, i) => (
                   <div key={i} className="rounded-xl border border-[#1f1f26] bg-[#0c0c0f] p-2.5">
                     <p className="mb-2 truncate text-[12.5px] font-medium text-white">{it.title}</p>
+                    <div className="mb-2 flex items-center gap-2">
+                      <IcTag size={12} className="shrink-0 text-[#e5454a]" />
+                      <Input value={it.sku ?? ""} placeholder="SKU"
+                        onChange={(e) => setItem(i, { sku: e.target.value })}
+                        className="py-2 font-mono text-[13px] tracking-wider" />
+                    </div>
                     <div className="flex items-center gap-2">
                       <Input value={it.price} onChange={(e) => setItem(i, { price: e.target.value })} className="flex-1 py-2 text-[13px]" />
                       <div className="flex items-center gap-1">
@@ -490,20 +497,30 @@ function OrderDetail({ order, onClose, onSave, onDelete, onStatus, busy }: {
           <div>
             <p className="mb-2 text-[10.5px] font-semibold uppercase tracking-[.12em] text-[#6c6c78]">Нарачано</p>
             <div className="space-y-1.5">
-              {order.items?.length ? order.items.map((it, i) => (
-                <div key={i} className="flex items-baseline gap-2 rounded-lg bg-[#0c0c0f] px-3 py-2.5">
-                  <span className="font-heading text-[15px] font-bold tabular-nums text-[#e5454a]">{it.quantity}×</span>
-                  <span className="min-w-0 flex-1 truncate text-[12.5px] text-[#c9c9d1]">{it.title}</span>
-                  <span className="shrink-0 text-[12.5px] font-semibold tabular-nums text-white">
-                    {c === "MKD" ? it.price : money(unitValue(it.price, it.price_eur, c), c)}
-                  </span>
+              {orderLines(order).map((line, i) => (
+                <div key={i} className="rounded-lg bg-[#0c0c0f] px-3 py-2.5">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-heading text-[15px] font-bold tabular-nums text-[#e5454a]">{line.quantity}×</span>
+                    <span className="min-w-0 flex-1 truncate text-[12.5px] text-[#c9c9d1]">{line.title}</span>
+                    <span className="shrink-0 text-[12.5px] font-semibold tabular-nums text-white">
+                      {order.items?.length
+                        ? (c === "MKD"
+                            ? order.items[i]?.price
+                            : money(unitValue(order.items[i]?.price ?? "", order.items[i]?.price_eur, c), c))
+                        : order.product_price}
+                    </span>
+                  </div>
+                  {line.sku && (
+                    <button
+                      onClick={() => { navigator.clipboard?.writeText(line.sku!); }}
+                      className="mt-1.5 inline-flex items-center gap-1 rounded-md border border-[#3a3a46] bg-[#1b1b21] px-1.5 py-0.5 font-mono text-[11px] font-bold tracking-wider text-[#f0b0ae] transition active:scale-95"
+                      title="Копирај SKU">
+                      <IcTag size={10} className="text-[#e5454a]" />
+                      {line.sku}
+                    </button>
+                  )}
                 </div>
-              )) : (
-                <div className="flex items-baseline gap-2 rounded-lg bg-[#0c0c0f] px-3 py-2.5">
-                  <span className="min-w-0 flex-1 truncate text-[12.5px] text-[#c9c9d1]">{order.product_title}</span>
-                  <span className="shrink-0 text-[12.5px] font-semibold text-white">{order.product_price}</span>
-                </div>
-              )}
+              ))}
             </div>
             <div className="mt-2 flex items-center justify-between border-t border-[#1f1f26] pt-2.5">
               <span className="text-[10.5px] font-semibold uppercase tracking-[.12em] text-[#6c6c78]">Вкупно</span>
