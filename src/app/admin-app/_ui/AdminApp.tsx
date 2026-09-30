@@ -30,7 +30,7 @@ export function AdminAppShell({ initialTab }: { initialTab: Tab }) {
 }
 
 function AdminApp({ initialTab }: { initialTab: Tab }) {
-  const { session } = useAdmin();
+  const { session, refresh } = useAdmin();
   const [tab, setTab] = useState<Tab>(initialTab);
   const [newOpen, setNewOpen] = useState(false);
 
@@ -49,7 +49,7 @@ function AdminApp({ initialTab }: { initialTab: Tab }) {
 
   return (
     <>
-      <Shell tab={tab} setTab={go} onNew={() => setNewOpen(true)}>
+      <Shell tab={tab} setTab={go} onNew={() => setNewOpen(true)} onRefresh={refresh}>
         {tab === "home" && <Dashboard goto={go} />}
         {tab === "orders" && <OrdersView openNew={newOpen} onNewClosed={() => setNewOpen(false)} />}
         {tab === "products" && <CatalogView openNew={newOpen} onNewClosed={() => setNewOpen(false)} />}
