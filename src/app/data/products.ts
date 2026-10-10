@@ -18,6 +18,7 @@ export type Product = {
   description_sq?: string;
   price_eur?: string;
   category?: string;   // rubber_mats | fabric_mats | auto_accessories
+  subcategory?: string | null;  // slug from the subcategories table
 };
 
 export type ProductCategory = "rubber_mats" | "fabric_mats" | "auto_accessories";
