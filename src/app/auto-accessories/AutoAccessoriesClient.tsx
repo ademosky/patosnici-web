@@ -8,7 +8,9 @@ import type { Product } from "../data/products";
 import { useLanguage } from "../context/LanguageContext";
 import { matchesAllWords } from "@/lib/search";
 import { type Subcategory, subcategoryLabel } from "../data/subcategories";
-import { cx } from "@/app/admin-app/_lib/core";
+
+/** Tiny class joiner — kept local so the storefront never imports admin code. */
+const cx = (...parts: Array<string | false | null | undefined>) => parts.filter(Boolean).join(" ");
 
 type Props = { initialProducts: Product[]; subcategories?: Subcategory[] };
 
@@ -43,7 +45,6 @@ export default function AutoAccessoriesClient({ initialProducts, subcategories =
   const sections: Array<{ key: string; label: string; items: Product[] }> = grouped
     ? [
         ...subcategories
-          .filter((s) => s.slug !== sub && false) // keep order; filtered below
           .map((s) => ({
             key: s.slug,
             label: subcategoryLabel(s, lang),
