@@ -84,6 +84,8 @@ export type Product = {
   sku?: string | null;
   in_stock?: boolean | null;
   category?: Category | null;
+  /** Slug of the subcategory (only used under auto_accessories). */
+  subcategory?: string | null;
   sort_order?: number | null;
   created_at?: string | null;
 };
