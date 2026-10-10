@@ -323,6 +323,18 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
         ))
       )}
 
+      <CategoryManager
+        open={catOpen}
+        onClose={() => setCatOpen(false)}
+        list={availableSubs}
+        counts={(slug) => base.filter((p) => p.subcategory === slug).length}
+        onAdd={addSubcategory}
+        onPatch={patchSubcategory}
+        onRemove={removeSubcategory}
+        onMove={moveSubcategory}
+        toast={toast}
+      />
+
       {/* ── editor ── */}
       <Sheet open={open} onClose={() => setOpen(false)}
         title={editId ? "Уреди производ" : (scope === "auto_accessories" ? "Нов додаток" : "Нов производ")}
@@ -418,5 +430,104 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
         </div>
       </Sheet>
     </div>
+  );
+}
+
+/* ── category manager ──────────────────────────────────────────────── */
+
+function CategoryManager({ open, onClose, list, counts, onAdd, onPatch, onRemove, onMove, toast }: {
+  open: boolean; onClose: () => void;
+  list: Array<{ id: number; slug: string; name: string; name_sq: string | null }>;
+  counts: (slug: string) => number;
+  onAdd: (p: { name: string; name_sq?: string; category: string }) => Promise<boolean>;
+  onPatch: (id: number, patch: { name?: string; name_sq?: string | null }) => Promise<boolean>;
+  onRemove: (id: number) => Promise<boolean>;
+  onMove: (id: number, dir: -1 | 1) => Promise<void>;
+  toast: (m: string, ok?: boolean) => void;
+}) {
+  const [name, setName] = useState("");
+  const [nameSq, setNameSq] = useState("");
+  const [adding, setAdding] = useState(false);
+  const [draft, setDraft] = useState<Record<number, { name: string; name_sq: string }>>({});
+
+  useEffect(() => { if (!open) { setName(""); setNameSq(""); setDraft({}); } }, [open]);
+
+  const add = async () => {
+    if (!name.trim()) { toast("Внеси име", false); return; }
+    setAdding(true);
+    const ok = await onAdd({ name: name.trim(), name_sq: nameSq.trim() || undefined, category: "auto_accessories" });
+    setAdding(false);
+    if (ok) { setName(""); setNameSq(""); }
+  };
+
+  const save = async (id: number) => {
+    const d = draft[id];
+    if (!d) return;
+    const ok = await onPatch(id, { name: d.name, name_sq: d.name_sq || null });
+    if (ok) setDraft((s) => { const n = { ...s }; delete n[id]; return n; });
+  };
+
+  return (
+    <Sheet open={open} onClose={onClose} title="Категории на додатоци"
+      footer={<Btn className="w-full" size="lg" onClick={onClose}>Готово</Btn>}>
+      <div className="space-y-4">
+        <div className="rounded-2xl border border-[#1f1f26] bg-[#0c0c0f] p-3.5">
+          <p className="mb-2.5 text-[10.5px] font-semibold uppercase tracking-[.12em] text-[#6c6c78]">Нова категорија</p>
+          <div className="space-y-2.5">
+            <Input value={name} onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && add()}
+              placeholder="Име (пр. Организери)" />
+            <Input value={nameSq} onChange={(e) => setNameSq(e.target.value)}
+              placeholder="Албански (опционално)" />
+            <Btn className="w-full" loading={adding} onClick={add}><IcPlus size={15} /> Додај</Btn>
+          </div>
+        </div>
+
+        {list.length === 0 ? (
+          <Empty icon={<IcLayers size={30} />} title="Нема категории"
+            sub="Додај прва категорија за да можеш да ги распоредиш додатоците." />
+        ) : (
+          <div className="space-y-2">
+            {list.map((s, idx) => {
+              const d = draft[s.id];
+              const dirty = !!d;
+              return (
+                <div key={s.id} className="rounded-2xl border border-[#1f1f26] bg-[#101014] p-3">
+                  <div className="flex items-center gap-2">
+                    <Pill tone="muted">{counts(s.slug)}</Pill>
+                    <span className="min-w-0 flex-1" />
+                    <IconBtn label="Погоре" size={32} onClick={() => onMove(s.id, -1)}><IcUp size={13} /></IconBtn>
+                    <IconBtn label="Подолу" size={32} onClick={() => onMove(s.id, 1)}><IcDown size={13} /></IconBtn>
+                  </div>
+                  <div className="mt-2.5 space-y-2">
+                    <Input value={d ? d.name : s.name}
+                      onChange={(e) => setDraft((st) => ({ ...st, [s.id]: { name: e.target.value, name_sq: st[s.id]?.name_sq ?? (s.name_sq ?? "") } }))} />
+                    <Input value={d ? d.name_sq : (s.name_sq ?? "")} placeholder="Албански (опционално)"
+                      onChange={(e) => setDraft((st) => ({ ...st, [s.id]: { name: st[s.id]?.name ?? s.name, name_sq: e.target.value } }))} />
+                  </div>
+                  <div className="mt-2.5 flex gap-2">
+                    {dirty && <Btn size="sm" className="flex-1" onClick={() => save(s.id)}>Зачувај</Btn>}
+                    <Btn size="sm" variant="danger" className="flex-1"
+                      onClick={async () => {
+                        const n = counts(s.slug);
+                        const msg = n > 0
+                          ? `Избриши „${s.name}“?\n\n${n} ${n === 1 ? "производ" : "производи"} ќе останат, само без категорија.`
+                          : `Избриши „${s.name}“?`;
+                        if (confirm(msg)) await onRemove(s.id);
+                      }}>
+                      <IcTrash size={14} /> Избриши
+                    </Btn>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        <p className="px-1 text-[11px] leading-relaxed text-[#5a5a64]">
+          Бришење на категорија <b className="text-[#8a8a95]">не ги брише производите</b> — тие само остануваат без ознака.
+        </p>
+      </div>
+    </Sheet>
   );
 }
