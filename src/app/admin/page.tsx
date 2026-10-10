@@ -221,9 +221,18 @@ export default function AdminPage() {
   const [showcaseEditId, setShowcaseEditId] = useState<number | null>(null);
   const [showcaseLoading, setShowcaseLoading] = useState(false);
 
-  const [accForm, setAccForm] = useState({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [] as string[], image: "" });
+  const [accForm, setAccForm] = useState({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [] as string[], image: "", subcategory: "" });
   const [accEditId, setAccEditId] = useState<number | null>(null);
   const [accLoading, setAccLoading] = useState(false);
+
+  // ── Поткатегории за додатоците ──
+  type Sub = { id: number; slug: string; name: string; name_sq: string | null; sort_order: number };
+  const [subs, setSubs] = useState<Sub[]>([]);
+  const [subFilter, setSubFilter] = useState("");
+  const [catsOpen, setCatsOpen] = useState(false);
+  const [newSubName, setNewSubName] = useState("");
+  const [newSubSq, setNewSubSq] = useState("");
+  const [subBusy, setSubBusy] = useState(false);
 
   const showToast = (msg: string, ok = true) => {
     setToast({ msg, ok });
@@ -944,11 +953,12 @@ export default function AdminPage() {
           description: accForm.description || "",
           description_sq: accForm.description_sq || "",
           category: "auto_accessories",
+          subcategory: accForm.subcategory || null,
         }),
       }
     );
     if (res.ok) {
-      setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "" });
+      setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "" });
       setAccEditId(null);
       await fetchProducts(pw);
       showToast(isEdit ? "Ажурирано! ✓" : "Додатокот е додаден! ✓");
@@ -970,6 +980,7 @@ export default function AdminPage() {
       description_sq: (p as any).description_sq ?? "",
       images: p.images || (p.image ? [p.image] : []),
       image: p.image,
+      subcategory: p.subcategory ?? "",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -982,7 +993,7 @@ export default function AdminPage() {
     });
     if (res.ok) {
       showToast("Избришано.");
-      if (accEditId === id) { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "" }); }
+      if (accEditId === id) { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "" }); }
       fetchProducts(getPw());
     }
   };
@@ -2288,7 +2299,7 @@ export default function AdminPage() {
                     {accEditId ? "Зачувај" : "Додај"}
                   </button>
                   {accEditId && (
-                    <button type="button" onClick={() => { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "" }); }}
+                    <button type="button" onClick={() => { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "" }); }}
                       className="rounded-xl border border-zinc-700 px-5 py-3 text-sm text-zinc-400 transition hover:border-red-600 hover:text-white">
                       Откажи
                     </button>
