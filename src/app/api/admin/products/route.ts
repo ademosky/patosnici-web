@@ -49,6 +49,7 @@ const slug = `${baseSlug}-${Date.now()}`;
       description: body.description || "",
       sku: body.sku || "",
       category: body.category || "rubber_mats",
+      subcategory: body.subcategory || null,
       in_stock: body.in_stock !== false,
       description_sq: body.description_sq || "",
       price_eur: body.price_eur || null,
