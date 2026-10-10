@@ -11,7 +11,7 @@ const MAP: Record<string, string> = {
   и:"i", ј:"j", к:"k", л:"l", љ:"lj", м:"m", н:"n", њ:"nj", о:"o", п:"p",
   р:"r", с:"s", т:"t", ќ:"kj", у:"u", ф:"f", х:"h", ц:"c", ч:"ch", џ:"dj", ш:"sh",
   // Serbian / other Cyrillic that may be pasted in
-  ћ:"c", ђ:"dj", ѐ:"e", ѝ:"i", ћ:"c",
+  ђ:"dj", ѐ:"e", ѝ:"i",
 };
 
 export function slugify(input: string): string {
