@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Header from "../components/Header";
 import AutoAccessoriesClient from "./AutoAccessoriesClient";
 import { getProductsByCategory } from "../data/products";
+import { getSubcategories } from "../data/subcategories";
 import { Market } from "@/lib/pricing";
 import {
   readMarketServer,
@@ -59,11 +60,16 @@ export async function generateMetadata(): Promise<Metadata> {
 export const dynamic = "force-dynamic";
 
 export default async function AutoAccessoriesPage() {
-  const products = await getProductsByCategory("auto_accessories");
+  // Fetched together so the grid and its grouping never disagree.
+  const [products, subcategories] = await Promise.all([
+    getProductsByCategory("auto_accessories"),
+    getSubcategories("auto_accessories"),
+  ]);
+
   return (
     <>
       <Header />
-      <AutoAccessoriesClient initialProducts={products} />
+      <AutoAccessoriesClient initialProducts={products} subcategories={subcategories} />
     </>
   );
 }
