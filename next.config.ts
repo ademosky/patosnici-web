@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // The deployed commit, readable in the app so it is always possible to tell
+  // which build is actually running (Vercel sets this at build time).
+  env: {
+    NEXT_PUBLIC_BUILD_SHA: (process.env.VERCEL_GIT_COMMIT_SHA ?? "dev").slice(0, 7),
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
