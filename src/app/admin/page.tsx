@@ -11,7 +11,7 @@ import {
   Lock, Plus, Trash2, LogOut, Package, ShoppingCart, Warehouse,
   CheckCircle, AlertCircle, Loader2, Pencil,
   X, Upload, ImageIcon, Phone, Mail as MailIcon, Clock, Minus, Download,
-  ChevronUp, ChevronDown, TrendingUp, Calendar,
+  ChevronUp, ChevronDown, TrendingUp, Calendar, Layers,
 } from "lucide-react";
 
 type Product = {
@@ -881,6 +881,13 @@ export default function AdminPage() {
 
   // ── Додатоци (auto accessories) CRUD — reuses products table with category auto_accessories ──
   const accessories = products.filter((p) => p.category === "auto_accessories");
+
+  // Subcategory filter for the accessories list
+  const visibleAccessories = !subFilter
+    ? accessories
+    : subFilter === "__none__"
+      ? accessories.filter((p) => !p.subcategory)
+      : accessories.filter((p) => p.subcategory === subFilter);
 
   const accUpdate = (k: string, v: string) => setAccForm((prev) => ({ ...prev, [k]: v }));
 
@@ -2481,7 +2488,7 @@ export default function AdminPage() {
               </div>
             ) : (
               <div className="space-y-2">
-                {accessories.map((p) => (
+                {visibleAccessories.map((p) => (
                   <div key={p.id} className="flex items-center gap-3 rounded-2xl border border-zinc-800 bg-[#111] px-4 py-3">
                     {p.image ? (
                       <Image src={p.image} alt={p.title} width={64} height={48} className="h-12 w-16 shrink-0 rounded-lg object-cover" unoptimized />
@@ -2492,7 +2499,19 @@ export default function AdminPage() {
                     )}
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-bold text-white">{p.title}</p>
-                      <p className="text-xs text-zinc-400">{p.brand === "all" ? "🌐 Универзално" : (brands.find((b) => b.id === p.brand)?.name ?? p.brand)}{p.sku ? ` · SKU ${p.sku}` : ""}</p>
+                      <p className="text-xs text-zinc-400">
+                        {p.brand === "all" ? "🌐 Универзално" : (brands.find((b) => b.id === p.brand)?.name ?? p.brand)}
+                        {p.sku ? ` · SKU ${p.sku}` : ""}
+                      </p>
+                      <p className="mt-0.5 text-xs">
+                        {p.subcategory ? (
+                          <span className="rounded-md bg-red-600/15 px-2 py-0.5 font-semibold text-red-400">
+                            {subs.find((s) => s.slug === p.subcategory)?.name ?? p.subcategory}
+                          </span>
+                        ) : (
+                          <span className="text-zinc-600">без поткатегорија</span>
+                        )}
+                      </p>
                       <p className="text-xs font-bold text-red-500">{p.price}</p>
                     </div>
                     <button type="button" onClick={() => handleAccEdit(p)}
@@ -2506,7 +2525,7 @@ export default function AdminPage() {
                   </div>
                 ))}
                 <div className="rounded-2xl border border-zinc-700 bg-[#111] px-4 py-3 text-center">
-                  <span className="text-xs text-zinc-500">{accessories.length} додатоци</span>
+                  <span className="text-xs text-zinc-500">{visibleAccessories.length} додатоци</span>
                 </div>
               </div>
             )}
