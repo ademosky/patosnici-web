@@ -2340,6 +2340,15 @@ export default function AdminPage() {
                   <input placeholder="Цена EUR" value={accForm.price_eur} onChange={(e) => accUpdate("price_eur", e.target.value)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
                 </div>
                 <input placeholder="SKU" value={accForm.sku} onChange={(e) => accUpdate("sku", e.target.value)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
+                <select value={accForm.subcategory} onChange={(e) => accUpdate("subcategory", e.target.value)} className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600">
+                  <option value="">— без поткатегорија —</option>
+                  {[...subs].sort((a, b) => a.sort_order - b.sort_order).map((s) => (
+                    <option key={s.id} value={s.slug}>{s.name}</option>
+                  ))}
+                </select>
+                {subs.length === 0 && (
+                  <p className="text-xs text-zinc-600">Нема поткатегории — отвори „Категории“ подолу за да креираш.</p>
+                )}
                 <textarea placeholder="Опис" rows={2} value={accForm.description} onChange={(e) => accUpdate("description", e.target.value)} className="w-full resize-none rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
                 <textarea placeholder="Опис на албански" rows={2} value={accForm.description_sq} onChange={(e) => accUpdate("description_sq", e.target.value)} className="w-full resize-none rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
 
@@ -2379,6 +2388,90 @@ export default function AdminPage() {
                 </div>
               </form>
             </div>
+
+            {/* Categories */}
+            <div className="mb-4 rounded-2xl border border-zinc-800 bg-[#111] p-4">
+              <button type="button" onClick={() => setCatsOpen((v) => !v)}
+                className="flex w-full items-center justify-between text-left">
+                <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+                  <Layers size={12} className="mr-1 inline text-red-600" /> Категории на додатоци
+                </span>
+                <span className="text-xs text-zinc-500">{subs.length} {subs.length === 1 ? "категорија" : "категории"} {catsOpen ? "▲" : "▼"}</span>
+              </button>
+
+              {catsOpen && (
+                <div className="mt-3 flex flex-col gap-2">
+                  {/* add */}
+                  <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
+                    <input placeholder="Име (пр. Организери)" value={newSubName}
+                      onChange={(e) => setNewSubName(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddSub())}
+                      className={IN} />
+                    <input placeholder="Албански (опционално)" value={newSubSq}
+                      onChange={(e) => setNewSubSq(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddSub())}
+                      className={IN} />
+                    <button type="button" onClick={handleAddSub} disabled={subBusy}
+                      className="flex items-center gap-1 rounded-xl bg-red-600 px-4 text-sm font-bold text-white transition hover:bg-red-700 disabled:opacity-60">
+                      {subBusy ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
+                    </button>
+                  </div>
+
+                  {/* existing */}
+                  {[...subs].sort((a, b) => a.sort_order - b.sort_order).map((s) => {
+                    const count = accessories.filter((p) => p.subcategory === s.slug).length;
+                    return (
+                      <div key={s.id} className="grid grid-cols-[1fr_1fr_auto_auto_auto] items-center gap-2 rounded-xl border border-zinc-800 bg-[#0d0d0d] p-2">
+                        <input defaultValue={s.name}
+                          onBlur={(e) => e.target.value !== s.name && handleRenameSub(s.id, e.target.value, s.name_sq ?? "")}
+                          className="rounded-lg border border-zinc-700 bg-[#1a1a1a] px-3 py-2 text-sm text-white outline-none focus:border-red-600" />
+                        <input defaultValue={s.name_sq ?? ""} placeholder="Албански"
+                          onBlur={(e) => (e.target.value || "") !== (s.name_sq ?? "") && handleRenameSub(s.id, s.name, e.target.value)}
+                          className="rounded-lg border border-zinc-700 bg-[#1a1a1a] px-3 py-2 text-sm text-white outline-none focus:border-red-600" />
+                        <span className="min-w-[2.5rem] text-center text-xs text-zinc-500">{count}</span>
+                        <div className="flex flex-col gap-0.5">
+                          <button type="button" onClick={() => handleMoveSub(s.id, -1)} className="text-zinc-500 hover:text-white"><ChevronUp size={14} /></button>
+                          <button type="button" onClick={() => handleMoveSub(s.id, 1)} className="text-zinc-500 hover:text-white"><ChevronDown size={14} /></button>
+                        </div>
+                        <button type="button" onClick={() => handleDeleteSub(s.id, s.name, count)}
+                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-700 text-zinc-500 transition hover:border-red-600 hover:text-red-500">
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    );
+                  })}
+
+                  <p className="text-xs text-zinc-600">
+                    Бришење на категорија не ги брише производите — тие само остануваат без ознака.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Filter by category */}
+            {subs.length > 0 && (
+              <div className="mb-4 flex flex-wrap gap-2">
+                <button type="button" onClick={() => setSubFilter("")}
+                  className={`rounded-full border px-4 py-2 text-xs font-bold transition ${!subFilter ? "border-red-600 bg-red-600/10 text-white" : "border-zinc-700 text-zinc-400"}`}>
+                  Сите <span className="opacity-60">{accessories.length}</span>
+                </button>
+                {[...subs].sort((a, b) => a.sort_order - b.sort_order).map((s) => {
+                  const n = accessories.filter((p) => p.subcategory === s.slug).length;
+                  return (
+                    <button key={s.id} type="button" onClick={() => setSubFilter(subFilter === s.slug ? "" : s.slug)}
+                      className={`rounded-full border px-4 py-2 text-xs font-bold transition ${subFilter === s.slug ? "border-red-600 bg-red-600/10 text-white" : "border-zinc-700 text-zinc-400"}`}>
+                      {s.name} <span className="opacity-60">{n}</span>
+                    </button>
+                  );
+                })}
+                {accessories.some((p) => !p.subcategory) && (
+                  <button type="button" onClick={() => setSubFilter(subFilter === "__none__" ? "" : "__none__")}
+                    className={`rounded-full border px-4 py-2 text-xs font-bold transition ${subFilter === "__none__" ? "border-amber-600 bg-amber-600/10 text-white" : "border-zinc-700 text-zinc-400"}`}>
+                    Без категорија <span className="opacity-60">{accessories.filter((p) => !p.subcategory).length}</span>
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* List */}
             {accessories.length === 0 ? (
