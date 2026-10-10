@@ -11,7 +11,7 @@
  *                          show data that no longer exists.
  *   • Offline navigation → cached shell, so the app still opens.
  */
-const VERSION = "op-admin-app-v1";
+const VERSION = "op-admin-app-v2";
 const SHELL = `${VERSION}-shell`;
 
 const SHELL_ASSETS = [
