@@ -25,22 +25,29 @@ type Form = {
   title: string; brand: string; model: string; car_model: string; year: string;
   price: string; price_eur: string; sku: string; category: Category;
   description: string; description_sq: string; image: string; images: string[]; in_stock: boolean;
+  subcategory: string;
 };
 
 const EMPTY: Form = {
   title: "", brand: "", model: "", car_model: "", year: "",
   price: "", price_eur: "", sku: "", category: "rubber_mats",
   description: "", description_sq: "", image: "", images: [], in_stock: true,
+  subcategory: "",
 };
 
 export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
   scope?: Category; openNew?: boolean; onNewClosed?: () => void;
 }) {
-  const { products, saveProduct, removeProduct, toast, loading } = useAdmin();
+  const {
+    products, subcategories, saveProduct, removeProduct, toast, loading,
+    addSubcategory, patchSubcategory, removeSubcategory, moveSubcategory,
+  } = useAdmin();
   const [cat, setCat] = useState<Category | "">(scope ?? "");
   const [q, setQ] = useState("");
   const [brand, setBrand] = useState("");
   const [onlyOut, setOnlyOut] = useState(false);
+  const [subFilter, setSubFilter] = useState("");
+  const [catOpen, setCatOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState<Form>(EMPTY);
@@ -56,6 +63,13 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
     [products, scope],
   );
 
+  // Subcategories only exist for accessories today.
+  const inAccessories = scope === "auto_accessories" || (!scope && cat === "auto_accessories");
+  const availableSubs = useMemo(
+    () => subcategories.filter((s) => s.category === "auto_accessories"),
+    [subcategories],
+  );
+
   const counts = useMemo(() => ({
     rubber: base.filter((p) => categoryOf(p) === "rubber_mats").length,
     fabric: base.filter((p) => categoryOf(p) === "fabric_mats").length,
@@ -69,13 +83,17 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
       if (cat && categoryOf(p) !== cat) return false;
       if (brand && p.brand !== brand) return false;
       if (onlyOut && p.in_stock !== false) return false;
+      if (inAccessories && subFilter) {
+        if (subFilter === "__none__") { if (p.subcategory) return false; }
+        else if (p.subcategory !== subFilter) return false;
+      }
       if (needle) {
         const hay = [p.title, p.brand, p.model, p.car_model, p.sku].filter(Boolean).join(" ").toLowerCase();
         if (!hay.includes(needle)) return false;
       }
       return true;
     });
-  }, [base, cat, brand, onlyOut, q]);
+  }, [base, cat, brand, onlyOut, q, inAccessories, subFilter]);
 
   const usedBrands = useMemo(
     () => [...new Set(base.map((p) => p.brand).filter(Boolean))].sort(),
@@ -89,7 +107,11 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
 
   const openNew = useCallback(() => {
     setEditId(null);
-    setForm({ ...EMPTY, category: scope === "auto_accessories" ? "auto_accessories" : (cat || "rubber_mats") });
+    setForm({
+      ...EMPTY,
+      category: scope === "auto_accessories" ? "auto_accessories" : (cat || "rubber_mats"),
+    });
+    setSubFilter("");
     setOpen(true);
   }, [scope, cat]);
 
@@ -110,6 +132,7 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
       image: p.image ?? "",
       images: p.images?.length ? p.images : (p.image ? [p.image] : []),
       in_stock: p.in_stock !== false,
+      subcategory: p.subcategory ?? "",
     });
     setOpen(true);
   };
@@ -125,6 +148,7 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
       image: form.image || form.images[0] || "",
       in_stock: form.in_stock,
       price_eur: form.price_eur || null,
+      subcategory: form.category === "auto_accessories" ? (form.subcategory || null) : null,
     }, editId);
     setSaving(false);
     if (ok) setOpen(false);
