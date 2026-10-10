@@ -490,6 +490,16 @@ export const VEHICLES: Vehicle[] = [
   { brandId: "suzuki", model: "Grand Vitara", generation: "JT (2005–2016)" },
   { brandId: "suzuki", model: "Kizashi", generation: "RF (2010–2014)" },
   { brandId: "suzuki", model: "Liana", generation: "ER (2001–2007)" },
+  // ── tesla ──
+  { brandId: "tesla", model: "Model S", generation: "Mk1 (2012–2016)" },
+  { brandId: "tesla", model: "Model S", generation: "Facelift (2016–2020)" },
+  { brandId: "tesla", model: "Model S", generation: "Palladium (2021–)" },
+  { brandId: "tesla", model: "Model 3", generation: "Mk1 (2017–2023)" },
+  { brandId: "tesla", model: "Model 3", generation: "Highland (2023–)" },
+  { brandId: "tesla", model: "Model X", generation: "Mk1 (2015–2020)" },
+  { brandId: "tesla", model: "Model X", generation: "Palladium (2021–)" },
+  { brandId: "tesla", model: "Model Y", generation: "Mk1 (2019–)" },
+  { brandId: "tesla", model: "Roadster", generation: "Mk1 (2008–2012)" },
   // ── toyota ──
   { brandId: "toyota", model: "Aygo", generation: "AB40 (2014–2021)" },
   { brandId: "toyota", model: "Yaris", generation: "XP130 (2011–2020)" },
