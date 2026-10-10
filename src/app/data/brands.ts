@@ -40,6 +40,7 @@ export const brands: Brand[] = [
   { id: "skoda",       name: "Škoda",        logo: "/brands/skoda.svg"       },
   { id: "smart",       name: "Smart",        logo: "/brands/smart.svg",       lightLogo: true  },
   { id: "suzuki",      name: "Suzuki",       logo: "/brands/suzuki.svg"      },
+  { id: "tesla",       name: "Tesla",        logo: "/brands/tesla.svg"       },
   { id: "toyota",      name: "Toyota",       logo: "/brands/toyota.svg"      },
   { id: "volkswagen",  name: "Volkswagen",   logo: "/brands/volkswagen.svg"  },
   { id: "volvo",       name: "Volvo",        logo: "/brands/volvo.svg"       },
