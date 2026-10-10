@@ -2413,11 +2413,11 @@ export default function AdminPage() {
                     <input placeholder="Име (пр. Организери)" value={newSubName}
                       onChange={(e) => setNewSubName(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddSub())}
-                      className={IN} />
+                      className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
                     <input placeholder="Албански (опционално)" value={newSubSq}
                       onChange={(e) => setNewSubSq(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddSub())}
-                      className={IN} />
+                      className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
                     <button type="button" onClick={handleAddSub} disabled={subBusy}
                       className="flex items-center gap-1 rounded-xl bg-red-600 px-4 text-sm font-bold text-white transition hover:bg-red-700 disabled:opacity-60">
                       {subBusy ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
