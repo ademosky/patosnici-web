@@ -19,6 +19,15 @@ import {
   InvItem, Order, OrderStatus, Product, ShowcaseItem, monthKey,
 } from "./core";
 
+export type Subcategory = {
+  id: number;
+  category: string;
+  slug: string;
+  name: string;
+  name_sq: string | null;
+  sort_order: number;
+};
+
 type Toast = { id: number; msg: string; ok: boolean };
 type BsRow = { rank: number; sku: string; title: string; brand: string; category: string; quantity: number; total: number };
 
@@ -37,6 +46,7 @@ type Ctx = {
   products: Product[];
   inventory: InvItem[];
   showcase: ShowcaseItem[];
+  subcategories: Subcategory[];
   month: string;
   setMonth: (m: string) => void;
   loading: boolean;
@@ -62,6 +72,11 @@ type Ctx = {
   patchShowcase: (id: number, patch: Partial<ShowcaseItem>) => Promise<boolean>;
   removeShowcase: (id: number) => Promise<boolean>;
   moveShowcase: (id: number, dir: -1 | 1) => Promise<void>;
+  /* subcategories */
+  addSubcategory: (p: { name: string; name_sq?: string; category: string }) => Promise<boolean>;
+  patchSubcategory: (id: number, patch: Partial<Subcategory>) => Promise<boolean>;
+  removeSubcategory: (id: number) => Promise<boolean>;
+  moveSubcategory: (id: number, dir: -1 | 1) => Promise<void>;
   /* stats */
   bestSellers: (opts?: { from?: string; to?: string }) => Promise<BsRow[]>;
 };
@@ -87,6 +102,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [inventory, setInventory] = useState<InvItem[]>([]);
   const [showcase, setShowcase] = useState<ShowcaseItem[]>([]);
+  const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   const [month, setMonthState] = useState<string>(() => monthKey());
   const [loading, setLoading] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -141,6 +157,14 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (res.ok) setShowcase(await res.json());
   }, [pw]);
 
+  const loadSubcategories = useCallback(async (password?: string) => {
+    const res = await fetch(`/api/admin/subcategories?_t=${Date.now()}`, {
+      headers: { "x-admin-password": password ?? pw },
+      cache: "no-store",
+    });
+    if (res.ok) setSubcategories(await res.json());
+  }, [pw]);
+
   const loadAll = useCallback(async (m: string, password?: string) => {
     setLoading(true);
     await Promise.all([
@@ -148,9 +172,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       loadProducts(password),
       loadInventory(password),
       loadShowcase(password),
+      loadSubcategories(password),
     ]);
     setLoading(false);
-  }, [loadOrders, loadProducts, loadInventory, loadShowcase]);
+  }, [loadOrders, loadProducts, loadInventory, loadShowcase, loadSubcategories]);
 
   /* ── session ─────────────────────────────────────────────────────── */
 
@@ -170,6 +195,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
           loadOrders(monthKey(), stored);
           loadInventory(stored);
           loadShowcase(stored);
+          loadSubcategories(stored);
         } else {
           localStorage.removeItem(KEY);
           sessionStorage.removeItem(KEY);
@@ -444,6 +470,77 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     }
   }, [showcase, authHeaders, toast]);
 
+  /* ── subcategories ───────────────────────────────────────────────── */
+
+  const addSubcategory = useCallback(async (p: { name: string; name_sq?: string; category: string }) => {
+    try {
+      const res = await fetch("/api/admin/subcategories", {
+        method: "POST", headers: authHeaders(true), body: JSON.stringify(p),
+      });
+      if (!res.ok) throw new Error();
+      toast("Категоријата е додадена");
+      await loadSubcategories();
+      return true;
+    } catch {
+      toast("Грешка при додавање", false);
+      return false;
+    }
+  }, [authHeaders, toast, loadSubcategories]);
+
+  const patchSubcategory = useCallback(async (id: number, patch: Partial<Subcategory>) => {
+    const before = subcategories.find((c) => c.id === id);
+    setSubcategories((all) => all.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+    try {
+      const res = await fetch(`/api/admin/subcategories/${id}`, {
+        method: "PATCH", headers: authHeaders(true), body: JSON.stringify(patch),
+      });
+      if (!res.ok) throw new Error();
+      return true;
+    } catch {
+      if (before) setSubcategories((all) => all.map((c) => (c.id === id ? before : c)));
+      toast("Грешка при зачувување", false);
+      return false;
+    }
+  }, [subcategories, authHeaders, toast]);
+
+  const removeSubcategory = useCallback(async (id: number) => {
+    const before = subcategories;
+    setSubcategories((all) => all.filter((c) => c.id !== id));
+    // products in it are not deleted — they fall back to "Останато"
+    setProducts((all) => all.map((p) => {
+      const target = before.find((c) => c.id === id);
+      return target && p.subcategory === target.slug ? { ...p, subcategory: null } : p;
+    }));
+    try {
+      const res = await fetch(`/api/admin/subcategories/${id}`, {
+        method: "DELETE", headers: authHeaders(),
+      });
+      if (!res.ok) throw new Error();
+      toast("Категоријата е избришана");
+      return true;
+    } catch {
+      setSubcategories(before);
+      await loadProducts();
+      toast("Грешка при бришење", false);
+      return false;
+    }
+  }, [subcategories, authHeaders, toast, loadProducts]);
+
+  const moveSubcategory = useCallback(async (id: number, dir: -1 | 1) => {
+    const list = [...subcategories].sort((a, b) => a.sort_order - b.sort_order);
+    const i = list.findIndex((c) => c.id === id);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= list.length) return;
+    [list[i], list[j]] = [list[j], list[i]];
+    const renumbered = list.map((c, idx) => ({ ...c, sort_order: idx }));
+    setSubcategories(renumbered);
+    // two small writes — the list is short and this keeps the API surface tiny
+    await Promise.all([
+      patchSubcategory(list[i].id, { sort_order: i }),
+      patchSubcategory(list[j].id, { sort_order: j }),
+    ]);
+  }, [subcategories, patchSubcategory]);
+
   /* ── stats ───────────────────────────────────────────────────────── */
 
   const bestSellers = useCallback(async (opts?: { from?: string; to?: string }) => {
@@ -462,18 +559,20 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<Ctx>(() => ({
     session, authed, signIn, signOut, refresh,
-    orders, products, inventory, showcase, month, setMonth, loading,
+    orders, products, inventory, showcase, subcategories, month, setMonth, loading,
     toasts, toast, dismiss,
     setOrderStatus, patchOrder, removeOrder, addOrder, exportOrders,
     saveProduct, removeProduct,
     addInventory, patchInventory, removeInventory,
     addShowcase, patchShowcase, removeShowcase, moveShowcase,
+    addSubcategory, patchSubcategory, removeSubcategory, moveSubcategory,
     bestSellers,
   }), [
     session, authed, signIn, signOut, refresh, orders, products, inventory, showcase, month, setMonth,
     loading, toasts, toast, dismiss, setOrderStatus, patchOrder, removeOrder, addOrder,
     exportOrders, saveProduct, removeProduct, addInventory, patchInventory,
-    removeInventory, addShowcase, patchShowcase, removeShowcase, moveShowcase, bestSellers,
+    removeInventory, addShowcase, patchShowcase, removeShowcase, moveShowcase,
+    addSubcategory, patchSubcategory, removeSubcategory, moveSubcategory, bestSellers,
   ]);
 
   return <AdminCtx.Provider value={value}>{children}</AdminCtx.Provider>;
