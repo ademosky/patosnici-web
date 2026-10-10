@@ -18,7 +18,7 @@ import { useAdmin } from "../_lib/store";
 import {
   Card, SectionTitle, Stat, Pill, Btn, IconBtn, Sheet, Field, Input, Select, Textarea,
   Segmented, Empty, IcSpinner, IcSearch, IcX, IcPlus, IcPencil, IcTrash,
-  IcBox, IcUpload, IcAlert, IcCheck, IcTag,
+  IcBox, IcUpload, IcAlert, IcCheck, IcTag, IcLayers, IcUp, IcDown,
 } from "../_ui/kit";
 
 type Form = {
@@ -101,8 +101,14 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
   );
 
   const grouped = useMemo(
-    () => groupBy(filtered, (p) => p.brand || "—"),
-    [filtered],
+    () => {
+      if (inAccessories && availableSubs.length > 0) {
+        const bySlug = new Map(availableSubs.map((s) => [s.slug, s.name]));
+        return groupBy(filtered, (p) => (p.subcategory && bySlug.get(p.subcategory)) || "Останато");
+      }
+      return groupBy(filtered, (p) => p.brand || "—");
+    },
+    [filtered, inAccessories, availableSubs],
   );
 
   const openNew = useCallback(() => {
@@ -204,10 +210,43 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
         </div>
         <div className="flex gap-2">
           <Btn className="flex-1" onClick={openNew}><IcPlus size={16} /> {scope === "auto_accessories" ? "Нов додаток" : "Нов производ"}</Btn>
+          {inAccessories && (
+            <Btn variant="outline" onClick={() => setCatOpen(true)}>
+              <IcLayers size={15} /> Категории
+            </Btn>
+          )}
           <Btn variant={onlyOut ? "danger" : "outline"} onClick={() => setOnlyOut((v) => !v)}>
             <IcAlert size={15} /> {counts.out}
           </Btn>
         </div>
+
+        {/* Subcategory filter — only meaningful for accessories */}
+        {inAccessories && availableSubs.length > 0 && (
+          <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
+            <button onClick={() => setSubFilter("")}
+              className={cx("shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-semibold transition",
+                !subFilter ? "border-[#d72026] bg-[#1a0e10] text-white" : "border-[#25252d] text-[#8a8a95]")}>
+              Сите
+            </button>
+            {availableSubs.map((s) => {
+              const n = base.filter((p) => p.subcategory === s.slug).length;
+              return (
+                <button key={s.id} onClick={() => setSubFilter(subFilter === s.slug ? "" : s.slug)}
+                  className={cx("shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-semibold transition",
+                    subFilter === s.slug ? "border-[#d72026] bg-[#1a0e10] text-white" : "border-[#25252d] text-[#8a8a95]")}>
+                  {s.name}{n > 0 && <span className="ml-1.5 opacity-60">{n}</span>}
+                </button>
+              );
+            })}
+            {base.some((p) => !p.subcategory) && (
+              <button onClick={() => setSubFilter(subFilter === "__none__" ? "" : "__none__")}
+                className={cx("shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-semibold transition",
+                  subFilter === "__none__" ? "border-[#e0b04a] bg-[#241d10] text-white" : "border-[#25252d] text-[#8a8a95]")}>
+                Без категорија
+              </button>
+            )}
+          </div>
+        )}
         {usedBrands.length > 1 && (
           <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1">
             <button onClick={() => setBrand("")}
@@ -238,7 +277,9 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
         grouped.map(([b, list]) => (
           <section key={b}>
             <SectionTitle action={<span className="text-[11px] text-[#5a5a64]">{list.length}</span>}>
-              {brands.find((x) => x.id === b)?.name ?? b}
+              {inAccessories && availableSubs.length > 0
+                ? b
+                : (brands.find((x) => x.id === b)?.name ?? b)}
             </SectionTitle>
             <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-3">
               {list.map((p) => (
@@ -334,6 +375,17 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
               </Select>
             </Field>
           </div>
+
+          {form.category === "auto_accessories" && (
+            <Field label="Поткатегорија" hint="Каде оди овој додаток во продавницата">
+              <Select value={form.subcategory} onChange={(e) => setForm({ ...form, subcategory: e.target.value })}>
+                <option value="">— без поткатегорија —</option>
+                {availableSubs.map((s) => (
+                  <option key={s.id} value={s.slug}>{s.name}</option>
+                ))}
+              </Select>
+            </Field>
+          )}
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Модел возило"><Input value={form.car_model} onChange={(e) => setForm({ ...form, car_model: e.target.value })} placeholder="A3" /></Field>
