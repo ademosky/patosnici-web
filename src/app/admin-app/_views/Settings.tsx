@@ -97,7 +97,8 @@ export function SettingsView() {
         <SectionTitle>За апликацијата</SectionTitle>
         <Card className="divide-y divide-[#1a1a20]">
           {[
-            ["Верзија", "App 1.0"],
+            ["Верзија", "App 1.1"],
+            ["Изградба", process.env.NEXT_PUBLIC_BUILD_SHA ?? "dev"],
             ["Компанија", "Original Patosnici"],
             ["Валути", "МКД · ЕУР · Лек"],
             ["Пазари", "Македонија · Косово · Албанија"],
@@ -112,6 +113,27 @@ export function SettingsView() {
         <p className="mt-2.5 px-1 text-[11px] leading-relaxed text-[#5a5a64]">
           Податоците никогаш не се кешираат локално — апликацијата секогаш прикажува точна состојба од серверот.
         </p>
+        <div className="mt-3 rounded-2xl border border-[#1f1f26] bg-[#0c0c0f] p-3.5">
+          <p className="text-[11.5px] font-semibold text-[#7c7c88]">Ажурирање на апликацијата</p>
+          <p className="mt-1.5 text-[11px] leading-relaxed text-[#5a5a64]">
+            Ако промените не се појавуваат, целосно затвори ја апликацијата (избриши ја од отворените)
+            и отвори ја одново. Ако „Изградба" погоре се разликува од последната промена, апликацијата
+            сè уште работи од стара верзија.
+          </p>
+          <button
+            onClick={async () => {
+              try {
+                const keys = await caches.keys();
+                await Promise.all(keys.map((k) => caches.delete(k)));
+                const reg = await navigator.serviceWorker?.getRegistration();
+                await reg?.update();
+              } catch {}
+              location.reload();
+            }}
+            className="mt-2.5 w-full rounded-xl border border-[#25252d] py-2.5 text-[12px] font-semibold text-[#9a9aa5] transition active:scale-[.98]">
+            Исчисти кеш и вчитај одново
+          </button>
+        </div>
       </section>
 
       {/* session */}
