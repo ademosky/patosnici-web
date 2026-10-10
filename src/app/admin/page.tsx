@@ -29,6 +29,8 @@ type Product = {
   images?: string[];
   in_stock?: boolean;
   category?: string;
+  /** Slug of the subcategory (only meaningful for auto_accessories). */
+  subcategory?: string | null;
   /** Optional EUR override, used by the /ks and /al markets. */
   price_eur?: string;
   /** Albanian description, shown on the Albanian markets. */
@@ -998,6 +1000,76 @@ export default function AdminPage() {
     }
   };
 
+  // ── Поткатегории ──
+  const loadSubs = async (pw: string) => {
+    if (!pw) return;
+    const res = await fetch(`/api/admin/subcategories?category=auto_accessories&_t=${Date.now()}`, {
+      headers: { "x-admin-password": pw },
+    });
+    if (res.ok) setSubs(await res.json());
+  };
+
+  const handleAddSub = async () => {
+    if (!newSubName.trim()) { showToast("Внеси име на категоријата.", false); return; }
+    setSubBusy(true);
+    const res = await fetch("/api/admin/subcategories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-password": getPw() },
+      body: JSON.stringify({
+        name: newSubName.trim(),
+        name_sq: newSubSq.trim() || undefined,
+        category: "auto_accessories",
+      }),
+    });
+    setSubBusy(false);
+    if (res.ok) {
+      setNewSubName(""); setNewSubSq("");
+      await loadSubs(getPw());
+      showToast("Категоријата е додадена ✓");
+    } else {
+      showToast("Грешка при додавање.", false);
+    }
+  };
+
+  const handleRenameSub = async (id: number, name: string, name_sq: string) => {
+    const res = await fetch(`/api/admin/subcategories/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", "x-admin-password": getPw() },
+      body: JSON.stringify({ name, name_sq: name_sq || null }),
+    });
+    if (res.ok) { setSubs((prev) => prev.map((s) => (s.id === id ? { ...s, name, name_sq: name_sq || null } : s))); showToast("Зачувано ✓"); }
+    else showToast("Грешка при зачувување.", false);
+  };
+
+  const handleDeleteSub = async (id: number, name: string, count: number) => {
+    const msg = count > 0
+      ? `Избриши „${name}“?\n\n${count} ${count === 1 ? "производ" : "производи"} ќе останат, само без категорија.`
+      : `Избриши „${name}“?`;
+    if (!confirm(msg)) return;
+    const res = await fetch(`/api/admin/subcategories/${id}`, {
+      method: "DELETE", headers: { "x-admin-password": getPw() },
+    });
+    if (res.ok) { await loadSubs(getPw()); await fetchProducts(getPw()); showToast("Избришано."); }
+    else showToast("Грешка при бришење.", false);
+  };
+
+  const handleMoveSub = async (id: number, dir: -1 | 1) => {
+    const list = [...subs].sort((a, b) => a.sort_order - b.sort_order);
+    const i = list.findIndex((s) => s.id === id);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= list.length) return;
+    [list[i], list[j]] = [list[j], list[i]];
+    setSubs(list.map((s, idx) => ({ ...s, sort_order: idx })));
+    await Promise.all([
+      fetch(`/api/admin/subcategories/${list[i].id}`, { method: "PATCH",
+        headers: { "Content-Type": "application/json", "x-admin-password": getPw() },
+        body: JSON.stringify({ sort_order: i }) }),
+      fetch(`/api/admin/subcategories/${list[j].id}`, { method: "PATCH",
+        headers: { "Content-Type": "application/json", "x-admin-password": getPw() },
+        body: JSON.stringify({ sort_order: j }) }),
+    ]);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("adminPw");
     sessionStorage.removeItem("adminPw");
@@ -1120,7 +1192,7 @@ export default function AdminPage() {
                 className={`px-4 py-2 text-xs font-bold uppercase transition ${activeTab === "showcase" ? "bg-red-600 text-white" : "text-zinc-400 hover:text-white"}`}>
                 <ImageIcon size={13} className="mr-1 inline" /> Платнени
               </button>
-              <button onClick={() => setActiveTab("accessories")}
+              <button onClick={() => { setActiveTab("accessories"); loadSubs(getPw()); }}
                 className={`px-4 py-2 text-xs font-bold uppercase transition ${activeTab === "accessories" ? "bg-red-600 text-white" : "text-zinc-400 hover:text-white"}`}>
                 <Package size={13} className="mr-1 inline" /> Додатоци
               </button>
@@ -1172,7 +1244,7 @@ export default function AdminPage() {
           </button>
           <div className="w-px bg-zinc-800" />
           <button
-            onClick={() => setActiveTab("accessories")}
+            onClick={() => { setActiveTab("accessories"); loadSubs(getPw()); }}
             className={`flex flex-1 items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 text-[10px] sm:text-xs font-bold uppercase transition ${activeTab === "accessories" ? "bg-red-600 text-white" : "text-zinc-400"}`}
           >
             <Package size={14} /> Додатоци
