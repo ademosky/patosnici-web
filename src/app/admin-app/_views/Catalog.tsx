@@ -26,13 +26,14 @@ type Form = {
   price: string; price_eur: string; sku: string; category: Category;
   description: string; description_sq: string; image: string; images: string[]; in_stock: boolean;
   subcategory: string;
+  related_product_id: number | null;
 };
 
 const EMPTY: Form = {
   title: "", brand: "", model: "", car_model: "", year: "",
   price: "", price_eur: "", sku: "", category: "rubber_mats",
   description: "", description_sq: "", image: "", images: [], in_stock: true,
-  subcategory: "",
+  subcategory: "", related_product_id: null,
 };
 
 export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
@@ -150,6 +151,7 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
       images: p.images?.length ? p.images : (p.image ? [p.image] : []),
       in_stock: p.in_stock !== false,
       subcategory: p.subcategory ?? "",
+      related_product_id: p.related_product_id ?? null,
     });
     setOpen(true);
   };
@@ -166,6 +168,7 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
       in_stock: form.in_stock,
       price_eur: form.price_eur || null,
       subcategory: form.category === "auto_accessories" ? (form.subcategory || null) : null,
+      related_product_id: form.category === "auto_accessories" ? form.related_product_id : null,
     }, editId);
     setSaving(false);
     if (ok) setOpen(false);
@@ -410,29 +413,20 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
             </Field>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
-            <Field
-              label={form.category === "auto_accessories" ? "Модел на возило" : "Модел возило"}
-              hint={
-                form.category === "auto_accessories"
-                  ? (form.car_model.trim()
-                      ? `Ќе се препорачува само на патосници за „${form.car_model.trim()}“.`
-                      : "Празно = на сите патосници од истиот бренд.")
-                  : undefined
-              }
-            >
-              <Input
-                value={form.car_model}
-                onChange={(e) => setForm({ ...form, car_model: e.target.value })}
-                placeholder="A3"
-                list={form.category === "auto_accessories" ? "acc-model-suggestions" : undefined}
-              />
-            </Field>
-            <Field label="Варијанта"><Input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} placeholder="A3 8V" /></Field>
-          </div>
-          <datalist id="acc-model-suggestions">
-            {modelSuggestions.map((m) => <option key={m} value={m} />)}
-          </datalist>
+          {form.category === "auto_accessories" ? (
+            <LinkPicker
+              products={products}
+              value={form.related_product_id}
+              onChange={(id) => setForm({ ...form, related_product_id: id })}
+            />
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Модел возило">
+                <Input value={form.car_model} onChange={(e) => setForm({ ...form, car_model: e.target.value })} placeholder="A3" />
+              </Field>
+              <Field label="Варијанта"><Input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} placeholder="A3 8V" /></Field>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Цена (ден) *" hint={form.price ? `Косово ≈ ${suggestedEur} € · Албанија ≈ ${suggestedAll.toLocaleString("mk-MK")} Lekë` : undefined}>
@@ -559,5 +553,65 @@ function CategoryManager({ open, onClose, list, counts, onAdd, onPatch, onRemove
         </p>
       </div>
     </Sheet>
+  );
+}
+
+/* ── link an accessory to one exact product ───────────────────────── */
+
+function LinkPicker({ products, value, onChange }: {
+  products: Array<{ id: number; title: string; sku?: string | null; car_model?: string | null; category?: string | null; brand?: string | null }>;
+  value: number | null;
+  onChange: (id: number | null) => void;
+}) {
+  const [q, setQ] = useState("");
+  const linked = products.find((p) => p.id === value) ?? null;
+
+  // Only mats are linkable targets — an accessory points at a product to sit beside.
+  const candidates = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    if (!needle) return [];
+    const isMat = (p: { category?: string | null }) => p.category !== "auto_accessories";
+    return products
+      .filter((p) => isMat(p) && [p.title, p.sku, p.car_model, p.brand]
+        .filter(Boolean).join(" ").toLowerCase().includes(needle))
+      .slice(0, 12);
+  }, [products, q]);
+
+  if (linked) {
+    return (
+      <Field label="Поврзан производ" hint="Се прикажува како препорачан САМО на оваа страница.">
+        <div className="flex items-center gap-2 rounded-xl border border-[#2c5c43] bg-[#12241a] px-3.5 py-3">
+          <IcCheck size={16} className="shrink-0 text-[#5fc48f]" />
+          <span className="min-w-0 flex-1 truncate text-[12.5px] font-semibold text-[#8fe0b2]">{linked.title}</span>
+          {linked.sku && <span className="shrink-0 font-mono text-[10.5px] text-[#5a5a64]">{linked.sku}</span>}
+          <button type="button" onClick={() => onChange(null)} aria-label="Отстрани врска"
+            className="shrink-0 rounded-lg border border-[#25252d] p-1.5 text-[#8a8a95] active:scale-95">
+            <IcX size={14} />
+          </button>
+        </div>
+      </Field>
+    );
+  }
+
+  return (
+    <Field label="Поврзан производ" hint="Празно = на сите патосници од истиот бренд.">
+      <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Пребарај производ (пр. Fabia)" />
+      {q.trim() && (
+        <div className="mt-2 max-h-[240px] space-y-1.5 overflow-y-auto">
+          {candidates.length === 0 ? (
+            <p className="rounded-xl border border-[#25252d] px-3.5 py-3 text-[12px] text-[#5a5a64]">
+              Ништо не најдено за „{q.trim()}"
+            </p>
+          ) : candidates.map((p) => (
+            <button key={p.id} type="button" onClick={() => { onChange(p.id); setQ(""); }}
+              className="flex w-full items-center gap-2 rounded-xl border border-[#1f1f26] bg-[#0c0c0f] px-3.5 py-2.5 text-left transition active:scale-[.99]">
+              <span className="min-w-0 flex-1 truncate text-[12.5px] text-white">{p.title}</span>
+              {p.sku && <span className="shrink-0 font-mono text-[10.5px] text-[#5a5a64]">{p.sku}</span>}
+              <IcPlus size={13} className="shrink-0 text-[#e5454a]" />
+            </button>
+          ))}
+        </div>
+      )}
+    </Field>
   );
 }
