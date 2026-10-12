@@ -26,14 +26,14 @@ type Form = {
   price: string; price_eur: string; sku: string; category: Category;
   description: string; description_sq: string; image: string; images: string[]; in_stock: boolean;
   subcategory: string;
-  related_product_id: number | null;
+  related_product_ids: number[];
 };
 
 const EMPTY: Form = {
   title: "", brand: "", model: "", car_model: "", year: "",
   price: "", price_eur: "", sku: "", category: "rubber_mats",
   description: "", description_sq: "", image: "", images: [], in_stock: true,
-  subcategory: "", related_product_id: null,
+  subcategory: "", related_product_ids: [],
 };
 
 export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
@@ -151,7 +151,7 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
       images: p.images?.length ? p.images : (p.image ? [p.image] : []),
       in_stock: p.in_stock !== false,
       subcategory: p.subcategory ?? "",
-      related_product_id: p.related_product_id ?? null,
+      related_product_ids: p.related_product_ids ?? (p.related_product_id != null ? [p.related_product_id] : []),
     });
     setOpen(true);
   };
@@ -168,7 +168,7 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
       in_stock: form.in_stock,
       price_eur: form.price_eur || null,
       subcategory: form.category === "auto_accessories" ? (form.subcategory || null) : null,
-      related_product_id: form.category === "auto_accessories" ? form.related_product_id : null,
+      related_product_ids: form.category === "auto_accessories" ? form.related_product_ids : [],
     }, editId);
     setSaving(false);
     if (ok) setOpen(false);
@@ -416,8 +416,8 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
           {form.category === "auto_accessories" ? (
             <LinkPicker
               products={products}
-              value={form.related_product_id}
-              onChange={(id) => setForm({ ...form, related_product_id: id })}
+              value={form.related_product_ids}
+              onChange={(ids) => setForm({ ...form, related_product_ids: ids })}
             />
           ) : (
             <div className="grid grid-cols-2 gap-3">
@@ -556,46 +556,53 @@ function CategoryManager({ open, onClose, list, counts, onAdd, onPatch, onRemove
   );
 }
 
-/* ── link an accessory to one exact product ───────────────────────── */
+/* ── link an accessory to one or more exact products ─────────────── */
 
 function LinkPicker({ products, value, onChange }: {
   products: Array<{ id: number; title: string; sku?: string | null; car_model?: string | null; category?: string | null; brand?: string | null }>;
-  value: number | null;
-  onChange: (id: number | null) => void;
+  value: number[];
+  onChange: (ids: number[]) => void;
 }) {
   const [q, setQ] = useState("");
-  const linked = products.find((p) => p.id === value) ?? null;
+  const chosen = value.map((id) => products.find((p) => p.id === id)).filter(Boolean) as Array<{ id: number; title: string; sku?: string | null }>;
 
-  // Only mats are linkable targets — an accessory points at a product to sit beside.
+  // Only mats are linkable targets — an accessory points at products to sit beside.
   const candidates = useMemo(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return [];
-    const isMat = (p: { category?: string | null }) => p.category !== "auto_accessories";
     return products
-      .filter((p) => isMat(p) && [p.title, p.sku, p.car_model, p.brand]
+      .filter((p) => p.category !== "auto_accessories" && !value.includes(p.id))
+      .filter((p) => [p.title, p.sku, p.car_model, p.brand]
         .filter(Boolean).join(" ").toLowerCase().includes(needle))
       .slice(0, 12);
-  }, [products, q]);
-
-  if (linked) {
-    return (
-      <Field label="Поврзан производ" hint="Се прикажува како препорачан САМО на оваа страница.">
-        <div className="flex items-center gap-2 rounded-xl border border-[#2c5c43] bg-[#12241a] px-3.5 py-3">
-          <IcCheck size={16} className="shrink-0 text-[#5fc48f]" />
-          <span className="min-w-0 flex-1 truncate text-[12.5px] font-semibold text-[#8fe0b2]">{linked.title}</span>
-          {linked.sku && <span className="shrink-0 font-mono text-[10.5px] text-[#5a5a64]">{linked.sku}</span>}
-          <button type="button" onClick={() => onChange(null)} aria-label="Отстрани врска"
-            className="shrink-0 rounded-lg border border-[#25252d] p-1.5 text-[#8a8a95] active:scale-95">
-            <IcX size={14} />
-          </button>
-        </div>
-      </Field>
-    );
-  }
+  }, [products, q, value]);
 
   return (
-    <Field label="Поврзан производ" hint="Празно = на сите патосници од истиот бренд.">
-      <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Пребарај производ (пр. Fabia)" />
+    <Field
+      label="Поврзани производи"
+      hint={chosen.length
+        ? `Се прикажува како препорачан само на ${chosen.length === 1 ? "оваа страница" : "овие страници"}.`
+        : "Празно = на сите патосници од истиот бренд."}
+    >
+      {chosen.length > 0 && (
+        <div className="mb-2.5 space-y-1.5">
+          {chosen.map((p) => (
+            <div key={p.id} className="flex items-center gap-2 rounded-xl border border-[#2c5c43] bg-[#12241a] px-3.5 py-2.5">
+              <IcCheck size={15} className="shrink-0 text-[#5fc48f]" />
+              <span className="min-w-0 flex-1 truncate text-[12.5px] font-semibold text-[#8fe0b2]">{p.title}</span>
+              {p.sku && <span className="shrink-0 font-mono text-[10.5px] text-[#5a5a64]">{p.sku}</span>}
+              <button type="button" onClick={() => onChange(value.filter((x) => x !== p.id))}
+                aria-label="Отстрани" className="shrink-0 rounded-lg border border-[#25252d] p-1.5 text-[#8a8a95] active:scale-95">
+                <IcX size={13} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Input value={q} onChange={(e) => setQ(e.target.value)}
+        placeholder={chosen.length ? "Додај уште (пр. Roomster)" : "Пребарај производ (пр. Fabia)"} />
+
       {q.trim() && (
         <div className="mt-2 max-h-[240px] space-y-1.5 overflow-y-auto">
           {candidates.length === 0 ? (
@@ -603,7 +610,8 @@ function LinkPicker({ products, value, onChange }: {
               Ништо не најдено за „{q.trim()}"
             </p>
           ) : candidates.map((p) => (
-            <button key={p.id} type="button" onClick={() => { onChange(p.id); setQ(""); }}
+            <button key={p.id} type="button"
+              onClick={() => { onChange([...value, p.id]); setQ(""); }}
               className="flex w-full items-center gap-2 rounded-xl border border-[#1f1f26] bg-[#0c0c0f] px-3.5 py-2.5 text-left transition active:scale-[.99]">
               <span className="min-w-0 flex-1 truncate text-[12.5px] text-white">{p.title}</span>
               {p.sku && <span className="shrink-0 font-mono text-[10.5px] text-[#5a5a64]">{p.sku}</span>}
