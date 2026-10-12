@@ -53,18 +53,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  // ── Title: product | brand line | OriginalPatosnici.com
-  const brandLine = isAlbanianMarket
-    ? "Tapete origjinale gome"
-    : "Оригинални гумени патосници";
-  const title = `${product.title} | ${brandLine} | OriginalPatosnici.com`;
+  // ── Title: product | the right category line
+  // An accessory is not a mat, so it must never claim to be one — in the tab
+  // title, the share preview or the structured data.
+  const isAccessory = product.category === "auto_accessories";
+  const brandLine = isAccessory
+    ? (isAlbanianMarket ? "Aksesorë për auto" : "Авто додатоци")
+    : (isAlbanianMarket ? "Tapete origjinale gome" : "Оригинални гумени патосници");
+  const title = `${product.title} | ${brandLine}`;
 
   // ── Description: unique per product, market-localised, max 160 chars
-  const descriptions: Record<Market, string> = {
-    mk: `Купете оригинални гумени патосници за ${product.title}. 100% еко гума без мирис, совршено вклопување, брза достава низ Македонија. Нарачајте онлајн.`,
-    ks: `Bleni tapete origjinale gome për ${product.title}. Gome ekologjike pa erë, përshtatje perfekte, dërgesë e shpejtë në Kosovë. Porositni online.`,
-    al: `Bleni tapete origjinale gome për ${product.title}. Gome ekologjike pa erë, përshtatje perfekte, dërgesë e shpejtë në Shqipëri. Porositni online.`,
-  };
+  const descriptions: Record<Market, string> = isAccessory
+    ? {
+        mk: `Купете ${product.title} — авто додаток за вашето возило. Брза достава низ Македонија. Нарачајте онлајн.`,
+        ks: `Blini ${product.title} — aksesor auto për automjetin tuaj. Dërgesë e shpejtë në Kosovë. Porositni online.`,
+        al: `Blini ${product.title} — aksesor auto për automjetin tuaj. Dërgesë e shpejtë në Shqipëri. Porositni online.`,
+      }
+    : {
+        mk: `Купете оригинални гумени патосници за ${product.title}. 100% еко гума без мирис, совршено вклопување, брза достава низ Македонија. Нарачајте онлајн.`,
+        ks: `Bleni tapete origjinale gome për ${product.title}. Gome ekologjike pa erë, përshtatje perfekte, dërgesë e shpejtë në Kosovë. Porositni online.`,
+        al: `Bleni tapete origjinale gome për ${product.title}. Gome ekologjike pa erë, përshtatje perfekte, dërgesë e shpejtë në Shqipëri. Porositni online.`,
+      };
   const descRaw = descriptions[market];
   const description =
     descRaw.length > 160 ? descRaw.slice(0, 157) + "..." : descRaw;
@@ -92,7 +101,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : `${SITE_URL}/images/logo.webp`;
 
   return {
-    title,
+    // absolute — otherwise the root "%s | Original Patosnici" template appends
+    // a second suffix to a title that already carries one.
+    title: { absolute: title },
     description,
 
     // Canonical URL tells Google the definitive URL for this page
@@ -169,9 +180,13 @@ export default async function ProductPage({ params }: Props) {
               : [],
             description:
               product.description ||
-              (isAlbanianMarket
-                ? `${product.brand} ${product.model} ${product.year} — Tapete origjinale gome për automjet. Përshtatje perfekte, gome ekologjike pa erë.`
-                : `${product.brand} ${product.model} ${product.year} — Оригинален гумен патосник за автомобил. Достава низ цела Македонија.`),
+              (isAccessory
+                ? (isAlbanianMarket
+                    ? `${product.title} — aksesor auto për automjetin tuaj. Dërgesë në të gjithë vendin.`
+                    : `${product.title} — авто додаток за вашето возило. Достава низ цела Македонија.`)
+                : (isAlbanianMarket
+                    ? `${product.brand} ${product.model} ${product.year} — Tapete origjinale gome për automjet. Përshtatje perfekte, gome ekologjike pa erë.`
+                    : `${product.brand} ${product.model} ${product.year} — Оригинален гумен патосник за автомобил. Достава низ цела Македонија.`)),
             sku: product.sku || undefined,
             brand: {
               "@type": "Brand",
