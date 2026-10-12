@@ -31,7 +31,9 @@ type Product = {
   category?: string;
   /** Slug of the subcategory (only meaningful for auto_accessories). */
   subcategory?: string | null;
-  /** Accessory linked to one exact product — recommended only there. */
+  /** Accessories linked to these exact products — recommended only there. */
+  related_product_ids?: number[] | null;
+  /** Legacy single link. */
   related_product_id?: number | null;
   /** Optional EUR override, used by the /ks and /al markets. */
   price_eur?: string;
@@ -225,7 +227,7 @@ export default function AdminPage() {
   const [showcaseEditId, setShowcaseEditId] = useState<number | null>(null);
   const [showcaseLoading, setShowcaseLoading] = useState(false);
 
-  const [accForm, setAccForm] = useState({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [] as string[], image: "", subcategory: "", car_model: "", related_product_id: null as number | null });
+  const [accForm, setAccForm] = useState({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [] as string[], image: "", subcategory: "", car_model: "", related_product_ids: [] as number[] });
   const [accEditId, setAccEditId] = useState<number | null>(null);
   const [accLoading, setAccLoading] = useState(false);
 
@@ -966,12 +968,12 @@ export default function AdminPage() {
           description_sq: accForm.description_sq || "",
           category: "auto_accessories",
           subcategory: accForm.subcategory || null,
-          related_product_id: accForm.related_product_id || null,
+          related_product_ids: accForm.related_product_ids?.length ? accForm.related_product_ids : null,
         }),
       }
     );
     if (res.ok) {
-      setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "", car_model: "", related_product_id: null as number | null });
+      setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "", car_model: "", related_product_ids: [] as number[] });
       setAccEditId(null);
       await fetchProducts(pw);
       showToast(isEdit ? "Ажурирано! ✓" : "Додатокот е додаден! ✓");
@@ -995,7 +997,7 @@ export default function AdminPage() {
       image: p.image,
       subcategory: p.subcategory ?? "",
       car_model: p.car_model ?? "",
-      related_product_id: p.related_product_id ?? null,
+      related_product_ids: p.related_product_ids ?? (p.related_product_id != null ? [p.related_product_id] : []),
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -1008,7 +1010,7 @@ export default function AdminPage() {
     });
     if (res.ok) {
       showToast("Избришано.");
-      if (accEditId === id) { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "", car_model: "", related_product_id: null as number | null }); }
+      if (accEditId === id) { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "", car_model: "", related_product_ids: [] as number[] }); }
       fetchProducts(getPw());
     }
   };
@@ -2363,55 +2365,61 @@ export default function AdminPage() {
                   <p className="text-xs text-zinc-600">Нема поткатегории — отвори „Категории“ подолу за да креираш.</p>
                 )}
 
-                {/* Link this accessory to one exact product */}
-                {accForm.related_product_id ? (
-                  <div className="flex items-center gap-2 rounded-xl border border-green-800 bg-green-950/20 px-4 py-3">
-                    <CheckCircle size={16} className="shrink-0 text-green-500" />
-                    <span className="min-w-0 flex-1 truncate text-sm font-semibold text-green-400">
-                      {products.find((p) => p.id === accForm.related_product_id)?.title ?? "—"}
-                    </span>
-                    <span className="shrink-0 font-mono text-xs text-zinc-500">
-                      {products.find((p) => p.id === accForm.related_product_id)?.sku ?? ""}
-                    </span>
-                    <button type="button" onClick={() => accUpdate("related_product_id", null)}
-                      className="shrink-0 rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-400 transition hover:border-red-600 hover:text-red-500">
-                      Отстрани
-                    </button>
+                {/* Link this accessory to one or more exact products */}
+                {accForm.related_product_ids?.length > 0 && (
+                  <div className="space-y-1">
+                    {accForm.related_product_ids.map((rid) => {
+                      const p = products.find((x) => x.id === rid);
+                      if (!p) return null;
+                      return (
+                        <div key={rid} className="flex items-center gap-2 rounded-xl border border-green-800 bg-green-950/20 px-4 py-3">
+                          <CheckCircle size={16} className="shrink-0 text-green-500" />
+                          <span className="min-w-0 flex-1 truncate text-sm font-semibold text-green-400">{p.title}</span>
+                          <span className="shrink-0 font-mono text-xs text-zinc-500">{p.sku ?? ""}</span>
+                          <button type="button"
+                            onClick={() => accUpdate("related_product_ids", (accForm.related_product_ids || []).filter((x: number) => x !== rid))}
+                            className="shrink-0 rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-400 transition hover:border-red-600 hover:text-red-500">
+                            Отстрани
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
-                ) : (
-                  <>
-                    <input
-                      placeholder="Поврзан производ — пребарај (пр. Fabia)"
-                      value={accLinkQuery}
-                      onChange={(e) => setAccLinkQuery(e.target.value)}
-                      className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600"
-                    />
-                    {accLinkQuery.trim() && (
-                      <div className="max-h-60 space-y-1 overflow-y-auto">
-                        {products
-                          .filter((p) => p.category !== "auto_accessories")
-                          .filter((p) => [p.title, p.sku, p.car_model, p.brand].filter(Boolean).join(" ").toLowerCase().includes(accLinkQuery.trim().toLowerCase()))
-                          .slice(0, 12)
-                          .map((p) => (
-                            <button key={p.id} type="button"
-                              onClick={() => { accUpdate("related_product_id", p.id); setAccLinkQuery(""); }}
-                              className="flex w-full items-center gap-2 rounded-xl border border-zinc-800 bg-[#0d0d0d] px-4 py-2.5 text-left transition hover:border-red-600">
-                              <span className="min-w-0 flex-1 truncate text-sm text-white">{p.title}</span>
-                              {p.sku && <span className="shrink-0 font-mono text-xs text-zinc-500">{p.sku}</span>}
-                              <Plus size={14} className="shrink-0 text-red-500" />
-                            </button>
-                          ))}
-                        {products.filter((p) => p.category !== "auto_accessories")
-                          .filter((p) => [p.title, p.sku, p.car_model, p.brand].filter(Boolean).join(" ").toLowerCase().includes(accLinkQuery.trim().toLowerCase())).length === 0 && (
-                          <p className="rounded-xl border border-zinc-800 px-4 py-3 text-sm text-zinc-500">Ништо не најдено.</p>
-                        )}
-                      </div>
-                    )}
-                  </>
                 )}
+                <input
+                  placeholder={accForm.related_product_ids?.length ? "Додај уште (пр. Roomster)" : "Поврзан производ — пребарај (пр. Fabia)"}
+                  value={accLinkQuery}
+                  onChange={(e) => setAccLinkQuery(e.target.value)}
+                  className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600"
+                />
+                {accLinkQuery.trim() && (() => {
+                  const hits = products
+                    .filter((p) => p.category !== "auto_accessories")
+                    .filter((p) => !(accForm.related_product_ids || []).includes(p.id))
+                    .filter((p) => [p.title, p.sku, p.car_model, p.brand].filter(Boolean).join(" ").toLowerCase().includes(accLinkQuery.trim().toLowerCase()))
+                    .slice(0, 12);
+                  return (
+                    <div className="max-h-60 space-y-1 overflow-y-auto">
+                      {hits.length === 0 ? (
+                        <p className="rounded-xl border border-zinc-800 px-4 py-3 text-sm text-zinc-500">Ништо не најдено.</p>
+                      ) : hits.map((p) => (
+                        <button key={p.id} type="button"
+                          onClick={() => {
+                            accUpdate("related_product_ids", [...(accForm.related_product_ids || []), p.id]);
+                            setAccLinkQuery("");
+                          }}
+                          className="flex w-full items-center gap-2 rounded-xl border border-zinc-800 bg-[#0d0d0d] px-4 py-2.5 text-left transition hover:border-red-600">
+                          <span className="min-w-0 flex-1 truncate text-sm text-white">{p.title}</span>
+                          {p.sku && <span className="shrink-0 font-mono text-xs text-zinc-500">{p.sku}</span>}
+                          <Plus size={14} className="shrink-0 text-red-500" />
+                        </button>
+                      ))}
+                    </div>
+                  );
+                })()}
                 <p className="text-xs text-zinc-600">
-                  {accForm.related_product_id
-                    ? "Ќе се прикажува како препорачан САМО на таа страница."
+                  {accForm.related_product_ids?.length
+                    ? "Ќе се прикажува како препорачан само на тие страници."
                     : "Празно = се прикажува на сите патосници од истиот бренд."}
                 </p>
                 <textarea placeholder="Опис" rows={2} value={accForm.description} onChange={(e) => accUpdate("description", e.target.value)} className="w-full resize-none rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
@@ -2445,7 +2453,7 @@ export default function AdminPage() {
                     {accEditId ? "Зачувај" : "Додај"}
                   </button>
                   {accEditId && (
-                    <button type="button" onClick={() => { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "", car_model: "", related_product_id: null as number | null }); }}
+                    <button type="button" onClick={() => { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "", car_model: "", related_product_ids: [] as number[] }); }}
                       className="rounded-xl border border-zinc-700 px-5 py-3 text-sm text-zinc-400 transition hover:border-red-600 hover:text-white">
                       Откажи
                     </button>
