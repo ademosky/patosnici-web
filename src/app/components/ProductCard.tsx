@@ -58,7 +58,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         <Link href={localizedPath(`/products/${product.slug}`)}>
           <h3 className="mt-1.5 sm:mt-2 text-base sm:text-xl font-bold text-white hover:text-red-500 transition">{product.title}</h3>
         </Link>
-        <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-zinc-400">{t("prod_original")}</p>
+        <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-zinc-400">
+          {product.category === "auto_accessories" ? t("prod_accessory") : t("prod_original")}
+        </p>
         <div className="mt-3 sm:mt-4"><span className="text-2xl sm:text-3xl font-extrabold text-red-600">{formatPrice(product.price, product.price_eur)}</span></div>
         <div className="mt-4 sm:mt-5 flex gap-2">
           <Link href={localizedPath(`/products/${product.slug}`)}
