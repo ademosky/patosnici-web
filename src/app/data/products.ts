@@ -71,25 +71,27 @@ function norm(str: string): string {
  *
  * Rules, in priority order:
  *
- *  1. The accessory names a vehicle model ("Golf 5") → it appears ONLY on
- *     products of that model. This is the precise control: an organiser made
- *     for one car is not advertised on every car of the same brand.
- *  2. No model, but a matching brand → appears on that brand's products.
- *  3. Brand "all" (universal) → appears everywhere.
+ *  1. The accessory is linked to this EXACT product → pinned to it alone.
+ *     This is the precise control: the Fabia II wiper shows on the Fabia II
+ *     mats, not on all four Fabia generations.
+ *  2. Otherwise, if the accessory names a vehicle model → that model only.
+ *  3. Otherwise, a matching brand → that brand's products.
+ *  4. Brand "all" (universal) → appears everywhere.
  *
  * Model names are compared loosely (case, spacing) so "Golf 5" and "golf  5"
  * are the same target.
  */
 export async function getRecommendedAccessories(
-  product: { brand: string; car_model?: string | null },
+  product: { id?: number; brand: string; car_model?: string | null },
   limit = 4,
 ): Promise<Product[]> {
   const brandId = product.brand;
   const productModel = norm(product.car_model ?? "");
+  const productId = product.id ?? null;
 
   const { data, error } = await supabase
     .from("products")
-    .select("id, slug, title, brand, car_model, year, price, image, sku, price_eur, in_stock")
+    .select("id, slug, title, brand, car_model, related_product_id, year, price, image, sku, price_eur, in_stock")
     .eq("category", "auto_accessories")
     .order("sort_order", { ascending: true }).order("created_at", { ascending: true });
 
@@ -103,15 +105,21 @@ export async function getRecommendedAccessories(
   const brandTargets = [norm(brandName), norm(brandId)];
   const sameBrand = (p: Product) => brandTargets.includes(norm(p.brand));
 
+  const linked: Product[] = [];
   const modelMatches: Product[] = [];
   const brandMatches: Product[] = [];
   const universal: Product[] = [];
 
   for (const p of items) {
-    const accModel = norm(p.car_model ?? "");
+    // Rule 1 — explicitly linked to one product. It belongs to that page only.
+    if (p.related_product_id != null) {
+      if (productId != null && p.related_product_id === productId) linked.push(p);
+      continue;
+    }
 
+    const accModel = norm(p.car_model ?? "");
     if (accModel) {
-      // Rule 1 — bound to a specific model.
+      // Rule 2 — bound to a whole model.
       if (productModel && accModel === productModel) modelMatches.push(p);
       continue;
     }
@@ -120,8 +128,8 @@ export async function getRecommendedAccessories(
     else if (sameBrand(p)) brandMatches.push(p);
   }
 
-  // An accessory pinned to a model always wins over brand-wide ones.
-  return [...modelMatches, ...brandMatches, ...universal].slice(0, limit);
+  // An exact link outranks anything broader.
+  return [...linked, ...modelMatches, ...brandMatches, ...universal].slice(0, limit);
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
