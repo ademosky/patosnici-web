@@ -894,7 +894,7 @@ export default function AdminPage() {
       ? accessories.filter((p) => !p.subcategory)
       : accessories.filter((p) => p.subcategory === subFilter);
 
-  const accUpdate = (k: string, v: string | number | null) => setAccForm((prev) => ({ ...prev, [k]: v }));
+  const accUpdate = (k: string, v: string | number | number[] | null) => setAccForm((prev) => ({ ...prev, [k]: v }));
 
   const accAddImage = (url: string) =>
     setAccForm((prev) => ({
