@@ -149,6 +149,9 @@ export default async function ProductPage({ params }: Props) {
   const isAlbanianMarket = market !== "mk";
   const productUrl = `${SITE_URL}${MARKET_PREFIX[market]}/products/${product.slug}`;
 
+  // Accessories carry their own wording — never the mat copy.
+  const isAccessory = product.category === "auto_accessories";
+
   // Structured-data price must match the currency the visitor actually sees
   const marketCurrency = MARKET_CURRENCY[market];
   const ldPrice =
