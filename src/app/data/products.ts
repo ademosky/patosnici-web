@@ -65,36 +65,61 @@ function norm(str: string): string {
 }
 
 /**
- * Recommend auto-accessories for a given product's brand (brand id slug).
- * - Exact brand match first (e.g. rubber "audi" → accessory brand "Audi"/"audi").
- * - Fallback to any other accessories if no same-brand accessory exists.
+ * Recommend auto-accessories for a product page.
+ *
+ * Rules, in priority order:
+ *
+ *  1. The accessory names a vehicle model ("Golf 5") → it appears ONLY on
+ *     products of that model. This is the precise control: an organiser made
+ *     for one car is not advertised on every car of the same brand.
+ *  2. No model, but a matching brand → appears on that brand's products.
+ *  3. Brand "all" (universal) → appears everywhere.
+ *
+ * Model names are compared loosely (case, spacing) so "Golf 5" and "golf  5"
+ * are the same target.
  */
-export async function getRecommendedAccessories(brandId: string, limit = 4): Promise<Product[]> {
+export async function getRecommendedAccessories(
+  product: { brand: string; car_model?: string | null },
+  limit = 4,
+): Promise<Product[]> {
+  const brandId = product.brand;
+  const productModel = norm(product.car_model ?? "");
+
   const { data, error } = await supabase
     .from("products")
-    .select("id, slug, title, brand, year, price, image, sku, price_eur, in_stock")
+    .select("id, slug, title, brand, car_model, year, price, image, sku, price_eur, in_stock")
     .eq("category", "auto_accessories")
     .order("sort_order", { ascending: true }).order("created_at", { ascending: true });
 
   if (error) { console.error("getRecommendedAccessories error:", error); return []; }
-  const items = (data || []) as Product[];
+
+  // Never recommend something that is not available.
+  const items = ((data || []) as Product[]).filter((p) => p.in_stock !== false);
 
   // Resolve brand id (slug like "volkswagen") to display name ("Volkswagen").
   const brandName = brands.find((b) => b.id === brandId)?.name ?? brandId;
-  const target = norm(brandName);
-  // Also compare against the raw id (e.g. accessory stored as "volkswagen" directly).
-  const targetAlt = norm(brandId);
+  const brandTargets = [norm(brandName), norm(brandId)];
+  const sameBrand = (p: Product) => brandTargets.includes(norm(p.brand));
 
-  // Universal accessories (brand "all") show everywhere.
-  const universal = items.filter((p) => norm(p.brand) === "all");
+  const modelMatches: Product[] = [];
+  const brandMatches: Product[] = [];
+  const universal: Product[] = [];
 
-  // Same-brand accessories only (no arbitrary fallback).
-  const sameBrand = items.filter((p) => {
-    const n = norm(p.brand);
-    return n === target || n === targetAlt;
-  });
+  for (const p of items) {
+    const accModel = norm(p.car_model ?? "");
 
-  return [...sameBrand, ...universal].slice(0, limit);
+    if (accModel) {
+      // Rule 1 — bound to a specific model.
+      if (productModel && accModel === productModel) modelMatches.push(p);
+      continue;
+    }
+
+    if (norm(p.brand) === "all") universal.push(p);
+    else if (sameBrand(p)) brandMatches.push(p);
+  }
+
+  // An accessory pinned to a model always wins over brand-wide ones.
+  return [...modelMatches, ...brandMatches, ...universal].slice(0, limit);
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
