@@ -70,6 +70,17 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
     [subcategories],
   );
 
+  // Every vehicle model already used by a mat — offered as suggestions when
+  // pinning an accessory to one model.
+  const modelSuggestions = useMemo(
+    () => [...new Set(
+      products
+        .filter((p) => categoryOf(p) === "rubber_mats" && p.car_model)
+        .map((p) => String(p.car_model).trim()),
+    )].sort((a, b) => a.localeCompare(b)),
+    [products],
+  );
+
   const counts = useMemo(() => ({
     rubber: base.filter((p) => categoryOf(p) === "rubber_mats").length,
     fabric: base.filter((p) => categoryOf(p) === "fabric_mats").length,
@@ -400,9 +411,28 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
           )}
 
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Модел возило"><Input value={form.car_model} onChange={(e) => setForm({ ...form, car_model: e.target.value })} placeholder="A3" /></Field>
+            <Field
+              label={form.category === "auto_accessories" ? "Модел на возило" : "Модел возило"}
+              hint={
+                form.category === "auto_accessories"
+                  ? (form.car_model.trim()
+                      ? `Ќе се препорачува само на патосници за „${form.car_model.trim()}“.`
+                      : "Празно = на сите патосници од истиот бренд.")
+                  : undefined
+              }
+            >
+              <Input
+                value={form.car_model}
+                onChange={(e) => setForm({ ...form, car_model: e.target.value })}
+                placeholder="A3"
+                list={form.category === "auto_accessories" ? "acc-model-suggestions" : undefined}
+              />
+            </Field>
             <Field label="Варијанта"><Input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} placeholder="A3 8V" /></Field>
           </div>
+          <datalist id="acc-model-suggestions">
+            {modelSuggestions.map((m) => <option key={m} value={m} />)}
+          </datalist>
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Цена (ден) *" hint={form.price ? `Косово ≈ ${suggestedEur} € · Албанија ≈ ${suggestedAll.toLocaleString("mk-MK")} Lekë` : undefined}>
