@@ -225,7 +225,7 @@ export default function AdminPage() {
   const [showcaseEditId, setShowcaseEditId] = useState<number | null>(null);
   const [showcaseLoading, setShowcaseLoading] = useState(false);
 
-  const [accForm, setAccForm] = useState({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [] as string[], image: "", subcategory: "", car_model: "", related_product_id: null });
+  const [accForm, setAccForm] = useState({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [] as string[], image: "", subcategory: "", car_model: "", related_product_id: null as number | null });
   const [accEditId, setAccEditId] = useState<number | null>(null);
   const [accLoading, setAccLoading] = useState(false);
 
@@ -971,7 +971,7 @@ export default function AdminPage() {
       }
     );
     if (res.ok) {
-      setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "", car_model: "", related_product_id: null });
+      setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "", car_model: "", related_product_id: null as number | null });
       setAccEditId(null);
       await fetchProducts(pw);
       showToast(isEdit ? "Ажурирано! ✓" : "Додатокот е додаден! ✓");
@@ -1008,7 +1008,7 @@ export default function AdminPage() {
     });
     if (res.ok) {
       showToast("Избришано.");
-      if (accEditId === id) { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "", car_model: "", related_product_id: null }); }
+      if (accEditId === id) { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "", car_model: "", related_product_id: null as number | null }); }
       fetchProducts(getPw());
     }
   };
@@ -2445,7 +2445,7 @@ export default function AdminPage() {
                     {accEditId ? "Зачувај" : "Додај"}
                   </button>
                   {accEditId && (
-                    <button type="button" onClick={() => { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "", car_model: "", related_product_id: null }); }}
+                    <button type="button" onClick={() => { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "", car_model: "", related_product_id: null as number | null }); }}
                       className="rounded-xl border border-zinc-700 px-5 py-3 text-sm text-zinc-400 transition hover:border-red-600 hover:text-white">
                       Откажи
                     </button>
