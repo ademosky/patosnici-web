@@ -148,7 +148,7 @@ export default async function ProductPage({ params }: Props) {
         : parseFloat(product.price.replace(/\./g, "").replace(/[^\d]/g, "")) || 0;
 
   // Recommended auto-accessories for this product's brand (dynamic).
-  const recommended = await getRecommendedAccessories(product.brand);
+  const recommended = await getRecommendedAccessories(product);
 
   return (
     <>
