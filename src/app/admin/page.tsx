@@ -223,7 +223,7 @@ export default function AdminPage() {
   const [showcaseEditId, setShowcaseEditId] = useState<number | null>(null);
   const [showcaseLoading, setShowcaseLoading] = useState(false);
 
-  const [accForm, setAccForm] = useState({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [] as string[], image: "", subcategory: "" });
+  const [accForm, setAccForm] = useState({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [] as string[], image: "", subcategory: "", car_model: "" });
   const [accEditId, setAccEditId] = useState<number | null>(null);
   const [accLoading, setAccLoading] = useState(false);
 
@@ -952,7 +952,7 @@ export default function AdminPage() {
           title: accForm.title,
           brand: accForm.brand,
           model: accForm.brand,
-          car_model: "",
+          car_model: accForm.car_model || "",
           year: "",
           price: accForm.price,
           price_eur: accForm.price_eur || null,
@@ -967,7 +967,7 @@ export default function AdminPage() {
       }
     );
     if (res.ok) {
-      setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "" });
+      setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "", car_model: "" });
       setAccEditId(null);
       await fetchProducts(pw);
       showToast(isEdit ? "Ажурирано! ✓" : "Додатокот е додаден! ✓");
@@ -990,6 +990,7 @@ export default function AdminPage() {
       images: p.images || (p.image ? [p.image] : []),
       image: p.image,
       subcategory: p.subcategory ?? "",
+      car_model: p.car_model ?? "",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -1002,7 +1003,7 @@ export default function AdminPage() {
     });
     if (res.ok) {
       showToast("Избришано.");
-      if (accEditId === id) { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "" }); }
+      if (accEditId === id) { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "", car_model: "" }); }
       fetchProducts(getPw());
     }
   };
@@ -2356,6 +2357,25 @@ export default function AdminPage() {
                 {subs.length === 0 && (
                   <p className="text-xs text-zinc-600">Нема поткатегории — отвори „Категории“ подолу за да креираш.</p>
                 )}
+
+                {/* Which vehicle model this accessory belongs to */}
+                <input
+                  list="acc-model-list"
+                  placeholder="Модел на возило (опционално — пр. Golf 5)"
+                  value={accForm.car_model}
+                  onChange={(e) => accUpdate("car_model", e.target.value)}
+                  className="rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600"
+                />
+                <datalist id="acc-model-list">
+                  {[...new Set(products.filter((p) => p.category === "rubber_mats" && p.car_model).map((p) => p.car_model as string))]
+                    .sort()
+                    .map((m) => <option key={m} value={m} />)}
+                </datalist>
+                <p className="text-xs text-zinc-600">
+                  {accForm.car_model.trim()
+                    ? `Ќе се прикажува само на патосници за „${accForm.car_model.trim()}“.`
+                    : "Празно = се прикажува на сите патосници од истиот бренд."}
+                </p>
                 <textarea placeholder="Опис" rows={2} value={accForm.description} onChange={(e) => accUpdate("description", e.target.value)} className="w-full resize-none rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
                 <textarea placeholder="Опис на албански" rows={2} value={accForm.description_sq} onChange={(e) => accUpdate("description_sq", e.target.value)} className="w-full resize-none rounded-xl border border-zinc-700 bg-[#1a1a1a] px-4 py-3 text-sm text-white outline-none transition focus:border-red-600" />
 
@@ -2387,7 +2407,7 @@ export default function AdminPage() {
                     {accEditId ? "Зачувај" : "Додај"}
                   </button>
                   {accEditId && (
-                    <button type="button" onClick={() => { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "" }); }}
+                    <button type="button" onClick={() => { setAccEditId(null); setAccForm({ title: "", brand: "", price: "", price_eur: "", sku: "", description: "", description_sq: "", images: [], image: "", subcategory: "", car_model: "" }); }}
                       className="rounded-xl border border-zinc-700 px-5 py-3 text-sm text-zinc-400 transition hover:border-red-600 hover:text-white">
                       Откажи
                     </button>
