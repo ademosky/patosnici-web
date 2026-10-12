@@ -31,6 +31,8 @@ type Product = {
   category?: string;
   /** Slug of the subcategory (only meaningful for auto_accessories). */
   subcategory?: string | null;
+  /** Accessory linked to one exact product — recommended only there. */
+  related_product_id?: number | null;
   /** Optional EUR override, used by the /ks and /al markets. */
   price_eur?: string;
   /** Albanian description, shown on the Albanian markets. */
@@ -890,7 +892,7 @@ export default function AdminPage() {
       ? accessories.filter((p) => !p.subcategory)
       : accessories.filter((p) => p.subcategory === subFilter);
 
-  const accUpdate = (k: string, v: string) => setAccForm((prev) => ({ ...prev, [k]: v }));
+  const accUpdate = (k: string, v: string | number | null) => setAccForm((prev) => ({ ...prev, [k]: v }));
 
   const accAddImage = (url: string) =>
     setAccForm((prev) => ({
@@ -2371,7 +2373,7 @@ export default function AdminPage() {
                     <span className="shrink-0 font-mono text-xs text-zinc-500">
                       {products.find((p) => p.id === accForm.related_product_id)?.sku ?? ""}
                     </span>
-                    <button type="button" onClick={() => accUpdate("related_product_id", null as any)}
+                    <button type="button" onClick={() => accUpdate("related_product_id", null)}
                       className="shrink-0 rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-400 transition hover:border-red-600 hover:text-red-500">
                       Отстрани
                     </button>
@@ -2392,7 +2394,7 @@ export default function AdminPage() {
                           .slice(0, 12)
                           .map((p) => (
                             <button key={p.id} type="button"
-                              onClick={() => { accUpdate("related_product_id", p.id as any); setAccLinkQuery(""); }}
+                              onClick={() => { accUpdate("related_product_id", p.id); setAccLinkQuery(""); }}
                               className="flex w-full items-center gap-2 rounded-xl border border-zinc-800 bg-[#0d0d0d] px-4 py-2.5 text-left transition hover:border-red-600">
                               <span className="min-w-0 flex-1 truncate text-sm text-white">{p.title}</span>
                               {p.sku && <span className="shrink-0 font-mono text-xs text-zinc-500">{p.sku}</span>}
