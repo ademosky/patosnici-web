@@ -56,7 +56,7 @@ export async function getProductsBySkus(skus: string[]): Promise<Product[]> {
   // Lightweight: only the fields ProductCard needs (no images/description blobs).
   const { data, error } = await supabase
     .from("products")
-    .select("id, slug, title, brand, model, car_model, year, price, image, sku, price_eur, in_stock")
+    .select("id, slug, title, brand, model, car_model, category, year, price, image, sku, price_eur, in_stock")
     .in("sku", skus);
 
   if (error) { console.error("getProductsBySkus error:", error); return []; }
@@ -109,7 +109,7 @@ export async function getRecommendedAccessories(
 
   const { data, error } = await supabase
     .from("products")
-    .select("id, slug, title, brand, car_model, related_product_ids, related_product_id, year, price, image, sku, price_eur, in_stock")
+    .select("id, slug, title, brand, car_model, category, related_product_ids, related_product_id, year, price, image, sku, price_eur, in_stock")
     .eq("category", "auto_accessories")
     .order("sort_order", { ascending: true }).order("created_at", { ascending: true });
 
