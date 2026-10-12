@@ -82,6 +82,7 @@ const mk = {
 
   // Product Card
   prod_original: "Оригинални гумени патосници",
+  prod_accessory: "Авто додатоци",
   prod_details: "Детали",
   prod_add_cart: "Додај во корпа",
   prod_added: "Додадено ✓",
@@ -260,6 +261,7 @@ const sq: typeof mk = {
   footer_follow: "Na ndiqni në Facebook",
 
   prod_original: "Tapete origjinale gome",
+  prod_accessory: "Aksesorë për auto",
   prod_details: "Detajet",
   prod_add_cart: "Shto në shportë",
   prod_added: "U shtua ✓",
