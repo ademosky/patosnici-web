@@ -29,6 +29,7 @@ export async function PUT(
       sku: body.sku ?? "",
       category: body.category ?? "rubber_mats",
       subcategory: body.subcategory ?? null,
+      related_product_id: body.related_product_id ? Number(body.related_product_id) : null,
       images: body.images || [],
       description_sq: body.description_sq ?? "",
       price_eur: body.price_eur ?? null,
