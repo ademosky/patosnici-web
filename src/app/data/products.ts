@@ -19,7 +19,13 @@ export type Product = {
   price_eur?: string;
   category?: string;   // rubber_mats | fabric_mats | auto_accessories
   subcategory?: string | null;  // slug from the subcategories table
-  /** When set, this accessory is recommended ONLY on that product's page. */
+  /**
+   * When set, this accessory is recommended ONLY on the listed products' pages.
+   * An array so one accessory can serve several cars (e.g. a wiper that fits
+   * both the Fabia II and the Roomster).
+   */
+  related_product_ids?: number[] | null;
+  /** Legacy single link — still read so nothing breaks before data migration. */
   related_product_id?: number | null;
 };
 
@@ -67,6 +73,18 @@ function norm(str: string): string {
 }
 
 /**
+ * The products an accessory is explicitly linked to.
+ *
+ * Reads the array first and falls back to the legacy single column, so links
+ * keep working whether or not the data has been migrated yet.
+ */
+export function linkedProductIds(p: { related_product_ids?: number[] | null; related_product_id?: number | null }): number[] {
+  const arr = p.related_product_ids;
+  if (Array.isArray(arr) && arr.length > 0) return arr.filter((n) => typeof n === "number");
+  return p.related_product_id != null ? [p.related_product_id] : [];
+}
+
+/**
  * Recommend auto-accessories for a product page.
  *
  * Rules, in priority order:
@@ -91,7 +109,7 @@ export async function getRecommendedAccessories(
 
   const { data, error } = await supabase
     .from("products")
-    .select("id, slug, title, brand, car_model, related_product_id, year, price, image, sku, price_eur, in_stock")
+    .select("id, slug, title, brand, car_model, related_product_ids, related_product_id, year, price, image, sku, price_eur, in_stock")
     .eq("category", "auto_accessories")
     .order("sort_order", { ascending: true }).order("created_at", { ascending: true });
 
@@ -111,9 +129,10 @@ export async function getRecommendedAccessories(
   const universal: Product[] = [];
 
   for (const p of items) {
-    // Rule 1 — explicitly linked to one product. It belongs to that page only.
-    if (p.related_product_id != null) {
-      if (productId != null && p.related_product_id === productId) linked.push(p);
+    // Rule 1 — explicitly linked products. It belongs to those pages only.
+    const linkIds = linkedProductIds(p);
+    if (linkIds.length > 0) {
+      if (productId != null && linkIds.includes(productId)) linked.push(p);
       continue;
     }
 
