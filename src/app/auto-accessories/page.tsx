@@ -53,6 +53,13 @@ export async function generateMetadata(): Promise<Metadata> {
       description: meta.description,
       images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: meta.title }],
     },
+    // Without these the root layout's mat copy leaks into the share preview.
+    twitter: {
+      card: "summary_large_image",
+      title: `${meta.title} | Original Patosnici`,
+      description: meta.description,
+      images: [OG_IMAGE],
+    },
     robots: { index: true, follow: true },
   };
 }
