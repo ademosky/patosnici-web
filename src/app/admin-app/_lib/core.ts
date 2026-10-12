@@ -86,7 +86,9 @@ export type Product = {
   category?: Category | null;
   /** Slug of the subcategory (only used under auto_accessories). */
   subcategory?: string | null;
-  /** Accessory linked to one exact product — recommended only there. */
+  /** Accessories linked to these exact products — recommended only there. */
+  related_product_ids?: number[] | null;
+  /** Legacy single link. */
   related_product_id?: number | null;
   sort_order?: number | null;
   created_at?: string | null;
