@@ -50,7 +50,10 @@ const slug = `${baseSlug}-${Date.now()}`;
       sku: body.sku || "",
       category: body.category || "rubber_mats",
       subcategory: body.subcategory || null,
-      related_product_id: body.related_product_id ? Number(body.related_product_id) : null,
+      related_product_ids: Array.isArray(body.related_product_ids) && body.related_product_ids.length
+        ? body.related_product_ids.map(Number).filter((n: number) => Number.isFinite(n))
+        : null,
+      related_product_id: null,
       in_stock: body.in_stock !== false,
       description_sq: body.description_sq || "",
       price_eur: body.price_eur || null,
