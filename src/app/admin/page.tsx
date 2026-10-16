@@ -1125,6 +1125,29 @@ export default function AdminPage() {
     showToast(ok ? `Копирано: ${phone}` : "Не може да се копира", ok);
   };
 
+  /**
+   * Order status palette — one RGB triple per status, shared by the card wash,
+   * its border and the inset rail, so a row is identifiable at a glance.
+   * Kept identical to the app's palette so both admins read as one product.
+   */
+  const STATUS_TONE: Record<string, { rgb: string; accent: string; border: string; rail: string }> = {
+    new:        { rgb: "224,176,74",  accent: "#e0b04a", border: "rgba(224,176,74,0.34)",  rail: "rgba(224,176,74,0.85)" },
+    in_process: { rgb: "111,163,224", accent: "#6fa3e0", border: "rgba(111,163,224,0.32)", rail: "rgba(111,163,224,0.80)" },
+    sent:       { rgb: "95,196,143",  accent: "#5fc48f", border: "rgba(95,196,143,0.28)",  rail: "rgba(95,196,143,0.75)" },
+  };
+
+  /** Soft wash from the left + a slim inset rail; text side stays untouched. */
+  const statusStyle = (status: string): React.CSSProperties => {
+    const t = STATUS_TONE[status] ?? STATUS_TONE.new;
+    return {
+      backgroundImage:
+        `linear-gradient(97deg, rgba(${t.rgb},0.13) 0%, rgba(${t.rgb},0.055) 38%, ` +
+        `rgba(${t.rgb},0.015) 72%, rgba(${t.rgb},0) 100%)`,
+      borderColor: t.border,
+      boxShadow: `inset 3px 0 0 ${t.rail}`,
+    };
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("adminPw");
     sessionStorage.removeItem("adminPw");
@@ -1996,11 +2019,8 @@ export default function AdminPage() {
                 )
                 .map((order) => (
                 <div key={order.id}
-                  className={`rounded-2xl border bg-[#111] p-3 sm:p-5 transition ${
-                    order.status === "new" ? "border-yellow-700/50" :
-                    order.status === "in_process" ? "border-blue-700/50" :
-                    "border-green-700/50"
-                  }`}
+                  style={statusStyle(order.status)}
+                  className="rounded-2xl border bg-[#111] p-3 sm:p-5 transition"
                 >
                   {/* Order header */}
                   <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-4">
