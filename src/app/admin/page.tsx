@@ -2053,10 +2053,17 @@ export default function AdminPage() {
                       )}
                       <span className="text-xs text-zinc-500">
                         <Clock size={11} className="mr-1 inline" />
-                        {new Date(order.created_at).toLocaleString("mk-MK", {
+                        {new Date(order.created_at).toLocaleDateString("mk-MK", {
                           day: "numeric", month: "long", year: "numeric",
-                          hour: "2-digit", minute: "2-digit", hourCycle: "h23",
                         })}
+                        {", "}
+                        {(() => {
+                          const p = new Intl.DateTimeFormat("en-GB", {
+                            timeZone: "Europe/Skopje", hour: "2-digit", minute: "2-digit", hour12: false,
+                          }).formatToParts(new Date(order.created_at));
+                          const h = p.find((x) => x.type === "hour")?.value ?? "00";
+                          return `${h === "24" ? "00" : h}:${p.find((x) => x.type === "minute")?.value ?? "00"}`;
+                        })()}
                       </span>
                       <span className="text-xs text-zinc-600">#{order.id}</span>
                     </div>
