@@ -2025,15 +2025,20 @@ export default function AdminPage() {
                   {/* Order header */}
                   <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-4">
                     <div className="flex flex-wrap items-center gap-2">
-                      {/* Status badge */}
-                      <span className={`rounded-lg px-2.5 py-1 text-xs font-bold uppercase ${
-                        order.status === "new" ? "bg-yellow-600/20 text-yellow-400" :
-                        order.status === "in_process" ? "bg-blue-600/20 text-blue-400" :
-                        "bg-green-600/20 text-green-400"
-                      }`}>
-                        {order.status === "new" ? "🆕 Нова" :
-                         order.status === "in_process" ? "⚙️ Во процес" :
-                         "✅ Испратена"}
+                      {/* Status badge — same tone as the card wash */}
+                      <span
+                        style={{
+                          background: STATUS_TONE[order.status]?.rgb
+                            ? `rgba(${STATUS_TONE[order.status].rgb},0.16)` : undefined,
+                          color: STATUS_TONE[order.status]?.accent,
+                          border: `1px solid ${STATUS_TONE[order.status]?.border ?? "transparent"}`,
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold uppercase tracking-wide">
+                        <span className="h-[7px] w-[7px] rounded-full"
+                          style={{ background: STATUS_TONE[order.status]?.accent, boxShadow: `0 0 7px ${STATUS_TONE[order.status]?.accent}` }} />
+                        {order.status === "new" ? "Нова" :
+                         order.status === "in_process" ? "Во процес" :
+                         "Испратена"}
                       </span>
                       {/* Source badge — FB/Phone/Manual */}
                       {order.source && order.source !== "web" && (
