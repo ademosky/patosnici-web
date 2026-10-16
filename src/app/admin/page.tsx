@@ -239,6 +239,7 @@ export default function AdminPage() {
   const [newSubName, setNewSubName] = useState("");
   const [newSubSq, setNewSubSq] = useState("");
   const [subBusy, setSubBusy] = useState(false);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
   const [accLinkQuery, setAccLinkQuery] = useState("");
 
   const showToast = (msg: string, ok = true) => {
@@ -1083,6 +1084,45 @@ export default function AdminPage() {
         headers: { "Content-Type": "application/json", "x-admin-password": getPw() },
         body: JSON.stringify({ sort_order: j }) }),
     ]);
+  };
+
+  /**
+   * Copy text to the clipboard.
+   *
+   * navigator.clipboard is unavailable in some in-app / standalone contexts,
+   * so a hidden textarea fallback keeps the button working everywhere.
+   */
+  const copyText = async (value: string): Promise<boolean> => {
+    const text = (value || "").trim();
+    if (!text) return false;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.top = "-1000px";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      ta.remove();
+      return ok;
+    } catch {
+      return false;
+    }
+  };
+
+  const copyPhone = async (phone: string, id: number) => {
+    const ok = await copyText(phone);
+    if (ok) {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId((x) => (x === id ? null : x)), 1600);
+    }
+    showToast(ok ? `Копирано: ${phone}` : "Не може да се копира", ok);
   };
 
   const handleLogout = () => {
@@ -2041,9 +2081,32 @@ export default function AdminPage() {
                       <p className="mb-2 text-xs font-bold uppercase tracking-wider text-zinc-500">Купувач</p>
                       <p className="font-semibold text-white">{order.name} {order.surname}</p>
                       <p className="mt-1 text-sm text-zinc-400">{order.address}, {order.city}</p>
-                      <a href={`tel:${order.phone}`} className="mt-1 flex items-center gap-1.5 text-sm text-red-500 hover:text-red-400">
-                        <Phone size={13} /> {order.phone}
-                      </a>
+                      <div className="mt-1 flex flex-wrap items-center gap-2">
+                        <a href={`tel:${order.phone}`} className="flex items-center gap-1.5 text-sm text-red-500 hover:text-red-400">
+                          <Phone size={13} /> {order.phone}
+                        </a>
+                        <button type="button" onClick={() => copyPhone(order.phone, order.id)}
+                          title="Копирај го телефонот"
+                          className={`flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold transition ${
+                            copiedId === order.id
+                              ? "border-green-700 bg-green-950/30 text-green-400"
+                              : "border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-red-400"
+                          }`}>
+                          {copiedId === order.id ? (
+                            <>
+                              <CheckCircle size={12} /> Копирано
+                            </>
+                          ) : (
+                            <>
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <rect x="9" y="9" width="12" height="12" rx="2" />
+                                <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+                              </svg>
+                              Копирај
+                            </>
+                          )}
+                        </button>
+                      </div>
                       {order.email && (
                         <a href={`mailto:${order.email}`} className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300">
                           <MailIcon size={11} /> {order.email}
