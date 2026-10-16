@@ -49,6 +49,27 @@ function statusWash(status: OrderStatus): React.CSSProperties {
   };
 }
 
+/**
+ * The status banner that caps every order card.
+ *
+ * Colour alone is fast but ambiguous; the word makes it certain. The relative
+ * time rides along on the right so the card's detail row stays uncluttered.
+ */
+function StatusBanner({ status, time }: { status: OrderStatus; time?: string }) {
+  const tone = STATUS_TONE[status];
+  return (
+    <div className="flex items-center gap-2 border-b px-3.5 py-1.5"
+      style={{ borderColor: tone.border, background: tone.soft }}>
+      <span className="h-[7px] w-[7px] shrink-0 rounded-full"
+        style={{ background: tone.accent, boxShadow: `0 0 7px ${tone.accent}` }} />
+      <span className="text-[10.5px] font-bold uppercase tracking-[.14em]" style={{ color: tone.accent }}>
+        {STATUS_LABEL[status]}
+      </span>
+      {time && <span className="ml-auto text-[10.5px] text-[#5a5a64]">{time}</span>}
+    </div>
+  );
+}
+
 const MONTH_NAMES = ["јан","фев","мар","апр","мај","јун","јул","авг","сеп","окт","ное","дек"];
 function monthLabel(m: string) {
   const [y, mm] = m.split("-");
@@ -251,6 +272,7 @@ export function OrdersView({ openNew, onNewClosed }: { openNew: boolean; onNewCl
             return (
               <div key={o.id} style={statusWash(o.status)}
                 className="overflow-hidden rounded-2xl border bg-[#101014] transition-colors">
+                <StatusBanner status={o.status} time={relTime(o.created_at)} />
                 <button onClick={() => setDetail(o)} className="flex w-full items-start gap-3 p-3.5 text-left">
                   <span className="mt-1 h-10 w-1 shrink-0 rounded-full"
                     style={{ background: STATUS_TONE[o.status].accent, boxShadow: `0 0 12px ${STATUS_TONE[o.status].soft}` }} />
@@ -285,7 +307,6 @@ export function OrdersView({ openNew, onNewClosed }: { openNew: boolean; onNewCl
                         : o.product_title}
                     </p>
                     <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10.5px] text-[#5a5a64]">
-                      <span className="inline-flex items-center gap-1"><IcClock size={11} /> {relTime(o.created_at)}</span>
                       {o.city && <span className="inline-flex items-center gap-1"><IcPin size={11} /> {o.city}</span>}
                       <span className="tabular-nums">#{o.id}</span>
                     </div>
@@ -410,9 +431,15 @@ function OrderDetail({ order, onClose, onSave, onDelete, onStatus, busy, toast }
 
       {/* status */}
       <div className="mb-4 flex items-center gap-2">
-        <Pill tone={order.status === "new" ? "warn" : order.status === "in_process" ? "info" : "ok"}>
+        <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-[.08em]"
+          style={{
+            borderColor: STATUS_TONE[order.status].border,
+            background: STATUS_TONE[order.status].soft,
+            color: STATUS_TONE[order.status].accent,
+          }}>
+          <span className="h-1.5 w-1.5 rounded-full" style={{ background: STATUS_TONE[order.status].accent }} />
           {STATUS_LABEL[order.status]}
-        </Pill>
+        </span>
         <Pill tone="muted">{CURRENCY_LABEL[c]}</Pill>
         <span className="ml-auto text-[11px] text-[#5a5a64]">{order.created_at ? prettyDateTime(order.created_at) : ""}</span>
       </div>
