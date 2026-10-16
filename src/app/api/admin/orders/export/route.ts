@@ -67,7 +67,13 @@ export async function GET(req: NextRequest) {
 
     return {
       "ID": o.id,
-      "Датум": o.created_at ? new Date(o.created_at).toLocaleString("mk-MK") : "",
+      "Датум": o.created_at
+        ? new Date(o.created_at).toLocaleString("mk-MK", {
+            timeZone: "Europe/Skopje",
+            day: "2-digit", month: "2-digit", year: "numeric",
+            hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+          })
+        : "",
       "Статус": STATUS_LABEL[o.status] || o.status,
       "Извор": o.source || "web",
       "Валута": o.currency || "MKD",
