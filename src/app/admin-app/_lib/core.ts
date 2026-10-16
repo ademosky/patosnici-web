@@ -247,9 +247,11 @@ export function prettyDate(iso: string): string {
   });
 }
 
+/** Date + time in 24-hour form — never AM/PM, which reads badly in an admin. */
 export function prettyDateTime(iso: string): string {
   return new Date(iso).toLocaleString("mk-MK", {
-    timeZone: "Europe/Skopje", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
+    timeZone: "Europe/Skopje", day: "numeric", month: "short",
+    hour: "2-digit", minute: "2-digit", hourCycle: "h23",
   });
 }
 
