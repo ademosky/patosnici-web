@@ -22,6 +22,33 @@ import {
   IcPhone, IcMail, IcPin, IcDownLoad, IcLeft, IcRight, IcRefresh, IcClock, IcCheck, IcOrders, IcTag, CopyBtn,
 } from "../_ui/kit";
 
+/**
+ * Status palette.
+ *
+ * Each status gets one RGB triple used for: the left rail, the card's
+ * directional wash, the border and the focus ring — so a card is unmistakable
+ * at a glance without shouting.
+ */
+const STATUS_TONE: Record<OrderStatus, { rgb: string; accent: string; border: string; soft: string }> = {
+  // Нова — needs action, so it carries the warmest, most forward tint.
+  new:        { rgb: "224,176,74",  accent: "#e0b04a", border: "rgba(224,176,74,0.34)",  soft: "rgba(224,176,74,0.13)" },
+  // Во процес — being handled; calm and neutral.
+  in_process: { rgb: "111,163,224", accent: "#6fa3e0", border: "rgba(111,163,224,0.32)", soft: "rgba(111,163,224,0.12)" },
+  // Испратена — done; the quietest of the three.
+  sent:       { rgb: "95,196,143",  accent: "#5fc48f", border: "rgba(95,196,143,0.28)",  soft: "rgba(95,196,143,0.10)" },
+};
+
+/** Tinted from the left and fading out, so the text side stays high-contrast. */
+function statusWash(status: OrderStatus): React.CSSProperties {
+  const { rgb } = STATUS_TONE[status];
+  return {
+    backgroundImage:
+      `linear-gradient(97deg, rgba(${rgb},0.115) 0%, rgba(${rgb},0.05) 38%, ` +
+      `rgba(${rgb},0.015) 72%, rgba(${rgb},0) 100%)`,
+    borderColor: STATUS_TONE[status].border,
+  };
+}
+
 const MONTH_NAMES = ["јан","фев","мар","апр","мај","јун","јул","авг","сеп","окт","ное","дек"];
 function monthLabel(m: string) {
   const [y, mm] = m.split("-");
@@ -222,10 +249,11 @@ export function OrdersView({ openNew, onNewClosed }: { openNew: boolean; onNewCl
             const busy = busyId === o.id;
             const skus = orderSkus(o);
             return (
-              <Card key={o.id} className="overflow-hidden">
+              <div key={o.id} style={statusWash(o.status)}
+                className="overflow-hidden rounded-2xl border bg-[#101014] transition-colors">
                 <button onClick={() => setDetail(o)} className="flex w-full items-start gap-3 p-3.5 text-left">
-                  <span className={cx("mt-1 h-10 w-1 shrink-0 rounded-full",
-                    o.status === "new" ? "bg-[#e0b04a]" : o.status === "in_process" ? "bg-[#6fa3e0]" : "bg-[#5fc48f]")} />
+                  <span className="mt-1 h-10 w-1 shrink-0 rounded-full"
+                    style={{ background: STATUS_TONE[o.status].accent, boxShadow: `0 0 12px ${STATUS_TONE[o.status].soft}` }} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="truncate text-[14.5px] font-semibold text-white">{o.name} {o.surname}</p>
@@ -290,7 +318,7 @@ export function OrdersView({ openNew, onNewClosed }: { openNew: boolean; onNewCl
                   <CopyBtn value={o.phone} label="Копирај го телефонот" size={34}
                     onCopied={(ok) => toast(ok ? `Копирано: ${o.phone}` : "Не може да се копира", ok)} />
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>
