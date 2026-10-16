@@ -19,7 +19,7 @@ import { useAdmin } from "../_lib/store";
 import {
   Card, SectionTitle, Stat, Pill, Btn, IconBtn, Sheet, Field, Input, Select, Textarea,
   Segmented, Empty, IcSpinner, IcSearch, IcX, IcPlus, IcMinus, IcPencil, IcTrash,
-  IcPhone, IcMail, IcPin, IcDownLoad, IcLeft, IcRight, IcRefresh, IcClock, IcCheck, IcOrders, IcTag,
+  IcPhone, IcMail, IcPin, IcDownLoad, IcLeft, IcRight, IcRefresh, IcClock, IcCheck, IcOrders, IcTag, CopyBtn,
 } from "../_ui/kit";
 
 const MONTH_NAMES = ["јан","фев","мар","апр","мај","јун","јул","авг","сеп","окт","ное","дек"];
@@ -287,6 +287,8 @@ export function OrdersView({ openNew, onNewClosed }: { openNew: boolean; onNewCl
                     className="flex h-[34px] w-[38px] items-center justify-center rounded-lg border border-[#25252d] text-[#6fa3e0] transition active:scale-95">
                     <IcPhone size={15} />
                   </a>
+                  <CopyBtn value={o.phone} label="Копирај го телефонот" size={34}
+                    onCopied={(ok) => toast(ok ? `Копирано: ${o.phone}` : "Не може да се копира", ok)} />
                 </div>
               </Card>
             );
@@ -295,7 +297,7 @@ export function OrdersView({ openNew, onNewClosed }: { openNew: boolean; onNewCl
       )}
 
       <OrderDetail order={detail} onClose={() => setDetail(null)}
-        onSave={patchOrder} onDelete={removeOrder} onStatus={change} busy={busyId} />
+        onSave={patchOrder} onDelete={removeOrder} onStatus={change} busy={busyId} toast={toast} />
 
       <NewOrderSheet open={openNew} onClose={onNewClosed} onSave={addOrder} />
     </div>
@@ -304,12 +306,13 @@ export function OrdersView({ openNew, onNewClosed }: { openNew: boolean; onNewCl
 
 /* ── detail / edit sheet ───────────────────────────────────────────── */
 
-function OrderDetail({ order, onClose, onSave, onDelete, onStatus, busy }: {
+function OrderDetail({ order, onClose, onSave, onDelete, onStatus, busy, toast }: {
   order: Order | null; onClose: () => void;
   onSave: (id: number, patch: Partial<Order>) => Promise<boolean>;
   onDelete: (id: number) => Promise<boolean>;
   onStatus: (id: number, s: OrderStatus) => void;
   busy: number | null;
+  toast: (m: string, ok?: boolean) => void;
 }) {
   const [edit, setEdit] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -472,11 +475,15 @@ function OrderDetail({ order, onClose, onSave, onDelete, onStatus, busy }: {
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-2.5">
-            <a href={`tel:${order.phone}`} className="flex items-center gap-2.5 rounded-xl border border-[#1f1f26] bg-[#0c0c0f] p-3 transition active:scale-[.98]">
-              <IcPhone size={16} className="text-[#6fa3e0]" />
+          <div className="flex items-stretch gap-2.5">
+            <a href={`tel:${order.phone}`} className="flex min-w-0 flex-1 items-center gap-2.5 rounded-xl border border-[#1f1f26] bg-[#0c0c0f] p-3 transition active:scale-[.98]">
+              <IcPhone size={16} className="shrink-0 text-[#6fa3e0]" />
               <span className="truncate text-[12.5px] text-white">{order.phone}</span>
             </a>
+            <CopyBtn value={order.phone} label="Копирај го телефонот" size={48}
+              onCopied={(ok) => toast(ok ? `Копирано: ${order.phone}` : "Не може да се копира", ok)} />
+          </div>
+          <div className="grid grid-cols-2 gap-2.5">
             {order.email ? (
               <a href={`mailto:${order.email}`} className="flex items-center gap-2.5 rounded-xl border border-[#1f1f26] bg-[#0c0c0f] p-3 transition active:scale-[.98]">
                 <IcMail size={16} className="text-[#6fa3e0]" />
