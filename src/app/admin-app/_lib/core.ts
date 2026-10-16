@@ -247,12 +247,25 @@ export function prettyDate(iso: string): string {
   });
 }
 
-/** Date + time in 24-hour form — never AM/PM, which reads badly in an admin. */
+/**
+ * "22:42" in Skopje time, always 24-hour.
+ *
+ * Deliberately locale-independent: asking for mk-MK can silently fall back to
+ * the device locale (often en-US), which renders "10:42 PM". Formatting via
+ * en-GB, which is h23 by definition, removes that whole class of surprise.
+ */
+export function skopjeTime(iso: string): string {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Skopje", hour: "2-digit", minute: "2-digit", hour12: false,
+  }).formatToParts(new Date(iso));
+  const h = parts.find((p) => p.type === "hour")?.value ?? "00";
+  const m = parts.find((p) => p.type === "minute")?.value ?? "00";
+  return `${h === "24" ? "00" : h}:${m}`;
+}
+
+/** Date + time, e.g. "17 окт., 22:42". Never AM/PM. */
 export function prettyDateTime(iso: string): string {
-  return new Date(iso).toLocaleString("mk-MK", {
-    timeZone: "Europe/Skopje", day: "numeric", month: "short",
-    hour: "2-digit", minute: "2-digit", hourCycle: "h23",
-  });
+  return `${prettyDate(iso)}, ${skopjeTime(iso)}`;
 }
 
 export function relTime(iso: string): string {
