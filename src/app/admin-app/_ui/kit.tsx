@@ -56,6 +56,7 @@ export const IcAlert = (p: IP) => <S {...p}><path d="M12 3 2 20h20Z"/><path d="M
 export const IcInfo = (p: IP) => <S {...p}><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></S>;
 export const IcShare = (p: IP) => <S {...p}><path d="M12 15V3"/><path d="m8 7 4-4 4 4"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></S>;
 export const IcStar = (p: IP) => <S {...p}><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1L3.2 9.5l6.1-.9Z"/></S>;
+export const IcCopy = (p: IP) => <S {...p}><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></S>;
 export const IcTag = (p: IP) => <S {...p}><path d="M20.6 13.4 12 22l-9-9V3h10l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.5" cy="7.5" r="1.4"/></S>;
 
 export function IcSpinner({ size = 18, className }: IP) {
@@ -296,6 +297,72 @@ export function Bars({ items, max, tone = "#d72026" }: {
         </div>
       ))}
     </div>
+  );
+}
+
+/* ── copy to clipboard ─────────────────────────────────────────────── */
+
+/**
+ * Copy helper that also works where navigator.clipboard is missing
+ * (some in-app browsers and standalone PWAs), via a hidden textarea.
+ */
+export async function copyText(value: string): Promise<boolean> {
+  const text = (value || "").trim();
+  if (!text) return false;
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.top = "-1000px";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand("copy");
+    ta.remove();
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Copy button that flashes a confirmation for a moment. */
+export function CopyBtn({ value, label = "Копирај", size = 40, tone = "info", onCopied }: {
+  value: string; label?: string; size?: number;
+  tone?: "neutral" | "red" | "ok" | "info"; onCopied?: (ok: boolean) => void;
+}) {
+  const [done, setDone] = useState(false);
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      style={{ width: size, height: size }}
+      onClick={async (e) => {
+        e.stopPropagation();
+        const ok = await copyText(value);
+        onCopied?.(ok);
+        if (ok) {
+          setDone(true);
+          setTimeout(() => setDone(false), 1500);
+        }
+      }}
+      className={cx(
+        "inline-flex shrink-0 items-center justify-center rounded-xl border transition active:scale-95",
+        done ? "border-[#2c5c43] bg-[#12241a] text-[#5fc48f]" : {
+          neutral: "border-[#25252d] text-[#8a8a95]",
+          red: "border-[#4a1d21] text-[#e5454a]",
+          ok: "border-[#2c5c43] text-[#5fc48f]",
+          info: "border-[#2c4a6b] text-[#6fa3e0]",
+        }[tone],
+      )}
+    >
+      {done ? <IcCheck size={16} /> : <IcCopy size={16} />}
+    </button>
   );
 }
 
