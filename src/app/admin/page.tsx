@@ -2053,9 +2053,9 @@ export default function AdminPage() {
                       )}
                       <span className="text-xs text-zinc-500">
                         <Clock size={11} className="mr-1 inline" />
-                        {new Date(order.created_at).toLocaleDateString("mk-MK", {
+                        {new Date(order.created_at).toLocaleString("mk-MK", {
                           day: "numeric", month: "long", year: "numeric",
-                          hour: "2-digit", minute: "2-digit"
+                          hour: "2-digit", minute: "2-digit", hourCycle: "h23",
                         })}
                       </span>
                       <span className="text-xs text-zinc-600">#{order.id}</span>
