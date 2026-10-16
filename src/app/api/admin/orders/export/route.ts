@@ -17,6 +17,25 @@ const STATUS_LABEL: Record<string, string> = {
 
 // GET /api/admin/orders/export?month=2026-07
 // Exports ALL orders for the month (no status filter) as an .xlsx file.
+/** dd.mm.yyyy in Skopje time. */
+function sheetDate(iso: string): string {
+  const p = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Skopje", day: "2-digit", month: "2-digit", year: "numeric",
+  }).formatToParts(new Date(iso));
+  const g = (t: string) => p.find((x) => x.type === t)?.value ?? "";
+  return `${g("day")}.${g("month")}.${g("year")}`;
+}
+
+/** HH:mm, always 24-hour — never AM/PM. */
+function sheetTime(iso: string): string {
+  const p = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Skopje", hour: "2-digit", minute: "2-digit", hour12: false,
+  }).formatToParts(new Date(iso));
+  const h = p.find((x) => x.type === "hour")?.value ?? "00";
+  const m = p.find((x) => x.type === "minute")?.value ?? "00";
+  return `${h === "24" ? "00" : h}:${m}`;
+}
+
 export async function GET(req: NextRequest) {
   if (!checkAuth(req))
     return NextResponse.json({ error: "Неовластен пристап" }, { status: 401 });
@@ -67,13 +86,8 @@ export async function GET(req: NextRequest) {
 
     return {
       "ID": o.id,
-      "Датум": o.created_at
-        ? new Date(o.created_at).toLocaleString("mk-MK", {
-            timeZone: "Europe/Skopje",
-            day: "2-digit", month: "2-digit", year: "numeric",
-            hour: "2-digit", minute: "2-digit", hourCycle: "h23",
-          })
-        : "",
+      // Date and time built separately so the clock is always 24-hour.
+      "Датум": o.created_at ? `${sheetDate(o.created_at)} ${sheetTime(o.created_at)}` : "",
       "Статус": STATUS_LABEL[o.status] || o.status,
       "Извор": o.source || "web",
       "Валута": o.currency || "MKD",
