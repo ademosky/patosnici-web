@@ -35,7 +35,45 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data ?? []);
+
+  /* Attach the stock state from the inventory table.
+   *
+   * Both admins read their orders from here, so resolving it once on the server
+   * means neither has to make a second request — and the badge can never
+   * disagree between them. An order with no SKU, or a SKU that is not in the
+   * inventory at all, simply gets has_stock = false and shows nothing. */
+  const { data: inv } = await supabaseAdmin().from("inventory").select("sku, quantity");
+
+  const inStock = new Set<string>();
+  for (const row of inv ?? []) {
+    const r = row as { sku?: string | null; quantity?: number | null };
+    const sku = String(r.sku ?? "").trim();
+    if (sku && Number(r.quantity) > 0) inStock.add(sku);
+  }
+
+  const enriched = (data ?? []).map((o: any) => {
+    const raw: Array<string | null | undefined> =
+      o.items && o.items.length > 0
+        ? o.items.map((it: any) => it?.sku)
+        : [o.product_sku];
+
+    const skus: string[] = [];
+    for (const s of raw) {
+      const v = String(s ?? "").trim();
+      if (v && !skus.includes(v)) skus.push(v);
+    }
+
+    const hit = skus.filter((s) => inStock.has(s));
+    return {
+      ...o,
+      order_skus: skus,
+      stock_skus: hit,
+      has_stock: hit.length > 0,
+      full_stock: skus.length > 0 && hit.length === skus.length,
+    };
+  });
+
+  return NextResponse.json(enriched);
 }
 
 // POST — create a manual order (from admin panel)
