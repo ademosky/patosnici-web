@@ -282,6 +282,18 @@ export function OrdersView({ openNew, onNewClosed }: { openNew: boolean; onNewCl
                       {o.source && o.source !== "web" && (
                         <Pill tone="muted" className="shrink-0">{o.source === "facebook" ? "FB" : o.source === "phone" ? "Тел" : "Рачно"}</Pill>
                       )}
+                      {/* Shown only when the inventory holds one of this order's SKUs. */}
+                      {o.has_stock && (
+                        <span
+                          className="shrink-0 rounded-lg border px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide"
+                          style={{
+                            borderColor: o.full_stock ? "rgba(95,196,143,0.5)" : "rgba(224,176,74,0.5)",
+                            background: o.full_stock ? "rgba(95,196,143,0.14)" : "rgba(224,176,74,0.14)",
+                            color: o.full_stock ? "#5fc48f" : "#e0b04a",
+                          }}>
+                          {o.full_stock ? "На залиха" : "Делумно"}
+                        </span>
+                      )}
                     </div>
 
                     {/* SKU — the identifier used when preparing the shipment */}
