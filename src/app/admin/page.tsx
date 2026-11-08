@@ -2056,8 +2056,10 @@ export default function AdminPage() {
                            order.source === "phone"    ? "📞" : "✏️"}
                         </span>
                       )}
-                      {/* Stock badge — shown only when the inventory holds one of this order's SKUs */}
-                      {order.has_stock && (
+                      {/* Stock badge — only while the order still needs building.
+                          Once it is marked sent the shipment is out, so the badge
+                          has nothing left to say. */}
+                      {order.has_stock && order.status !== "sent" && (
                         <span
                           style={{
                             background: order.full_stock ? "rgba(95,196,143,0.16)" : "rgba(224,176,74,0.16)",
