@@ -58,6 +58,11 @@ type Order = {
   note?: string;
   source?: string;
   currency?: string;
+  /* Filled in by /api/admin/orders from the inventory table. */
+  order_skus?: string[];
+  stock_skus?: string[];
+  has_stock?: boolean;
+  full_stock?: boolean;
 };
 
 // Convert an ISO timestamp to the user's local calendar date (Europe/Skopje).
@@ -2049,6 +2054,20 @@ export default function AdminPage() {
                         }`}>
                           {order.source === "facebook" ? "🔵 FB" :
                            order.source === "phone"    ? "📞" : "✏️"}
+                        </span>
+                      )}
+                      {/* Stock badge — shown only when the inventory holds one of this order's SKUs */}
+                      {order.has_stock && (
+                        <span
+                          style={{
+                            background: order.full_stock ? "rgba(95,196,143,0.16)" : "rgba(224,176,74,0.16)",
+                            color: order.full_stock ? "#5fc48f" : "#e0b04a",
+                            border: `1px solid ${order.full_stock ? "rgba(95,196,143,0.45)" : "rgba(224,176,74,0.45)"}`,
+                          }}
+                          className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold uppercase tracking-wide">
+                          <span className="h-[7px] w-[7px] rounded-full"
+                            style={{ background: order.full_stock ? "#5fc48f" : "#e0b04a" }} />
+                          {order.full_stock ? "На залиха" : "Делумно на залиха"}
                         </span>
                       )}
                       <span className="text-xs text-zinc-500">
