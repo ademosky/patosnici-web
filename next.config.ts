@@ -12,6 +12,30 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  /**
+   * Static images are content-addressed by filename, so they can be cached hard.
+   *
+   * Without this Next serves everything in /public with
+   * `cache-control: max-age=0, must-revalidate`, which means a returning visitor
+   * re-validates every image on every visit. Those re-validation requests count
+   * against the Vercel CDN allowance, which is why the free tier was running out.
+   */
+  async headers() {
+    return [
+      {
+        source: "/brands/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400" }],
+      },
+      {
+        source: "/images/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400" }],
+      },
+      {
+        source: "/icons/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400" }],
+      },
+    ];
+  },
   async rewrites() {
     return [
       // ── Kosovo (/ks) — EUR · Albanian ──
