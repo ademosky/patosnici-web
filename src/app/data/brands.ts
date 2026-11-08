@@ -12,8 +12,16 @@ export type Brand = {
  *  individual /brands/*.svg files stay for the mat preview, which embeds a
  *  single logo inside a generated SVG where a sprite reference cannot go.
  */
+const SPRITE_VERSION = 2;
+
 export function brandSprite(id: string): string {
-  return `/brands/sprite.svg#b-${id}`;
+  /* The version is part of the URL on purpose.
+   *
+   * The sprite is cached for 30 days, so without it a corrected sprite would
+   * never reach anyone who had already loaded the old one — which is exactly
+   * what happened when the first build shipped with a few unparsable symbols.
+   * Bump this whenever sprite.svg changes. */
+  return `/brands/sprite.svg?v=${SPRITE_VERSION}#b-${id}`;
 }
 
 export const brands: Brand[] = [
