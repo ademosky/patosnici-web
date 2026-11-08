@@ -65,6 +65,11 @@ export type Order = {
   product_price?: string | null;
   product_sku?: string | null;
   items?: OrderItem[] | null;
+  /* Filled in by /api/admin/orders from the inventory table. */
+  order_skus?: string[];
+  stock_skus?: string[];
+  has_stock?: boolean;
+  full_stock?: boolean;
 };
 
 export type Product = {
