@@ -5,6 +5,17 @@ export type Brand = {
   lightLogo?: boolean; // true = не применувај инверт
 };
 
+/** Sprite symbol for a brand.
+ *
+ *  All 38 logos live in one file now. The homepage used to make 38 separate
+ *  image requests before it could draw the brand grid; this makes it one. The
+ *  individual /brands/*.svg files stay for the mat preview, which embeds a
+ *  single logo inside a generated SVG where a sprite reference cannot go.
+ */
+export function brandSprite(id: string): string {
+  return `/brands/sprite.svg#b-${id}`;
+}
+
 export const brands: Brand[] = [
   { id: "alfa-romeo",  name: "Alfa Romeo",  logo: "/brands/alfa-romeo.svg",  lightLogo: true  },
   { id: "audi",        name: "Audi",         logo: "/brands/audi.svg"        },
