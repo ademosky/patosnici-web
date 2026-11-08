@@ -282,8 +282,9 @@ export function OrdersView({ openNew, onNewClosed }: { openNew: boolean; onNewCl
                       {o.source && o.source !== "web" && (
                         <Pill tone="muted" className="shrink-0">{o.source === "facebook" ? "FB" : o.source === "phone" ? "Тел" : "Рачно"}</Pill>
                       )}
-                      {/* Shown only when the inventory holds one of this order's SKUs. */}
-                      {o.has_stock && (
+                      {/* Only while the order still needs building — a sent order
+                          has its shipment out, so stock no longer matters. */}
+                      {o.has_stock && o.status !== "sent" && (
                         <span
                           className="shrink-0 rounded-lg border px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide"
                           style={{
