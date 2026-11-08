@@ -1,6 +1,6 @@
 "use client";
 
-import { Brand } from "../data/brands";
+import { Brand, brandSprite } from "../data/brands";
 import { useState } from "react";
 
 type BrandCardProps = {
@@ -43,12 +43,11 @@ export default function BrandCard({
       className="group flex h-36 flex-col items-center justify-center rounded-2xl border border-zinc-800 bg-[#141414] transition-all duration-300 hover:-translate-y-1 hover:border-red-600"
     >
       {brand.logo && !imgError ? (
-        <img
-          src={brand.logo}
-          alt={brand.name}
-          onError={() => setImgError(true)}
-          className={imgClass}
-        />
+        /* Drawn from the shared sprite: one request for all 38 brands. */
+        <svg className={imgClass} role="img" aria-label={brand.name}
+          onError={() => setImgError(true)}>
+          <use href={brandSprite(brand.id)} />
+        </svg>
       ) : (
         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-800 text-lg font-black text-white">
           {brand.name.slice(0, 2).toUpperCase()}
