@@ -197,6 +197,8 @@ const mk = {
   contact_thanks: "Ви благодариме! ✓",
   contact_opened: "Вашиот email клиент се отвори. Ако не се отвори,",
   contact_write_directly: "пишете директно",
+  contact_msg_label: "Пишете ни на",
+  contact_msg_hint: "Одговараме најбрзо преку WhatsApp и Viber.",
 };
 
 const sq: typeof mk = {
@@ -371,6 +373,8 @@ const sq: typeof mk = {
   contact_thanks: "Faleminderit! ✓",
   contact_opened: "Klienti juaj i email-it u hap. Nëse nuk hapet,",
   contact_write_directly: "shkruani direkt",
+  contact_msg_label: "Na shkruani në",
+  contact_msg_hint: "Përgjigjemi më shpejt përmes WhatsApp dhe Viber.",
 };
 
 export type TKey = keyof typeof mk;
