@@ -439,14 +439,25 @@ function readMarket(): Market {
   return "mk";
 }
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
+export function LanguageProvider({
+  children,
+  initialMarket = "mk",
+}: {
+  children: ReactNode;
+  /** Market resolved on the SERVER from the middleware's x-market header.
+   *
+   *  Without it the first server render had no way to see the /ks or /al
+   *  prefix — readMarket() has no window on the server, so it returned "mk"
+   *  and every Albanian page was shipped as Macedonian HTML and only corrected
+   *  once React hydrated. Crawlers and link previews saw the wrong language. */
+  initialMarket?: Market;
+}) {
   const pathname = usePathname(); // re-render trigger on navigation
 
-  // Lazy initial state read straight from the URL — correct on first paint,
-  // before any effect or localStorage touches it.
-  const [market, setMarket] = useState<Market>(readMarket);
-  const [lang, setLang] = useState<Lang>(() => (readMarket() === "mk" ? "mk" : "sq"));
-  const [currency, setCurrency] = useState<Currency>(() => MARKET_CURRENCY[readMarket()]);
+  // Server value first, so the SSR markup and the first client render agree.
+  const [market, setMarket] = useState<Market>(initialMarket);
+  const [lang, setLang] = useState<Lang>(() => (initialMarket === "mk" ? "mk" : "sq"));
+  const [currency, setCurrency] = useState<Currency>(() => MARKET_CURRENCY[initialMarket]);
 
   useEffect(() => {
     const m = readMarket();
