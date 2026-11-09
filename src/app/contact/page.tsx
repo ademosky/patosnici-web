@@ -83,7 +83,7 @@ export default function ContactPage() {
                 <p className="mt-1 text-xs text-zinc-500">{t("contact_msg_hint")}</p>
               </div>
 
-              <div className="flex items-center justify-center gap-3">
+              <div className="flex flex-wrap items-center justify-center gap-3">
                 <a
                   href="https://wa.me/38975799697"
                   target="_blank"
@@ -105,6 +105,18 @@ export default function ContactPage() {
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" />
                   </svg>
                   Viber
+                </a>
+
+                <a
+                  href="https://m.me/patosnici"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#0084FF] px-4 py-2.5 text-sm font-bold text-white transition hover:brightness-110"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17" aria-hidden="true">
+                    <path d="M12 0C5.373 0 0 4.974 0 11.111c0 3.498 1.744 6.614 4.469 8.654V24l4.088-2.242c1.092.3 2.246.464 3.443.464 6.627 0 12-4.975 12-11.111S18.627 0 12 0zm1.191 14.963l-3.055-3.26-5.963 3.26L10.732 8l3.131 3.26L19.752 8l-6.561 6.963z" />
+                  </svg>
+                  Messenger
                 </a>
               </div>
             </div>
