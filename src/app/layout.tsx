@@ -5,6 +5,7 @@ import Footer from "./components/Footer";
 import { CartProvider } from "./context/CartContext";
 import { LanguageProvider } from "./context/LanguageContext";
 import Script from "next/script";
+import { headers } from "next/headers";
 import FacebookFloat from "./components/FacebookFloat";
 import MetaPixel from "@/components/MetaPixel";
 
@@ -69,17 +70,26 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  /* The market the middleware stamped on the request, BEFORE the /ks and /al
+     rewrites erased the prefix from the path. Reading it here is what lets the
+     server render Albanian for Kosovo and Albania instead of always shipping
+     Macedonian HTML and fixing it up in the browser. */
+  const requestHeaders = await headers();
+  const raw = requestHeaders.get("x-market");
+  const initialMarket: "mk" | "ks" | "al" =
+    raw === "ks" ? "ks" : raw === "al" ? "al" : "mk";
+
   return (
-    <html lang="mk">
+    <html lang={initialMarket === "mk" ? "mk" : "sq"}>
       <body
         className={`${barlowCondensed.variable} ${dmSans.variable} antialiased`}
       >
-        <LanguageProvider>
+        <LanguageProvider initialMarket={initialMarket}>
         <CartProvider>
           {children}
           <Footer />
