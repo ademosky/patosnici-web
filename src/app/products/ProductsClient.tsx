@@ -44,6 +44,22 @@ function ProductsContent({ initialProducts, brands }: Props) {
   // A new filter or a new search starts from the top again.
   useEffect(() => { setShowCount(PAGE_SIZE); }, [activeBrand, activeCarModel, localSearch]);
 
+  /**
+   * Once BOTH a brand and a model are chosen the shopper has identified their
+   * vehicle, so remember it — the homepage then offers it in one tap instead of
+   * making them hunt through the brand grid again.
+   */
+  useEffect(() => {
+    if (activeBrand === "all" || activeCarModel === "all") return;
+    const brandName = brands.find((b) => b.id === activeBrand)?.name ?? activeBrand;
+    try {
+      localStorage.setItem(
+        "op_my_car",
+        JSON.stringify({ brand: activeBrand, carModel: activeCarModel, label: `${brandName} ${activeCarModel}` }),
+      );
+    } catch { /* private mode — not worth reporting */ }
+  }, [activeBrand, activeCarModel, brands]);
+
   // Уникатни car_models за избраниот бренд
   const carModels = useMemo(() => {
     if (activeBrand === "all") return [];
