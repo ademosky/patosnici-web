@@ -16,10 +16,13 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 z-50 w-full border-b border-white/10 bg-black/95 backdrop-blur">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
+      {/* 64px on a phone, 80px from md up. A fixed 80px header ate a fifth of a
+          390px-tall viewport and pushed the hero below the fold. */}
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 md:h-20">
 
         <Link href={localizedPath("/")} className="flex-shrink-0">
-          <Image src="/images/logo.webp" alt="Original Patosnici" width={300} height={100} priority fetchPriority="high" className="h-auto w-[220px]" />
+          <Image src="/images/logo.webp" alt="Original Patosnici" width={300} height={100} priority fetchPriority="high"
+            className="h-auto w-[150px] sm:w-[180px] md:w-[220px]" />
         </Link>
 
         {/* Desktop nav */}
@@ -58,7 +61,7 @@ export default function Header() {
           <Link href={localizedPath("/contact")} className="transition hover:text-red-500">{t("nav_contact")}</Link>
         </nav>
 
-        <div className="flex items-center gap-3 text-white">
+        <div className="flex items-center gap-2 sm:gap-3 text-white">
 
           {/* Language switcher — only on the Macedonian market */}
           {!isMarketLocked && (
