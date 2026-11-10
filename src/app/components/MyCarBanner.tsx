@@ -31,7 +31,9 @@ export default function MyCarBanner() {
   if (!car) return null;
 
   const href = localizedPath(
-    `/products?brand=${encodeURIComponent(car.brand)}&car_model=${encodeURIComponent(car.carModel)}`,
+    car.carModel
+      ? `/products?brand=${encodeURIComponent(car.brand)}&car_model=${encodeURIComponent(car.carModel)}`
+      : `/products?brand=${encodeURIComponent(car.brand)}`,
   );
 
   const forget = () => {
