@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { normalizeSearchWords, matchesAllWords, productMatchesQuery } from "@/lib/search";
+import { normalizeSearchWords, productMatchesQuery } from "@/lib/search";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
