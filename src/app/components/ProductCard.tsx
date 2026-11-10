@@ -54,9 +54,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </Link>
       <div className="p-3.5 sm:p-5">
-        <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-red-600">{product.model} · {product.year}</p>
+        <p className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-red-600">{product.model} · {product.year}</p>
         <Link href={localizedPath(`/products/${product.slug}`)}>
-          <h3 className="mt-1.5 sm:mt-2 text-base sm:text-xl font-bold text-white hover:text-red-500 transition">{product.title}</h3>
+          <h3 className="mt-1.5 sm:mt-2 line-clamp-2 min-h-[2.6em] text-base sm:text-xl font-bold leading-snug text-white hover:text-red-500 transition">{product.title}</h3>
         </Link>
         <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-zinc-400">
           {product.category === "auto_accessories" ? t("prod_accessory") : t("prod_original")}
@@ -64,12 +64,12 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="mt-3 sm:mt-4"><span className="text-2xl sm:text-3xl font-extrabold text-red-600">{formatPrice(product.price, product.price_eur)}</span></div>
         <div className="mt-4 sm:mt-5 flex gap-2">
           <Link href={localizedPath(`/products/${product.slug}`)}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 py-2.5 sm:py-3 text-xs sm:text-sm font-bold uppercase tracking-wide text-white transition hover:bg-red-700">
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 py-3 sm:py-3 text-xs sm:text-sm font-bold uppercase tracking-wide text-white transition hover:bg-red-700">
             {t("prod_details")}
           </Link>
           {product.in_stock !== false ? (
             <button onClick={handleAddToCart} title={t("prod_add_cart")}
-              className={`flex items-center justify-center gap-1.5 rounded-xl border px-4 py-3 text-sm font-semibold transition ${added ? "border-green-600 bg-green-600/20 text-green-400" : "border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-red-400"}`}>
+              className={`flex items-center justify-center gap-1.5 rounded-xl border px-3.5 sm:px-4 py-3 text-sm font-semibold transition ${added ? "border-green-600 bg-green-600/20 text-green-400" : "border-zinc-700 text-zinc-400 hover:border-red-600 hover:text-red-400"}`}>
               <ShoppingCart size={16} />
               {added ? "✓" : ""}
             </button>
