@@ -44,6 +44,29 @@ export function yearRangeCovers(
 
 const YEAR_RE = /^(?:19|20)\d{2}$/;
 
+/**
+ * Word comparison used specifically for product search.
+ *
+ * The old rule was "any word of the product CONTAINS the query token", which
+ * broke the way people actually search a car:
+ *
+ *   "mercedes c"  →  every Mercedes, because "mercedes" contains a "c".
+ *                    (and every "… Class" model, since "class" starts with c)
+ *   "golf 5"      →  unrelated models, because "5" appears inside SKUs.
+ *
+ * So: a single letter must equal a whole word (that is what a model letter is),
+ * and longer tokens match by word prefix — "gol" still finds Golf, but a stray
+ * digit inside a SKU no longer drags in a different car.
+ */
+export function matchesSearchWords(haystack: string, query: string): boolean {
+  const words = normalizeSearchWords(query);
+  if (words.length === 0) return true;
+  const hay = normalizeSearchWords(haystack);
+  return words.every((w) =>
+    hay.some((hw) => (w.length === 1 ? hw === w : hw.startsWith(w))),
+  );
+}
+
 /** Everything a product can be found by, as one searchable string. */
 export function productHaystack(p: {
   title?: string | null; model?: string | null; car_model?: string | null;
@@ -74,7 +97,7 @@ export function productMatchesQuery(
   const yearWords = words.filter((w) => YEAR_RE.test(w));
   const textWords = words.filter((w) => !YEAR_RE.test(w));
 
-  if (textWords.length > 0 && !matchesAllWords(productHaystack(p), textWords.join(" "))) {
+  if (textWords.length > 0 && !matchesSearchWords(productHaystack(p), textWords.join(" "))) {
     return false;
   }
   for (const y of yearWords) {
