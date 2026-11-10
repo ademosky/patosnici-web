@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useLanguage } from "../context/LanguageContext";
+import ModelSearch from "./ModelSearch";
 
 export default function Hero() {
   const { t, localizedPath } = useLanguage();
@@ -21,8 +22,13 @@ export default function Hero() {
               <span key={i}>{line}{i === 0 && <br />}</span>
             ))}
           </p>
-          <Link href={localizedPath("/products")} className="mt-6 sm:mt-10 inline-block rounded-md bg-red-600 px-7 sm:px-8 py-3.5 sm:py-4 text-sm font-bold uppercase tracking-wide transition hover:bg-red-700">
-            {t("hero_cta")}
+          {/* The search is the primary action: a shopper knows their car, not
+              which of 38 brand logos to pick. */}
+          <div className="mt-7 sm:mt-9">
+            <ModelSearch />
+          </div>
+          <Link href={localizedPath("/products")} className="mt-4 inline-block text-sm text-zinc-400 underline-offset-4 transition hover:text-white hover:underline">
+            {t("hero_cta")} →
           </Link>
         </div>
         <div className="relative h-[300px] sm:h-[420px] lg:h-[520px]">
