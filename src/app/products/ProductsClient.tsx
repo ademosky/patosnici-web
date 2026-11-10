@@ -158,11 +158,13 @@ function ProductsContent({ initialProducts, brands }: Props) {
                 {t("prod_select_model")} {activeBrandName}:
               </p>
               {/* Horizontal scroll on mobile, wrap on larger screens */}
-              <div className="-mx-6 px-6 sm:mx-0 sm:px-0">
-                <div className="flex gap-3 overflow-x-auto pb-2 sm:flex-wrap sm:overflow-x-visible sm:pb-0">
+              <div className="-mx-4 px-4 sm:mx-0 sm:px-0">
+                {/* Wrap instead of scroll: on a phone the third model was half
+                    off-screen with nothing to say it could be swiped. */}
+                <div className="flex flex-wrap gap-2 sm:gap-3">
                   <button
                     onClick={() => router.push(localizedPath(`/products?brand=${activeBrand}`))}
-                    className={`flex-shrink-0 rounded-2xl px-6 py-3 text-sm font-bold uppercase tracking-wide transition ${
+                    className={`rounded-2xl px-5 py-3 text-sm font-bold uppercase tracking-wide transition ${
                       activeCarModel === "all"
                         ? "bg-red-600 text-white"
                         : "border-2 border-zinc-700 text-zinc-300 hover:border-red-600 hover:text-white"
@@ -173,13 +175,13 @@ function ProductsContent({ initialProducts, brands }: Props) {
                   {carModels.map((model) => (
                     <button key={model}
                       onClick={() => router.push(localizedPath(`/products?brand=${activeBrand}&car_model=${encodeURIComponent(model)}`))}
-                      className={`flex-shrink-0 rounded-2xl px-6 py-3 text-sm font-bold uppercase tracking-wide transition ${
+                      className={`rounded-2xl px-5 py-3 text-sm font-bold uppercase tracking-wide transition ${
                         activeCarModel === model
                           ? "bg-red-600 text-white"
                           : "border-2 border-zinc-700 text-zinc-300 hover:border-red-600 hover:text-white"
                       }`}
                     >
-                      {activeBrandName} {model}
+                      {model}
                     </button>
                   ))}
                 </div>
