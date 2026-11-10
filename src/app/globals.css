@@ -24,3 +24,39 @@
     background-color: #0b0b0b;
   }
 }
+
+/* ── Mobile interaction polish ─────────────────────────────────────────────
+ * These are feel, not looks — nothing on screen moves.
+ *
+ * · tap-highlight off: Android/iOS paint a grey box over a tapped link, which
+ *   makes every tap feel laggy. The pressed states in the components are the
+ *   feedback instead.
+ * · touch-action: manipulation removes the ~300ms wait the browser adds while
+ *   it checks whether a tap is really a double-tap-to-zoom.
+ * · text-size-adjust: stops the browser inflating body text on landscape.
+ * · scroll-padding-top: anchored jumps land below the sticky header instead of
+ *   underneath it.
+ */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a, button, [role="button"], label[for], input, select, textarea {
+  touch-action: manipulation;
+}
+
+/* A tap target under ~44px is hard to hit on a phone. Only applied where the
+   element is a standalone control, never to inline text links. */
+@media (max-width: 640px) {
+  .tap-target {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
