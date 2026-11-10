@@ -153,39 +153,47 @@ function ProductsContent({ initialProducts, brands }: Props) {
                 <span className="text-sm font-semibold text-white">{activeBrandName}</span>
               </div>
 
-              {/* Модел копчиња — ГОЛЕМ приказ */}
-              <p className="mb-3 text-xs font-bold uppercase tracking-widest text-zinc-500">
-                {t("prod_select_model")} {activeBrandName}:
-              </p>
-              {/* Horizontal scroll on mobile, wrap on larger screens */}
-              <div className="-mx-4 px-4 sm:mx-0 sm:px-0">
-                {/* Wrap instead of scroll: on a phone the third model was half
-                    off-screen with nothing to say it could be swiped. */}
-                <div className="flex flex-wrap gap-2 sm:gap-3">
+              {/* Once a model is chosen the other thirty chips are noise — a
+                  Volkswagen page listed 30 of them and pushed the product off
+                  the screen entirely. A chosen model collapses to itself plus
+                  a way back to the full list. */}
+              {activeCarModel === "all" ? (
+                <>
+                  <p className="mb-3 text-xs font-bold uppercase tracking-widest text-zinc-500">
+                    {t("prod_select_model")} {activeBrandName}:
+                  </p>
+                  <div className="-mx-4 px-4 sm:mx-0 sm:px-0">
+                    <div className="flex flex-wrap gap-2 sm:gap-3">
+                      <button
+                        onClick={() => router.push(localizedPath(`/products?brand=${activeBrand}`))}
+                        className="rounded-2xl bg-red-600 px-5 py-3 text-sm font-bold uppercase tracking-wide text-white transition"
+                      >
+                        {t("all")} {activeBrandName}
+                      </button>
+                      {carModels.map((model) => (
+                        <button key={model}
+                          onClick={() => router.push(localizedPath(`/products?brand=${activeBrand}&car_model=${encodeURIComponent(model)}`))}
+                          className="rounded-2xl border-2 border-zinc-700 px-5 py-3 text-sm font-bold uppercase tracking-wide text-zinc-300 transition hover:border-red-600 hover:text-white"
+                        >
+                          {model}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-2xl bg-red-600 px-5 py-3 text-sm font-bold uppercase tracking-wide text-white">
+                    {activeCarModel}
+                  </span>
                   <button
                     onClick={() => router.push(localizedPath(`/products?brand=${activeBrand}`))}
-                    className={`rounded-2xl px-5 py-3 text-sm font-bold uppercase tracking-wide transition ${
-                      activeCarModel === "all"
-                        ? "bg-red-600 text-white"
-                        : "border-2 border-zinc-700 text-zinc-300 hover:border-red-600 hover:text-white"
-                    }`}
+                    className="rounded-2xl border-2 border-zinc-700 px-5 py-3 text-sm font-bold uppercase tracking-wide text-zinc-300 transition hover:border-red-600 hover:text-white"
                   >
-                    {t("all")} {activeBrandName}
+                    {t("prod_change_model")}
                   </button>
-                  {carModels.map((model) => (
-                    <button key={model}
-                      onClick={() => router.push(localizedPath(`/products?brand=${activeBrand}&car_model=${encodeURIComponent(model)}`))}
-                      className={`rounded-2xl px-5 py-3 text-sm font-bold uppercase tracking-wide transition ${
-                        activeCarModel === model
-                          ? "bg-red-600 text-white"
-                          : "border-2 border-zinc-700 text-zinc-300 hover:border-red-600 hover:text-white"
-                      }`}
-                    >
-                      {model}
-                    </button>
-                  ))}
                 </div>
-              </div>
+              )}
             </div>
           )}
 
