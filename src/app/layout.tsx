@@ -89,6 +89,48 @@ export default async function RootLayout({
       <body
         className={`${barlowCondensed.variable} ${dmSans.variable} antialiased`}
       >
+        {/* Organization + WebSite structured data.
+            Google reads this to build the knowledge panel and to understand the
+            store's own name, logo and contact channels — none of which it could
+            infer from the page text alone. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  "@id": `${SITE_URL}/#organization`,
+                  name: "Original Patosnici",
+                  url: SITE_URL,
+                  logo: `${SITE_URL}/images/logo.webp`,
+                  description:
+                    "Оригинални гумени патосници за сите марки возила, изработени по мерка.",
+                  areaServed: ["MK", "XK", "AL"],
+                  contactPoint: {
+                    "@type": "ContactPoint",
+                    telephone: "+38975799697",
+                    contactType: "customer service",
+                    availableLanguage: ["mk", "sq"],
+                  },
+                  sameAs: [
+                    "https://www.facebook.com/patosnici",
+                    "https://www.instagram.com/patosnici",
+                  ],
+                },
+                {
+                  "@type": "WebSite",
+                  "@id": `${SITE_URL}/#website`,
+                  url: SITE_URL,
+                  name: "Original Patosnici",
+                  inLanguage: ["mk", "sq"],
+                  publisher: { "@id": `${SITE_URL}/#organization` },
+                },
+              ],
+            }),
+          }}
+        />
         <LanguageProvider initialMarket={initialMarket}>
         <CartProvider>
           {children}
