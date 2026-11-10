@@ -18,6 +18,7 @@ import { CheckCircle, ArrowLeft, Tag } from "lucide-react";
 import AddToCartButton from "../../components/AddToCartButton";
 import ProductDescription from "../../components/ProductDescription";
 import ProductViewEvent from "../../components/ProductViewEvent";
+import MyCarSaver from "../../components/MyCarSaver";
 import PriceDisplay from "../../components/PriceDisplay";
 import ProductFeatures from "../../components/ProductFeatures";
 import OrderHeader from "../../components/OrderHeader";
@@ -222,6 +223,15 @@ export default async function ProductPage({ params }: Props) {
         productName={product.title}
         productPrice={product.price}
       />
+
+      {/* Remember this car so the homepage can offer it next time. */}
+      {!isAccessory && (
+        <MyCarSaver
+          brand={product.brand}
+          carModel={product.car_model}
+          label={product.title}
+        />
+      )}
       <main className="min-h-screen bg-[#0b0b0b] pt-20 sm:pt-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-12">
 
