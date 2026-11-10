@@ -170,6 +170,8 @@ const mk = {
   best_title: "Најпродавани производи",
   best_desc: "Избрани оригинални патосници од нашата понуда.",
   best_view_all: "Види ги сите →",
+  prod_show_more: "Покажи повеќе",
+  prod_showing_of: "прикажани од",
 
   // Image gallery (screen-reader labels + UI copy)
   img_none: "Нема слика",
@@ -346,6 +348,8 @@ const sq: typeof mk = {
   best_title: "Produktet më të shitura",
   best_desc: "Tapete origjinale të zgjedhura nga oferta jonë.",
   best_view_all: "Shiko të gjitha →",
+  prod_show_more: "Shfaq më shumë",
+  prod_showing_of: "të shfaqura nga",
 
   // Image gallery (screen-reader labels + UI copy)
   img_none: "Nuk ka imazh",
