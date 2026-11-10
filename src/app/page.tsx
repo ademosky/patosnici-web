@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { unstable_cache } from "next/cache";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
+import MyCarBanner from "./components/MyCarBanner";
 import BrandSelector from "./components/BrandSelector";
 import BestSellers from "./components/BestSellers";
 import Features from "./components/Features";
@@ -115,6 +116,7 @@ export default async function Home() {
       <Header />
       <main className="min-h-screen bg-[#0b0b0b]">
         <Hero />
+        <MyCarBanner />
         <BrandSelector />
         <Features />
         <BestSellers products={bestSellers} />
