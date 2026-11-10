@@ -20,7 +20,10 @@ export default function FacebookFloat() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="group fixed bottom-6 left-6 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-2xl transition-transform hover:scale-110 active:scale-95"
+      /* On a phone it sat bottom-LEFT, directly over the start of every
+         paragraph and over the first field of the order form. Smaller, and on
+         the right where text is ragged, so it stops covering words. */
+      className="group fixed bottom-4 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full shadow-2xl transition-transform hover:scale-110 active:scale-95 sm:bottom-6 sm:left-6 sm:right-auto sm:h-14 sm:w-14"
       style={{ background: "#1877F2", boxShadow: "0 4px 24px rgba(24,119,242,0.45)" }}
     >
       {/* Facebook icon */}
@@ -29,7 +32,7 @@ export default function FacebookFloat() {
       </svg>
 
       {/* Tooltip — само на desktop hover */}
-      <span className="pointer-events-none absolute left-16 whitespace-nowrap rounded-xl bg-zinc-900 px-3 py-2 text-xs font-semibold text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
+      <span className="pointer-events-none absolute right-16 hidden whitespace-nowrap rounded-xl bg-zinc-900 px-3 py-2 text-xs font-semibold text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 sm:left-16 sm:right-auto sm:block">
         {tooltip}
         <span className="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 border-4 border-transparent border-r-zinc-900" />
       </span>
