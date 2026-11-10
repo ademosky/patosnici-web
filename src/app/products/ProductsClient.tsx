@@ -29,6 +29,21 @@ function ProductsContent({ initialProducts, brands }: Props) {
 
   useEffect(() => { setLocalSearch(globalQuery); }, [globalQuery]);
 
+  /**
+   * How many cards are actually rendered.
+   *
+   * The catalogue is 626 products and the page used to render every one of
+   * them: two megabytes of markup, 595 cards, 598 <img> tags — all parsed and
+   * laid out before the shopper could scroll a single row. The full list still
+   * lives in memory (that is what makes the search instant), it is only the
+   * *rendering* that is capped, so searching is unaffected.
+   */
+  const PAGE_SIZE = 60;
+  const [showCount, setShowCount] = useState(PAGE_SIZE);
+
+  // A new filter or a new search starts from the top again.
+  useEffect(() => { setShowCount(PAGE_SIZE); }, [activeBrand, activeCarModel, localSearch]);
+
   // Уникатни car_models за избраниот бренд
   const carModels = useMemo(() => {
     if (activeBrand === "all") return [];
@@ -170,11 +185,27 @@ function ProductsContent({ initialProducts, brands }: Props) {
 
           {/* ── ПРОИЗВОДИ GRID ── */}
           {filtered.length > 0 ? (
-            <div className="grid grid-cols-2 gap-3 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
-              {filtered.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-2 gap-3 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
+                {filtered.slice(0, showCount).map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+
+              {filtered.length > showCount && (
+                <div className="mt-10 flex flex-col items-center gap-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                    {showCount} / {filtered.length}
+                  </p>
+                  <button
+                    onClick={() => setShowCount((n) => n + PAGE_SIZE)}
+                    className="inline-flex items-center justify-center rounded-xl border border-zinc-700 bg-[#111] px-8 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition hover:border-red-600 hover:bg-[#1a1a1a]"
+                  >
+                    {t("prod_show_more")} (+{Math.min(PAGE_SIZE, filtered.length - showCount)})
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <div className="mx-auto max-w-md py-16 text-center">
               <div className="flex h-20 w-20 mx-auto items-center justify-center rounded-2xl border border-zinc-800 bg-[#111]">
