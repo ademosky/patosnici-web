@@ -180,20 +180,20 @@ export default function CartPage() {
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-white">{item.title}</p>
+                      <p className="text-sm font-semibold leading-snug text-white sm:text-base">{item.title}</p>
                       <p className="mt-1 text-base sm:text-lg font-bold text-red-500">{formatPrice(item.price, item.price_eur)}</p>
                     </div>
 
                     {/* Quantity */}
                     <div className="flex items-center gap-2">
                       <button onClick={() => updateQty(item.id, item.quantity - 1)}
-                        className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white"
+                        className="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white"
                       >
                         <Minus size={14} />
                       </button>
                       <span className="w-6 sm:w-8 text-center text-sm sm:text-base font-bold text-white">{item.quantity}</span>
                       <button onClick={() => updateQty(item.id, item.quantity + 1)}
-                        className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white"
+                        className="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center rounded-lg border border-zinc-700 text-zinc-400 transition hover:border-red-600 hover:text-white"
                       >
                         <Plus size={14} />
                       </button>
