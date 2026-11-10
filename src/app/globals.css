@@ -60,3 +60,23 @@ a, button, [role="button"], label[for], input, select, textarea {
     align-items: center;
   }
 }
+
+/* ── Touch feedback ────────────────────────────────────────────────────────
+ * The native grey tap highlight is switched off above, because it looks like a
+ * rendering glitch. That left taps with no answer at all — the site felt dead
+ * on a phone. This gives every link and button a visible press instead.
+ *
+ * Scoped to devices with no hover: on a desktop the hover states already do
+ * this job, and an :active dim on top of them would just look like flicker.
+ * Deliberately no transition here — a transition on a bare `a` selector would
+ * be unlayered CSS and would override Tailwind's own transition utilities on
+ * the product cards. Press feedback should be instant anyway.
+ */
+@media (hover: none) {
+  a:active,
+  button:active,
+  [role="button"]:active,
+  label[for]:active {
+    opacity: 0.68;
+  }
+}
