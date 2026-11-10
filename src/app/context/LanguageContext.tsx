@@ -124,12 +124,12 @@ const mk = {
   order_email_opt: "опционален — за потврда на нарачката",
 
   // Form fields
-  form_name: "Ime",
-  form_surname: "Prezime",
-  form_address: "Adresa",
-  form_city: "Grad",
-  form_phone: "Telefon",
-  form_email: "Email",
+  form_name: "Име",
+  form_surname: "Презиме",
+  form_address: "Адреса",
+  form_city: "Град",
+  form_phone: "Телефон",
+  form_email: "Емаил",
   form_note: "Напомена",
   form_note_opt: "опционално",
   form_name_ph: "Марко",
