@@ -12,7 +12,7 @@ export default function ProductDescription({ description_mk, description_sq }: P
   const text = lang === "sq" && description_sq ? description_sq : description_mk;
 
   return (
-    <p className="mt-5 text-base leading-8 text-zinc-400">
+    <p className="mt-4 text-[15px] leading-[1.65] text-zinc-400 sm:mt-5 sm:text-base sm:leading-8">
       {text}
     </p>
   );
