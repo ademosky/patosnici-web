@@ -172,6 +172,14 @@ const mk = {
   best_view_all: "Види ги сите →",
   prod_show_more: "Покажи повеќе",
   prod_showing_of: "прикажани од",
+  hero_search_ph: "Напиши го твоето возило... пр. Golf 5, Passat 2015",
+  hero_search_btn: "Најди",
+  hero_search_hint: "Можеш и година — пр. Golf 2010",
+  nores_whatsapp: "Прашај не на WhatsApp",
+  nores_wa_prefix: "Здраво, барам патосници за",
+  mycar_label: "Твоето возило",
+  mycar_view: "Види патосници",
+  mycar_change: "Промени",
 
   // Image gallery (screen-reader labels + UI copy)
   img_none: "Нема слика",
@@ -350,6 +358,14 @@ const sq: typeof mk = {
   best_view_all: "Shiko të gjitha →",
   prod_show_more: "Shfaq më shumë",
   prod_showing_of: "të shfaqura nga",
+  hero_search_ph: "Shkruaj automjetin tënd... p.sh. Golf 5, Passat 2015",
+  hero_search_btn: "Gjej",
+  hero_search_hint: "Mund edhe vitin — p.sh. Golf 2010",
+  nores_whatsapp: "Na pyet në WhatsApp",
+  nores_wa_prefix: "Përshëndetje, kërkoj tapete për",
+  mycar_label: "Automjeti yt",
+  mycar_view: "Shiko tapetet",
+  mycar_change: "Ndrysho",
 
   // Image gallery (screen-reader labels + UI copy)
   img_none: "Nuk ka imazh",
