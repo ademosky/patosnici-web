@@ -132,7 +132,7 @@ function ProductsContent({ initialProducts, brands }: Props) {
               {brands.map((b) => (
                 <button key={b.id}
                   onClick={() => router.push(localizedPath(`/products?brand=${b.id}`))}
-                  className="rounded-xl border border-zinc-700 px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold uppercase tracking-wide text-zinc-400 transition hover:border-red-600 hover:text-white"
+                  className="tap-target rounded-xl border border-zinc-700 px-3.5 sm:px-4 py-2.5 sm:py-2 text-xs font-bold uppercase tracking-wide text-zinc-400 transition hover:border-red-600 hover:text-white"
                 >
                   {b.name}
                 </button>
