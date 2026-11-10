@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { normalizeSearchWords, matchesAllWords } from "@/lib/search";
+import { normalizeSearchWords, matchesAllWords, productMatchesQuery } from "@/lib/search";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -32,12 +32,10 @@ export async function GET(req: NextRequest) {
   // Multi-word AND filter: every search word must appear in at least one field.
   let results = data ?? [];
   if (words.length > 0) {
-    results = results.filter((p) => {
-      const haystack = [p.title, p.model, p.car_model, p.brand, p.sku]
-        .filter(Boolean)
-        .join(" ");
-      return matchesAllWords(haystack, q);
-    });
+    /* productMatchesQuery also understands years: "golf 2010" finds the model
+       whose production range covers 2010, which the old field-by-field text
+       match could not do because a year range never literally contains it. */
+    results = results.filter((p) => productMatchesQuery(p, q));
   }
 
   return NextResponse.json(results.slice(0, limitParam));
