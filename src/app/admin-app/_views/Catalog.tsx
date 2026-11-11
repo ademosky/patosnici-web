@@ -25,6 +25,7 @@ type Form = {
   title: string; brand: string; model: string; car_model: string; year: string;
   price: string; price_eur: string; sku: string; category: Category;
   description: string; description_sq: string; image: string; images: string[]; in_stock: boolean;
+  hidden: boolean;
   subcategory: string;
   related_product_ids: number[];
 };
@@ -32,7 +33,7 @@ type Form = {
 const EMPTY: Form = {
   title: "", brand: "", model: "", car_model: "", year: "",
   price: "", price_eur: "", sku: "", category: "rubber_mats",
-  description: "", description_sq: "", image: "", images: [], in_stock: true,
+  description: "", description_sq: "", image: "", images: [], in_stock: true, hidden: false,
   subcategory: "", related_product_ids: [],
 };
 
@@ -150,6 +151,7 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
       image: p.image ?? "",
       images: p.images?.length ? p.images : (p.image ? [p.image] : []),
       in_stock: p.in_stock !== false,
+      hidden: p.hidden === true,
       subcategory: p.subcategory ?? "",
       related_product_ids: p.related_product_ids ?? (p.related_product_id != null ? [p.related_product_id] : []),
     });
@@ -166,6 +168,7 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
       images: form.images,
       image: form.image || form.images[0] || "",
       in_stock: form.in_stock,
+      hidden: form.hidden,
       price_eur: form.price_eur || null,
       subcategory: form.category === "auto_accessories" ? (form.subcategory || null) : null,
       related_product_ids: form.category === "auto_accessories" ? form.related_product_ids : [],
@@ -446,6 +449,17 @@ export function CatalogView({ scope, openNew: openNewReq, onNewClosed }: {
             className={cx("flex w-full items-center justify-between rounded-xl border px-3.5 py-3 text-[13px] font-semibold transition",
               form.in_stock ? "border-[#2c5c43] bg-[#12241a] text-[#5fc48f]" : "border-[#5c2024] bg-[#240f11] text-[#e5454a]")}>
             <span className="inline-flex items-center gap-2"><IcTag size={15} /> {form.in_stock ? "Достапно" : "Нема залиха"}</span>
+            <span className="text-[11px] opacity-70">допре за промена</span>
+          </button>
+
+          {/* Скриј од страната — останува само во админот. */}
+          <button onClick={() => setForm((f) => ({ ...f, hidden: !f.hidden }))}
+            className={cx("flex w-full items-center justify-between rounded-xl border px-3.5 py-3 text-[13px] font-semibold transition",
+              form.hidden ? "border-[#5c2024] bg-[#240f11] text-[#e5454a]" : "border-[#2c5c43] bg-[#12241a] text-[#5fc48f]")}>
+            <span className="inline-flex items-center gap-2">
+              {form.hidden ? <IcAlert size={15} /> : <IcCheck size={15} />}
+              {form.hidden ? "Скриен од сајтот" : "Видлив на сајтот"}
+            </span>
             <span className="text-[11px] opacity-70">допре за промена</span>
           </button>
 
