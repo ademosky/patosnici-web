@@ -37,7 +37,7 @@ export function asTab(v: string | string[] | undefined): Tab {
 }
 
 export type Currency = "MKD" | "EUR" | "ALL";
-export type OrderStatus = "new" | "in_process" | "sent";
+export type OrderStatus = "new" | "in_process" | "sent" | "returned";
 export type Category = "rubber_mats" | "fabric_mats" | "auto_accessories";
 
 export type OrderItem = {
@@ -291,12 +291,15 @@ export const STATUS_LABEL: Record<OrderStatus, string> = {
   new: "Нова",
   in_process: "Во процес",
   sent: "Испратена",
+  /* The parcel came back — the customer never picked it up. */
+  returned: "Вратена",
 };
 
 export const STATUS_SHORT: Record<OrderStatus, string> = {
   new: "Нова",
   in_process: "Процес",
   sent: "Пратена",
+  returned: "Вратена",
 };
 
 export const CATEGORY_LABEL: Record<Category, string> = {
