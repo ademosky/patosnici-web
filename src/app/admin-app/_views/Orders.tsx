@@ -180,6 +180,7 @@ export function OrdersView({ openNew, onNewClosed }: { openNew: boolean; onNewCl
             { v: "new" as const, label: "Нови" },
             { v: "in_process" as const, label: "Процес" },
             { v: "sent" as const, label: "Пратени" },
+            { v: "returned" as const, label: "Вратени" },
           ]} />
 
         {/* Search — full width, tall tap target */}
