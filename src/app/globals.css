@@ -82,3 +82,26 @@ a, button, [role="button"], label[for], input, select, textarea {
     opacity: 0.8;
   }
 }
+
+/* ── The page must never scroll sideways ───────────────────────────────────
+ * On a phone the layout was occasionally wider than the screen — after going
+ * back and forth it was possible to drag the page left/right and the header
+ * and hero looked sliced. A different phone width should reflow, never scroll.
+ *
+ * `clip` rather than `hidden`: hidden turns the element into a scroll
+ * container, which breaks position: sticky. clip only cuts the overflow.
+ * `hidden` is kept first as the fallback for browsers without clip support.
+ */
+html {
+  overflow-x: hidden;
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  overflow-x: clip;
+  max-width: 100%;
+  /* Whatever still tries to be wider than the screen is cut, never scaled. */
+  overscroll-behavior-x: none;
+}
