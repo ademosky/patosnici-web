@@ -53,7 +53,7 @@ type Order = {
   product_title?: string;
   product_price?: string;
   product_sku?: string;
-  status: "new" | "in_process" | "sent";
+  status: "new" | "in_process" | "sent" | "returned";
   created_at: string;
   note?: string;
   source?: string;
@@ -1138,6 +1138,8 @@ export default function AdminPage() {
   const STATUS_TONE: Record<string, { rgb: string; accent: string; border: string; rail: string }> = {
     new:        { rgb: "224,176,74",  accent: "#e0b04a", border: "rgba(224,176,74,0.34)",  rail: "rgba(224,176,74,0.85)" },
     in_process: { rgb: "111,163,224", accent: "#6fa3e0", border: "rgba(111,163,224,0.32)", rail: "rgba(111,163,224,0.80)" },
+    /* Red, never green: a returned parcel is money lost, not a delivery done. */
+    returned:   { rgb: "229,72,77",  accent: "#e5484d", border: "rgba(229,72,77,0.34)",  rail: "rgba(229,72,77,0.80)" },
     sent:       { rgb: "95,196,143",  accent: "#5fc48f", border: "rgba(95,196,143,0.28)",  rail: "rgba(95,196,143,0.75)" },
   };
 
@@ -1909,6 +1911,7 @@ export default function AdminPage() {
                     { v: "new",        label: "🆕 Нови" },
                     { v: "in_process", label: "⚙️ Во процес" },
                     { v: "sent",       label: "✅ Испратени" },
+              { v: "returned",   label: "↩️ Вратени" },
                   ].map(({ v, label }) => (
                     <button key={v}
                       onClick={() => setOrdersStatus(v)}
@@ -2043,6 +2046,7 @@ export default function AdminPage() {
                           style={{ background: STATUS_TONE[order.status]?.accent, boxShadow: `0 0 7px ${STATUS_TONE[order.status]?.accent}` }} />
                         {order.status === "new" ? "Нова" :
                          order.status === "in_process" ? "Во процес" :
+                         order.status === "returned" ? "Вратена" :
                          "Испратена"}
                       </span>
                       {/* Source badge — FB/Phone/Manual */}
