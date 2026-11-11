@@ -34,6 +34,7 @@ const STATUS_TONE: Record<OrderStatus, { rgb: string; accent: string; border: st
   new:        { rgb: "224,176,74",  accent: "#e0b04a", border: "rgba(224,176,74,0.34)",  soft: "rgba(224,176,74,0.13)" },
   // Во процес — being handled; calm and neutral.
   in_process: { rgb: "111,163,224", accent: "#6fa3e0", border: "rgba(111,163,224,0.32)", soft: "rgba(111,163,224,0.12)" },
+  returned:   { rgb: "229,72,77", accent: "#e5484d", border: "rgba(229,72,77,0.34)", soft: "rgba(229,72,77,0.12)" },
   // Испратена — done; the quietest of the three.
   sent:       { rgb: "95,196,143",  accent: "#5fc48f", border: "rgba(95,196,143,0.28)",  soft: "rgba(95,196,143,0.10)" },
 };
@@ -473,6 +474,7 @@ function OrderDetail({ order, onClose, onSave, onDelete, onStatus, busy, toast }
                 <option value="new">Нова</option>
                 <option value="in_process">Во процес</option>
                 <option value="sent">Испратена</option>
+                <option value="returned">Вратена</option>
               </Select>
             </Field>
           </div>
