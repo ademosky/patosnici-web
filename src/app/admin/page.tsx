@@ -28,6 +28,7 @@ type Product = {
   sku?: string;
   images?: string[];
   in_stock?: boolean;
+  hidden?: boolean;
   category?: string;
   /** Slug of the subcategory (only meaningful for auto_accessories). */
   subcategory?: string | null;
@@ -89,7 +90,7 @@ function fmtOrderPrice(
 const EMPTY_FORM = {
   title: "", brand: "", car_model: "", model: "", year: "", category: "rubber_mats",
   price: "", price_eur: "", image: "", description: "", description_sq: "", sku: "",
-  images: [] as string[], in_stock: true,
+  images: [] as string[], in_stock: true, hidden: false,
 };
 
 async function compressImage(file: File): Promise<Blob> {
@@ -711,6 +712,7 @@ export default function AdminPage() {
       description: p.description, sku: p.sku ?? "",
       images: p.images && p.images.length > 0 ? p.images : (p.image ? [p.image] : []),
       in_stock: p.in_stock !== false,
+      hidden: p.hidden === true,
       description_sq: p.description_sq ?? "",
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1700,6 +1702,26 @@ export default function AdminPage() {
                   type="checkbox"
                   checked={form.in_stock}
                   onChange={(e) => setForm((prev) => ({ ...prev, in_stock: e.target.checked }))}
+                  className="h-5 w-5 accent-red-600 cursor-pointer"
+                />
+              </label>
+
+              {/* Скриј од сајтот — производот останува во админот. */}
+              <label className="flex cursor-pointer items-center justify-between rounded-xl border border-zinc-700 bg-[#1a1a1a] px-5 py-4 transition hover:border-zinc-600">
+                <div>
+                  <p className="text-sm font-semibold text-white">
+                    {form.hidden ? "Скриен од сајтот" : "Видлив на сајтот"}
+                  </p>
+                  <p className="mt-0.5 text-xs text-zinc-500">
+                    {form.hidden
+                      ? "Не се прикажува никаде на страната — останува само во админот."
+                      : "Купувачите го гледаат во каталогот."}
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={!!form.hidden}
+                  onChange={(e) => setForm((prev) => ({ ...prev, hidden: e.target.checked }))}
                   className="h-5 w-5 accent-red-600 cursor-pointer"
                 />
               </label>
