@@ -2284,6 +2284,7 @@ export default function AdminPage() {
                   <option value="new">🆕 Нова</option>
                   <option value="in_process">⚙️ Во процес</option>
                   <option value="sent">✅ Испратена</option>
+                  <option value="returned">↩️ Вратена</option>
                 </select>
               </div>
             </div>
