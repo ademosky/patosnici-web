@@ -88,6 +88,8 @@ export type Product = {
   description_sq?: string | null;
   sku?: string | null;
   in_stock?: boolean | null;
+  /** true = off the storefront, still in the admin. */
+  hidden?: boolean | null;
   category?: Category | null;
   /** Slug of the subcategory (only used under auto_accessories). */
   subcategory?: string | null;
