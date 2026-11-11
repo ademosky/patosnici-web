@@ -37,6 +37,7 @@ export async function PUT(
       description_sq: body.description_sq ?? "",
       price_eur: body.price_eur ?? null,
       in_stock: body.in_stock !== false,
+      hidden: body.hidden === true,
     })
     .eq("id", parseInt(id))
     .select()
