@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
   let query = supabase
     .from("products")
     .select("id, slug, title, brand, car_model, model, year, price, image, sku")
+    .eq("hidden", false)
     .order("created_at", { ascending: true });
 
   if (brand) {
