@@ -14,11 +14,11 @@ export default function Header() {
   const { total } = useCart();
   const { lang, setLang, t, isMarketLocked, localizedPath } = useLanguage();
 
+  // The header used to be #000 over a #0b0b0b page with a 10% white divider —
+  // two slightly different blacks meeting at a hard line, which read as the
+  // page being cut. Same tone now, and the divider is barely there, so the
+  // header and the hero look like one continuous surface.
   return (
-    {/* The header used to be #000 over a #0b0b0b page with a 10% white
-        divider — two slightly different blacks meeting at a hard line, which
-        read as the page being cut. Same tone, and the divider is now barely
-        there, so the header and the hero look like one surface. */}
     <header className="fixed top-0 left-0 z-50 w-full border-b border-white/[0.06] bg-[#0b0b0b]/95 backdrop-blur">
       {/* 64px on a phone, 80px from md up. A fixed 80px header ate a fifth of a
           390px-tall viewport and pushed the hero below the fold. */}
