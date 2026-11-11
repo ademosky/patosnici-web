@@ -15,14 +15,18 @@ export default function Header() {
   const { lang, setLang, t, isMarketLocked, localizedPath } = useLanguage();
 
   return (
-    <header className="fixed top-0 left-0 z-50 w-full border-b border-white/10 bg-black/95 backdrop-blur">
+    {/* The header used to be #000 over a #0b0b0b page with a 10% white
+        divider — two slightly different blacks meeting at a hard line, which
+        read as the page being cut. Same tone, and the divider is now barely
+        there, so the header and the hero look like one surface. */}
+    <header className="fixed top-0 left-0 z-50 w-full border-b border-white/[0.06] bg-[#0b0b0b]/95 backdrop-blur">
       {/* 64px on a phone, 80px from md up. A fixed 80px header ate a fifth of a
           390px-tall viewport and pushed the hero below the fold. */}
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 md:h-20">
 
         <Link href={localizedPath("/")} className="flex-shrink-0">
           <Image src="/images/logo.webp" alt="Original Patosnici" width={300} height={100} priority fetchPriority="high"
-            className="h-auto w-[150px] sm:w-[180px] md:w-[220px]" />
+            className="h-auto w-[165px] sm:w-[190px] md:w-[220px]" />
         </Link>
 
         {/* Desktop nav */}
