@@ -47,6 +47,7 @@ export async function getProductsByCategory(category: string): Promise<Product[]
   const { data, error } = await supabase
     .from("products")
     .select("*")
+    .eq("hidden", false)
     .eq("category", category)
     .order("sort_order", { ascending: true }).order("created_at", { ascending: true });
 
@@ -164,6 +165,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   const { data, error } = await supabase
     .from("products")
     .select("*")
+    .eq("hidden", false)
     .eq("slug", slug)
     .single();
 
