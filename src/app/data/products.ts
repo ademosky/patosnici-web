@@ -34,6 +34,9 @@ export async function getProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from("products")
     .select("*")
+    /* A hidden product is off the shop completely: not in the catalogue, not in
+       search, not in best sellers, and its page 404s. It stays in the admin. */
+    .eq("hidden", false)
     .order("sort_order", { ascending: true }).order("created_at", { ascending: true });
 
   if (error) { console.error("getProducts error:", error); return []; }
@@ -57,6 +60,9 @@ export async function getProductsBySkus(skus: string[]): Promise<Product[]> {
   const { data, error } = await supabase
     .from("products")
     .select("id, slug, title, brand, model, car_model, category, year, price, image, sku, price_eur, in_stock")
+    /* A hidden product is off the shop completely: not in the catalogue, not in
+       search, not in best sellers, and its page 404s. It stays in the admin. */
+    .eq("hidden", false)
     .in("sku", skus);
 
   if (error) { console.error("getProductsBySkus error:", error); return []; }
@@ -110,6 +116,9 @@ export async function getRecommendedAccessories(
   const { data, error } = await supabase
     .from("products")
     .select("id, slug, title, brand, car_model, category, related_product_ids, related_product_id, year, price, image, sku, price_eur, in_stock")
+    /* A hidden product is off the shop completely: not in the catalogue, not in
+       search, not in best sellers, and its page 404s. It stays in the admin. */
+    .eq("hidden", false)
     .eq("category", "auto_accessories")
     .order("sort_order", { ascending: true }).order("created_at", { ascending: true });
 
