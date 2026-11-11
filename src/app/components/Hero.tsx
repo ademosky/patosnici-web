@@ -41,7 +41,12 @@ export default function Hero() {
             sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0b0b0b] via-transparent to-transparent" />
+          {/* On a phone the photo sits BELOW the text, so it needs to fade in
+              from the top — the old left-to-right gradient (meant for the
+              desktop side-by-side layout) only darkened its left edge and made
+              the image look like a pasted rectangle. */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0b0b0b] via-transparent to-transparent lg:hidden" />
+          <div className="absolute inset-0 hidden bg-gradient-to-r from-[#0b0b0b] via-transparent to-transparent lg:block" />
         </div>
       </div>
     </section>
