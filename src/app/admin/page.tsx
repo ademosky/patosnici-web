@@ -3,6 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { foldText, phoneMatches } from "@/lib/search";
 import Image from "next/image";
 import Link from "next/link";
 import { brands } from "../data/brands";
@@ -2040,13 +2041,16 @@ export default function AdminPage() {
             <div className="space-y-4">
               {dayFilteredOrders
                 .filter((order) => !ordersStatus || order.status === ordersStatus)
-                .filter((order) =>
-                  !ordersSearch ||
-                  `${order.name} ${order.surname}`.toLowerCase().includes(ordersSearch.toLowerCase()) ||
-                  (order.phone || "").includes(ordersSearch) ||
-                  (order.product_sku || "").toLowerCase().includes(ordersSearch.toLowerCase()) ||
-                  (order.items || []).some((it) => (it.sku || "").toLowerCase().includes(ordersSearch.toLowerCase()))
-                )
+                .filter((order) => {
+                  if (!ordersSearch) return true;
+                  const q = foldText(ordersSearch);
+                  /* Names match in either alphabet, phones match on the last digits. */
+                  if (foldText(`${order.name} ${order.surname}`).includes(q)) return true;
+                  if (phoneMatches(order.phone, ordersSearch)) return true;
+                  if (foldText(order.product_sku || "").includes(q)) return true;
+                  return (order.items || []).some((it) =>
+                    foldText(`${it.title || ""} ${it.sku || ""}`).includes(q));
+                })
                 .map((order) => (
                 <div key={order.id}
                   style={statusStyle(order.status)}
