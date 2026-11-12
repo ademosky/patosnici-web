@@ -25,7 +25,14 @@ export function foldText(value: string | null | undefined): string {
     .replace(/[\u0300-\u036f]/g, "")   /* ë→e, č→c, š→s */
     .split("")
     .map((ch) => CYR_TO_LAT[ch] ?? ch)
-    .join("");
+    .join("")
+    /* Cyrillic has no "w", so Macedonians write BMW as БМВ → "bmv". Folding w
+       to v meets them halfway instead of failing on one letter. */
+    .replace(/w/g, "v")
+    /* "Passat" and "пасат" differ only by a doubled consonant the Cyrillic
+       spelling drops. Collapsing runs of the same letter makes them equal.
+       Letters only — collapsing digits would destroy years (2009 → 209). */
+    .replace(/([a-z])\1+/g, "$1");
 }
 
 /**
