@@ -4,10 +4,50 @@
  *  Lowercases and replaces hyphens, underscores, parentheses, slashes and
  *  dots with spaces so "C-KLASSE", "C KLASSE" and "C (KLASSE)" all match.
  */
-export function normalizeSearchWords(s: string): string[] {
-  return s
+const CYR_TO_LAT: Record<string, string> = {
+  "а":"a","б":"b","в":"v","г":"g","д":"d","ѓ":"gj","е":"e","ж":"z","з":"z","ѕ":"dz",
+  "и":"i","ј":"j","к":"k","л":"l","љ":"lj","м":"m","н":"n","њ":"nj","о":"o","п":"p",
+  "р":"r","с":"s","т":"t","ќ":"kj","у":"u","ф":"f","х":"h","ц":"c","ч":"c","џ":"dz","ш":"s",
+};
+
+/**
+ * One spelling for both alphabets.
+ *
+ * A shopper types "голф" or "golf" and means the same car. Folding Cyrillic to
+ * Latin (and stripping accents) means search never asks anyone to switch their
+ * keyboard. Applied to BOTH the query and the text being searched, so the
+ * comparison is always like-for-like.
+ */
+export function foldText(value: string | null | undefined): string {
+  return String(value ?? "")
     .toLowerCase()
-    .replace(/[-_()/.,]+/g, " ")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")   /* ë→e, č→c, š→s */
+    .split("")
+    .map((ch) => CYR_TO_LAT[ch] ?? ch)
+    .join("");
+}
+
+/**
+ * One phone number, many spellings.
+ *
+ * +38970774945, 070774945 and 70774945 all end in the same digits, so compare
+ * the tail rather than the whole string. Country codes and the leading zero
+ * then stop mattering — including for Albania (+355) and Kosovo (+383).
+ */
+export function phoneMatches(phone: string | null | undefined, query: string): boolean {
+  const qd = String(query ?? "").replace(/\D/g, "");
+  if (qd.length < 6) return false;
+  const pd = String(phone ?? "").replace(/\D/g, "");
+  if (pd.length < 6) return false;
+  const tail = qd.slice(-7);
+  return pd.endsWith(tail) || pd.includes(tail);
+}
+
+/** Split a string into normalized search words. */
+export function normalizeSearchWords(s: string): string[] {
+  return foldText(s)
+    .replace(/[-_()/.,+]+/g, " ")
     .split(/\s+/)
     .filter(Boolean);
 }
