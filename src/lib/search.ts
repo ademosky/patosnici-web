@@ -29,6 +29,10 @@ export function foldText(value: string | null | undefined): string {
     /* Cyrillic has no "w", so Macedonians write BMW as БМВ → "bmv". Folding w
        to v meets them halfway instead of failing on one letter. */
     .replace(/w/g, "v")
+    /* "тојота" is spelled Toyota in Latin: the Slavic j IS the y. Mapping both
+       to one symbol makes the pair equal without breaking "југо"/Jugo, which
+       needs the same treatment in the other direction. */
+    .replace(/[jy]/g, "i")
     /* "Passat" and "пасат" differ only by a doubled consonant the Cyrillic
        spelling drops. Collapsing runs of the same letter makes them equal.
        Letters only — collapsing digits would destroy years (2009 → 209). */
