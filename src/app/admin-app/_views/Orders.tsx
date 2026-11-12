@@ -15,6 +15,7 @@ import {
   skopjeDate, today, relTime, prettyDateTime, monthKey, orderSkus, orderLines,
   STATUS_LABEL, CURRENCY_LABEL, toCsv, download, cx,
 } from "../_lib/core";
+import { foldText, phoneMatches } from "@/lib/search";
 import { useAdmin } from "../_lib/store";
 import {
   Card, SectionTitle, Stat, Pill, Btn, IconBtn, Sheet, Field, Input, Select, Textarea,
@@ -105,17 +106,18 @@ export function OrdersView({ openNew, onNewClosed }: { openNew: boolean; onNewCl
   }, [orders]);
 
   const filtered = useMemo(() => {
-    const needle = q.trim().toLowerCase();
+    const needle = q.trim();
     return orders.filter((o) => {
       if (day && (!o.created_at || skopjeDate(o.created_at) !== day)) return false;
       if (status && o.status !== status) return false;
       if (cur && orderCurrency(o) !== cur) return false;
       if (needle) {
-        const hay = [
+        const hay = foldText([
           o.name, o.surname, o.phone, o.city, o.product_title, o.product_sku,
           ...(o.items ?? []).flatMap((i) => [i.title, i.sku]),
-        ].filter(Boolean).join(" ").toLowerCase();
-        if (!hay.includes(needle)) return false;
+        ].filter(Boolean).join(" "));
+        /* A phone matches on its last digits, so +389, 0 and bare forms all work. */
+        if (!hay.includes(foldText(needle)) && !phoneMatches(o.phone, needle)) return false;
       }
       return true;
     });
