@@ -47,6 +47,7 @@ const NOISE = new Set([
   "keni", "pershendetje", "здраво", "zdravo", "hello", "hi", "me", "men", "mua",
   "molim", "молим", "ve", "ве", "vi", "ви", "do", "до", "od", "од", "e", "eshte",
   "je", "godina", "godiste", "viti", "vit", "kemi", "dua", "desha",
+  "per", "për", "ли", "dhe", "the", "for", "any", "кени", "имам", "imaм",
 ].map((w) => foldText(w)));
 
 export function hasCyrillic(text: string): boolean {
@@ -148,10 +149,16 @@ export async function lookupByText(text: string, year: number | null): Promise<P
     .limit(400);
   if (error || !data) return [];
 
-  const hits = data.filter((p) => {
-    const title = foldText(p.title || "");
-    return words.every((w) => title.includes(foldText(w)));
-  });
+  const scored = data
+    .map((p) => {
+      const title = foldText(p.title || "");
+      const score = words.filter((w) => title.includes(foldText(w))).length;
+      return { p, score };
+    })
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  const hits = scored.map((s) => s.p);
   if (year === null) return hits;
   return hits.filter((p) => yearCovers(p.year, year));
 }
