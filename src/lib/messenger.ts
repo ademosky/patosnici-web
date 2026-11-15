@@ -94,7 +94,9 @@ function findModel(text: string, brand: string): string {
     keep.push(w);
   }
   const model = keep.slice(0, 3).join(" ").trim();
-  return model && model === model.toLowerCase() ? model.replace(/\b\w/g, (c) => c.toUpperCase()) : model;
+  return model && model === model.toLowerCase()
+    ? model.split(" ").map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w)).join(" ")
+    : model;
 }
 
 function yearCovers(yearText: string | null | undefined, year: number): boolean {
@@ -125,6 +127,34 @@ export function extractVehicle(text: string, remembered?: { brand?: string | nul
 }
 
 export type Product = { id: number; slug: string; title: string; year: string | null; brand: string };
+
+/**
+ * The customer often names the model without the make: "Patosnici za Q5 2013".
+ * Nobody says Audi, but Q5 is an Audi. Search the whole catalogue by the words
+ * that are left, and let the row's own title decide.
+ */
+export async function lookupByText(text: string, year: number | null): Promise<Product[]> {
+  const words = (text || "")
+    .split(/[^A-Za-zА-Яа-яЀ-ӿ0-9]+/)
+    .map((w) => w.trim())
+    .filter((w) => w.length >= 2 && !/^(?:19|20)\d{2}$/.test(w) && !NOISE.has(foldText(w)));
+  if (!words.length) return [];
+
+  const probe = foldText(words.join(" "));
+  const { data, error } = await supabaseAdmin()
+    .from("products")
+    .select("id, slug, title, year, brand")
+    .eq("hidden", false)
+    .limit(400);
+  if (error || !data) return [];
+
+  const hits = data.filter((p) => {
+    const title = foldText(p.title || "");
+    return words.every((w) => title.includes(foldText(w)));
+  });
+  if (year === null) return hits;
+  return hits.filter((p) => yearCovers(p.year, year));
+}
 
 export async function lookup(brand: string, model: string, year: number | null): Promise<Product[]> {
   const { data, error } = await supabaseAdmin()
