@@ -211,6 +211,52 @@ export async function sendReply(psid: string, url: string, lang: "mk" | "sq"): P
   return first && second;
 }
 
+/**
+ * Nothing is sent without a human saying so.
+ *
+ * The match is right most of the time, but not always — and a wrong product
+ * link is worse than a slow reply. So the assistant writes the draft into a
+ * queue, the message stays unanswered in Messenger, and the shop approves.
+ */
+export async function saveDraft(draft: {
+  psid: string; text: string; product: string; slug: string; lang: "mk" | "sq"; url: string;
+}): Promise<void> {
+  await supabaseAdmin().from("messenger_queue").insert({
+    ...draft,
+    status: "pending",
+    created_at: new Date().toISOString(),
+  });
+}
+
+export type Draft = {
+  id: number; psid: string; text: string; product: string; slug: string;
+  lang: "mk" | "sq"; url: string; status: string; created_at: string;
+};
+
+export async function listDrafts(): Promise<Draft[]> {
+  const { data, error } = await supabaseAdmin()
+    .from("messenger_queue")
+    .select("*")
+    .eq("status", "pending")
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error || !data) return [];
+  return data as Draft[];
+}
+
+export async function approveDraft(id: number): Promise<{ ok: boolean; product?: string }> {
+  const { data, error } = await supabaseAdmin()
+    .from("messenger_queue").select("*").eq("id", id).maybeSingle();
+  if (error || !data) return { ok: false };
+
+  const sent = await sendReply(data.psid, data.url, data.lang as "mk" | "sq");
+  if (!sent) return { ok: false };
+
+  await supabaseAdmin().from("messenger_queue")
+    .update({ status: "sent", sent_at: new Date().toISOString() }).eq("id", id);
+  return { ok: true, product: data.product };
+}
+
 export async function sendText(psid: string, text: string): Promise<boolean> {
   const token = process.env.FB_PAGE_TOKEN;
   if (!token) return false;
