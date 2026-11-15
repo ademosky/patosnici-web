@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { detectLang, extractVehicle, lookup, productUrl, replyText, askYearText } from "@/lib/messenger";
+import { detectLang, extractVehicle, lookup, lookupByText, productUrl, replyText, askYearText } from "@/lib/messenger";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +16,17 @@ export async function POST(req: NextRequest) {
   const lang = detectLang(text);
   const { brand, model, year } = extractVehicle(text);
 
-  if (!brand) return NextResponse.json({ action: "silent", reason: "no_vehicle", text });
+  if (!brand) {
+    const found = await lookupByText(text, year);
+    if (!found.length) return NextResponse.json({ action: "silent", reason: "no_vehicle", text });
+    if (found.length > 1 && year === null) {
+      return NextResponse.json({ action: "ask_year", question: askYearText(lang, found[0].title || ""), candidates: found.length });
+    }
+    return NextResponse.json({
+      action: "replied", product: found[0].title, year: found[0].year, lang,
+      text: replyText(lang, productUrl(found[0].slug, lang)),
+    });
+  }
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return NextResponse.json({ action: "error", reason: "missing_service_role_key" }, { status: 500 });
   }
