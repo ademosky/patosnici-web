@@ -20,6 +20,7 @@ import { CatalogView } from "../_views/Catalog";
 import { StockView } from "../_views/Stock";
 import { StatsView } from "../_views/Stats";
 import { SettingsView } from "../_views/Settings";
+import { MessagesView } from "../_views/Messages";
 
 export function AdminAppShell({ initialTab }: { initialTab: Tab }) {
   return (
@@ -57,6 +58,7 @@ function AdminApp({ initialTab }: { initialTab: Tab }) {
         {tab === "stock" && <StockView />}
         {tab === "showcase" && <StockView initialTab="gal" />}
         {tab === "stats" && <StatsView />}
+        {(tab as string) === "messages" && <MessagesView />}
         {tab === "settings" && <SettingsView />}
       </Shell>
       <Toasts />
