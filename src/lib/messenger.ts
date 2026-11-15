@@ -197,6 +197,20 @@ export function askYearText(lang: "mk" | "sq", model: string): string {
   return (lang === "sq" ? ASK_YEAR_SQ : ASK_YEAR_MK).replace("{model}", model);
 }
 
+/**
+ * Send the product link and the shop's message as TWO messages.
+ *
+ * Messenger only builds its rich preview card when a URL arrives on its own.
+ * Put the link and the paragraph in one message and the customer sees a bare
+ * URL — which looks like a link dump instead of a product.
+ */
+export async function sendReply(psid: string, url: string, lang: "mk" | "sq"): Promise<boolean> {
+  const first = await sendText(psid, url);
+  await new Promise((resolve) => setTimeout(resolve, 700));
+  const second = await sendText(psid, lang === "sq" ? TEMPLATE_SQ : TEMPLATE_MK);
+  return first && second;
+}
+
 export async function sendText(psid: string, text: string): Promise<boolean> {
   const token = process.env.FB_PAGE_TOKEN;
   if (!token) return false;
