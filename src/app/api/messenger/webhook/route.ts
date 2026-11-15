@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import {
-  askYearText, detectLang, extractVehicle, lookup, productUrl, replyText, sendText,
+  askYearText, detectLang, extractVehicle, lookup, lookupByText, productUrl, replyText, sendText,
 } from "@/lib/messenger";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
@@ -63,7 +63,22 @@ async function handle(psid: string, text: string) {
   const lang = detectLang(text, pending?.lang);
   const { brand, model, year } = extractVehicle(text, pending);
 
-  if (!brand) return { action: "silent", reason: "no_vehicle" };
+  /* No make named — the model alone usually still identifies the car. */
+  if (!brand) {
+    const { year: bareYear } = extractVehicle(text, pending);
+    const found = await lookupByText(text, bareYear);
+    if (found.length === 0) return { action: "silent", reason: "no_vehicle" };
+    if (found.length > 1 && bareYear === null) {
+      const question = askYearText(lang, found[0].title || "");
+      await sendText(psid, question);
+      return { action: "ask_year", question, candidates: found.length };
+    }
+    const url = productUrl(found[0].slug, lang);
+    const body = replyText(lang, url);
+    const ok = await sendText(psid, body);
+    return ok ? { action: "replied", product: found[0].title, slug: found[0].slug, lang }
+              : { action: "send_failed" };
+  }
 
   let results = await lookup(brand, model, year);
 
