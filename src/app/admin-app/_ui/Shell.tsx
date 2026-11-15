@@ -26,7 +26,8 @@ const PRIMARY: Array<{ t: Tab; label: string; icon: (p: { size?: number; classNa
 ];
 
 const SECONDARY: Array<{ t: Tab; label: string; desc: string; icon: (p: { size?: number; className?: string }) => ReactNode }> = [
-  { t: "stock",       label: "Залиха",   desc: "Состојба на лагер",        icon: IcLayers },
+  { t: "messages" as any, label: "Пораки", desc: "Messenger нацрти за одобрување", icon: IcOrders },
+    { t: "stock",       label: "Залиха",   desc: "Состојба на лагер",        icon: IcLayers },
   { t: "accessories", label: "Додатоци", desc: "Авто додатоци",            icon: IcSpark },
   { t: "showcase",    label: "Галерија", desc: "Прикажани на почетна",     icon: IcImage },
   { t: "settings",    label: "Подесувања", desc: "Апликација и одјава",    icon: IcSettings },
