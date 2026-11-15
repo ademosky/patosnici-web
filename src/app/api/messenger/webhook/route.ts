@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import {
-  askYearText, detectLang, extractVehicle, lookup, lookupByText, productUrl, sendReply, sendText,
+  askYearText, detectLang, extractVehicle, lookup, lookupByText, productUrl, saveDraft, sendText,
 } from "@/lib/messenger";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
@@ -73,9 +73,9 @@ async function handle(psid: string, text: string) {
       await sendText(psid, question);
       return { action: "ask_year", question, candidates: found.length };
     }
-    const ok = await sendReply(psid, productUrl(found[0].slug, lang), lang);
-    return ok ? { action: "replied", product: found[0].title, slug: found[0].slug, lang }
-              : { action: "send_failed" };
+    await saveDraft({ psid, text, product: found[0].title, slug: found[0].slug, lang,
+                      url: productUrl(found[0].slug, lang) });
+    return { action: "queued", product: found[0].title, slug: found[0].slug, lang };
   }
 
   let results = await lookup(brand, model, year);
@@ -94,11 +94,10 @@ async function handle(psid: string, text: string) {
 
   if (results.length === 0) return { action: "silent", reason: "no_product" };
 
-  const ok = await sendReply(psid, productUrl(results[0].slug, lang), lang);
+  await saveDraft({ psid, text, product: results[0].title, slug: results[0].slug, lang,
+                    url: productUrl(results[0].slug, lang) });
   await savePending(psid, null);
-  return ok
-    ? { action: "replied", product: results[0].title, slug: results[0].slug, lang }
-    : { action: "send_failed" };
+  return { action: "queued", product: results[0].title, slug: results[0].slug, lang };
 }
 
 export async function POST(req: NextRequest) {
