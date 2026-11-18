@@ -62,7 +62,7 @@ export default function ImageCarousel({ images, alt }: Props) {
   // otherwise the hook order would change between renders and React would throw.
   if (!hasImages) {
     return (
-      <div className="relative h-[420px] w-full overflow-hidden rounded-2xl border border-zinc-800 bg-[#111111] flex items-center justify-center">
+      <div className="relative aspect-[3/4] max-h-[70vh] w-full overflow-hidden rounded-2xl border border-zinc-800 bg-[#111111] flex items-center justify-center">
         <p className="text-zinc-600 text-sm">{t("img_none")}</p>
       </div>
     );
@@ -78,7 +78,7 @@ export default function ImageCarousel({ images, alt }: Props) {
       >
         <button
           onClick={() => setLightboxOpen(true)}
-          className="group relative h-[420px] w-full overflow-hidden rounded-2xl border border-zinc-800 bg-[#111111]"
+          className="group relative aspect-[3/4] max-h-[70vh] w-full overflow-hidden rounded-2xl border border-zinc-800 bg-[#111111]"
           aria-label={t("img_zoom")}
         >
           <Image
