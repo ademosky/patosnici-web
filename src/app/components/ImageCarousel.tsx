@@ -86,7 +86,7 @@ export default function ImageCarousel({ images, alt }: Props) {
             alt={`${alt} — ${t("img_label")} ${current + 1}`}
             fill
             priority
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-contain transition-transform duration-500 group-hover:scale-[1.03]"
           />
 
           {/* Hover overlay */}
@@ -143,7 +143,7 @@ export default function ImageCarousel({ images, alt }: Props) {
                 src={img}
                 alt={`${alt} — ${t("img_label")} ${i + 1}`}
                 fill
-                className="object-cover"
+                className="object-contain"
               />
             </button>
           ))}
@@ -216,7 +216,7 @@ export default function ImageCarousel({ images, alt }: Props) {
                   }`}
                   aria-label={`${t("img_label")} ${i + 1}`}
                 >
-                  <Image src={img} alt={`${alt} — ${t("img_label")} ${i + 1}`} fill className="object-cover" />
+                  <Image src={img} alt={`${alt} — ${t("img_label")} ${i + 1}`} fill className="object-contain" />
                 </button>
               ))}
             </div>
