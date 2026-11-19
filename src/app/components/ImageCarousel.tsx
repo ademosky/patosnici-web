@@ -127,12 +127,12 @@ export default function ImageCarousel({ images, alt }: Props) {
 
       {/* ── THUMBNAILS ── */}
       {count > 1 && (
-        <div className="mt-3 flex gap-3 overflow-x-auto pb-1">
+        <div className="mt-3 flex flex-wrap gap-2 sm:gap-3">
           {images.map((img, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
-              className={`relative h-20 w-24 flex-shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-200 ${
+              className={`relative h-16 w-20 sm:h-20 sm:w-24 shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-200 ${
                 i === current
                   ? "border-red-600 opacity-100"
                   : "border-zinc-700 opacity-50 hover:opacity-90"
